@@ -3,7 +3,7 @@ package it.polimi.dima.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static it.polimi.dima.model.HttpRequest.httpRequest;
+
 
 /**
  * Created by Davide on 17/12/2016.
@@ -16,7 +16,7 @@ public class Group {
     private Integer id;
     private String name;
     private String picture;
-    private boolean isBusy;
+    private int isBusy;
     private int idBusy;
 
 
@@ -25,7 +25,7 @@ public class Group {
         this.id = id;
         this.name = name;
         this.picture = picture;
-        isBusy = false;
+        isBusy = 0;
         idBusy = 0;
     }
 
@@ -34,41 +34,61 @@ public class Group {
 
         name = user.getString("name");
         picture = user.getString("picture");
-        isBusy = user.getBoolean("isBusy");
+        isBusy = user.getInt("isBusy");
         idBusy = user.getInt("idBusy");
 
     }
 
     // return if the cgroup is busy
     public boolean isBusy(){
-        return isBusy;
+        if (isBusy==1) return true;
+        else return false;
     }
 
     //try to put the group busy
-    public boolean setBusy(int idUser) throws JSONException {
-        JSONObject response = httpRequest("http://skitalk.altervista.org/setGroupBusy.php", "idGroup="+id+"&idUser="+idUser);
-        if (response.get("isBusy") == 1){
-            isBusy = true;
-            return true;
-        }
-        else
-            return false;
+    public void setBusy(int idUser) throws JSONException {
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/setGroupBusy.php", "idGroup="+id+"&idUser="+idUser);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject response = request.getResponse();
+        isBusy = response.getInt("isBusy");
     }
 
     // put the group free
-    public boolean setNotBusy() throws JSONException {
-        JSONObject response = httpRequest("http://skitalk.altervista.org/unsetGroupBusy.php", "idGroup="+id);
-        if (response.get("isBusy") == 1){
-            isBusy = false;
-            return true;
-        }
-        else
-            return false;
-
+    public void setNotBusy() throws JSONException {
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/unsetGroupBusy.php", "idGroup=" + id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject response = request.getResponse();
+        isBusy = response.getInt("isBusy");
     }
 
     public void setName(String name) throws JSONException {
-        JSONObject response = httpRequest("http://skitalk.altervista.org/editGroupName.php", "idGroup="+id+"&name="+name);
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/editGroupName.php", "idGroup="+id+"&name="+name);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject response = request.getResponse();
         setGroup(response);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public Boolean getIsBusy() {
+        if (isBusy==1) return true;
+        else return false;
+    }
+
+    public int getIdBusy() {
+        return idBusy;
     }
 }

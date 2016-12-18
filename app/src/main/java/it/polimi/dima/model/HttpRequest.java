@@ -1,5 +1,7 @@
 package it.polimi.dima.model;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -13,67 +15,116 @@ import java.net.URL;
  * Created by Davide on 17/12/2016.
  */
 
-public class HttpRequest{
+public class HttpRequest implements Runnable{
 
     private String targetURL;
     private String urlParameters;
+    JSONObject res = null;
+    private boolean ready = false;
 
 
+    public HttpRequest(String url, String par){
+        targetURL = url;
+        urlParameters = par;
+    }
 
-    public static JSONObject httpRequest(String targetURL, String urlParameters)
-    {
+    @Override
+    public void run() {
         URL url;
-        HttpURLConnection connection = null;
+        String response="";
+        HttpURLConnection urlConnection = null;
         try {
-            //Create connection
-            url = new URL(targetURL);
-            connection = (HttpURLConnection)url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type",
-                    "application/x-www-form-urlencoded");
+            url = new URL(targetURL+"?"+urlParameters);
 
-            connection.setRequestProperty("Content-Length", "" +
-                    Integer.toString(urlParameters.getBytes().length));
-            connection.setRequestProperty("Content-Language", "en-US");
+            System.out.println("Request to: "+targetURL+"?"+urlParameters);
 
-            connection.setUseCaches (false);
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
+            urlConnection = (HttpURLConnection) url
+                    .openConnection();
 
-            //Send request
-            DataOutputStream wr = new DataOutputStream (
-                    connection.getOutputStream ());
-            wr.writeBytes (urlParameters);
-            wr.flush ();
-            wr.close ();
+            InputStream in = urlConnection.getInputStream();
 
-            //Get Response
-            InputStream is = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-            String line;
-            StringBuffer response = new StringBuffer();
-            while((line = rd.readLine()) != null) {
-                response.append(line);
-                response.append('\r');
+            InputStreamReader isw = new InputStreamReader(in);
+
+            int data = isw.read();
+
+            while (data != -1) {
+                char current = (char) data;
+                data = isw.read();
+                response += current;
+
             }
-            rd.close();
-
-            String resp = response.toString();
-            JSONObject res = new JSONObject(resp);
-            return res;
-
         } catch (Exception e) {
-
             e.printStackTrace();
-            return null;
-
         } finally {
-
-            if(connection != null) {
-                connection.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
             }
         }
+
+        try {
+
+            JSONArray jsonArr = new JSONArray(response);  //<<< convert to jsonarray
+            res = jsonArr.getJSONObject(0);
+            ready = true;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
+
+    public JSONObject getResponse(){
+        while(!ready);
+        return res;
     }
 
 
+
+    /*NOT USED
+
+    public static JSONObject httpRequest(String targetURL, String urlParameters) {
+
+        URL url;
+        String response="";
+        HttpURLConnection urlConnection = null;
+        try {
+            url = new URL(targetURL+"?"+urlParameters);
+
+            System.out.println(targetURL+"?"+urlParameters);
+
+            urlConnection = (HttpURLConnection) url
+                    .openConnection();
+
+            InputStream in = urlConnection.getInputStream();
+
+            InputStreamReader isw = new InputStreamReader(in);
+
+            int data = isw.read();
+
+            while (data != -1) {
+                char current = (char) data;
+                data = isw.read();
+                response += current;
+                System.out.print(current);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+
+
+        JSONObject res = null;
+        try {
+            res = new JSONObject(response);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+     */
 }

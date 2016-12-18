@@ -10,7 +10,10 @@ public class Coords {
     private Float latitude;
     private Float longitude;
 
-
+    public Coords (Double latitude, Double longitude) {
+        this.latitude = latitude.floatValue();
+        this.longitude = longitude.floatValue();
+    }
 
     public Float getLatitude() {
         return latitude;
