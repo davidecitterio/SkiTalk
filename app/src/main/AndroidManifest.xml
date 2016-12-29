@@ -21,6 +21,7 @@
         <activity android:name=".activity.MyProfile"></activity>
         <activity android:name=".activity.HomePage"></activity>
         <activity android:name=".activity.SignIn"></activity>
+        <activity android:name=".activity.Logout"></activity>
     </application>
 
 </manifest>

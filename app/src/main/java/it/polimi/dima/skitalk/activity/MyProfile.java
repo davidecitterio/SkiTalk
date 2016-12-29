@@ -1,14 +1,12 @@
 package it.polimi.dima.skitalk.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -73,7 +71,10 @@ public class MyProfile extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else if (itemId == R.id.logout) {
-                    //TODO logout
+                    //TODO: insert user id
+                    Intent myIntent = new Intent(MyProfile.this, Logout.class);
+                    myIntent.putExtra("id", 1); //Optional parameters
+                    MyProfile.this.startActivity(myIntent);
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
                 }
