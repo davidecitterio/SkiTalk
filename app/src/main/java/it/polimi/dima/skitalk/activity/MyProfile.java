@@ -49,20 +49,12 @@ public class MyProfile extends AppCompatActivity {
         setNavigationDrawer();
 
         switch(itemId) {
-            /*
-            case R.id.menu_settings:
-                btnName = "Settings";
-                break;
-            */
             // Android home
             case android.R.id.home: {
                 dLayout.openDrawer(GravityCompat.START);
                 return true;
             }
         }
-
-        /*Snackbar.make(layout, "Button " + btnName,
-                Snackbar.LENGTH_SHORT).show();*/
         return true;
     }
 
