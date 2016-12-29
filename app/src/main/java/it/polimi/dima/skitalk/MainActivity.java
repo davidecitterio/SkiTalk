@@ -1,7 +1,9 @@
 package it.polimi.dima.skitalk;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import org.json.JSONException;
 
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
             User davide = new User(1);
             System.out.println("Nickname: "+davide.getNickname());
+
 
         } catch (JSONException e) {
             e.printStackTrace();

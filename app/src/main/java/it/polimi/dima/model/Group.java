@@ -1,8 +1,13 @@
 package it.polimi.dima.model;
 
+import android.graphics.Bitmap;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -15,31 +20,41 @@ public class Group {
 
     private Integer id;
     private String name;
-    private String picture;
+    private String pictureURL;
+    private Bitmap picture;
     private int isBusy;
     private int idBusy;
+    private ArrayList<Integer> users = new ArrayList<Integer>();
 
 
-    public void Group(int id, String name, String picture){
-
-        this.id = id;
-        this.name = name;
-        this.picture = picture;
-        isBusy = 0;
-        idBusy = 0;
+    // built group starting from id
+    public Group(int id) throws JSONException {
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupInfo.php", "id="+id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject group = request.getResponse();
+        this.id = group.getInt("id");
+        name = group.getString("name");
+        pictureURL = group.getString("picture");
+        isBusy = group.getInt("isBusy");
+        idBusy = group.getInt("idBusy");
+        setPicture();
+        setMembers();
     }
 
-    // built user starting from json object
-    public void setGroup(JSONObject user) throws JSONException {
-
-        name = user.getString("name");
-        picture = user.getString("picture");
-        isBusy = user.getInt("isBusy");
-        idBusy = user.getInt("idBusy");
-
+    // built group starting from id
+    public void setGroup(JSONObject group) throws JSONException {
+        this.id = group.getInt("id");
+        name = group.getString("name");
+        pictureURL = group.getString("picture");
+        isBusy = group.getInt("isBusy");
+        idBusy = group.getInt("idBusy");
+        setPicture();
+        setMembers();
     }
 
-    // return if the cgroup is busy
+
+    // return true if the group is busy
     public boolean isBusy(){
         if (isBusy==1) return true;
         else return false;
@@ -47,7 +62,7 @@ public class Group {
 
     //try to put the group busy
     public void setBusy(int idUser) throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/setGroupBusy.php", "idGroup="+id+"&idUser="+idUser);
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idGroup="+id+"&idUser="+idUser);
         Thread t = new Thread(request);
         t.start();
         JSONObject response = request.getResponse();
@@ -56,21 +71,43 @@ public class Group {
 
     // put the group free
     public void setNotBusy() throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/unsetGroupBusy.php", "idGroup=" + id);
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/unsetGroupBusy.php", "idGroup=" + id);
         Thread t = new Thread(request);
         t.start();
         JSONObject response = request.getResponse();
         isBusy = response.getInt("isBusy");
     }
 
+    //edit name of the group
     public void setName(String name) throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/editGroupName.php", "idGroup="+id+"&name="+name);
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/editGroupName.php", "idGroup="+id+"&name="+name);
         Thread t = new Thread(request);
         t.start();
         JSONObject response = request.getResponse();
         setGroup(response);
     }
 
+    //set all members of the group (only the id of the users)
+    public void setMembers() throws JSONException {
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupMembers.php", "id="+id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONArray users = request.getArrayResponse();
+        for (int i=0; i< users.length(); i++){
+           // inserisco tutti gli utenti, io incluso...
+            this.users.add(users.getJSONObject(i).getInt("id"));
+        }
+
+    }
+
+    public void setPicture(){
+        PictureDownloader pic = new PictureDownloader(getPictureURL());
+        Thread t = new Thread(pic);
+        t.start();
+        picture = pic.getPicture();
+    }
+
+    //getters
     public Integer getId() {
         return id;
     }
@@ -79,8 +116,8 @@ public class Group {
         return name;
     }
 
-    public String getPicture() {
-        return picture;
+    public String getPictureURL() {
+        return pictureURL;
     }
 
     public Boolean getIsBusy() {
@@ -90,5 +127,9 @@ public class Group {
 
     public int getIdBusy() {
         return idBusy;
+    }
+
+    public Bitmap getPicture(){
+        return picture;
     }
 }
