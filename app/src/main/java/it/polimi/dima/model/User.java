@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 /**
  * Created by Davide on 17/12/2016.
  */
-
 
 public class User {
 
