@@ -30,23 +30,53 @@ public class User {
     private ArrayList<Group> groups = new ArrayList<Group>();
 
     //public constructor
-    public User (int id) throws JSONException {
+    public User (int id)  {
         this.id = id;
         HttpRequest request = new HttpRequest(address+"getUser.php", "id="+id);
         Thread t = new Thread(request);
         t.start();
         JSONObject user = request.getResponse();
 
-        name = user.getString("name");
-        surname = user.getString("surname");
-        email = user.getString("email");
-        nickname = user.getString("nickname");
-        pictureURL = user.getString("picture");
-        ip = user.getString("ip");
-        isOnline = user.getInt("isOnline");
-        coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
-        setPicture();
-        setGroups();
+        try {
+            name = user.getString("name");
+            surname = user.getString("surname");
+            email = user.getString("email");
+            nickname = user.getString("nickname");
+            pictureURL = user.getString("picture");
+            ip = user.getString("ip");
+            isOnline = user.getInt("isOnline");
+            coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
+            setPicture();
+            setGroups();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public User (int id, int n)  {
+        this.id = id;
+        HttpRequest request = new HttpRequest(address+"getUser.php", "id="+id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject user = request.getResponse();
+
+        try {
+            nickname = user.getString("nickname");
+            if (n!=0){
+                name = user.getString("name");
+                surname = user.getString("surname");
+                email = user.getString("email");
+                pictureURL = user.getString("picture");
+                ip = user.getString("ip");
+                isOnline = user.getInt("isOnline");
+                coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
+                setPicture();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

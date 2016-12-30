@@ -2,6 +2,7 @@ package it.polimi.dima.skitalk.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,15 +13,19 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import it.polimi.dima.model.Group;
+import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.temp.RecyclerTest;
 import it.polimi.dima.skitalk.temp.RecyclerTestAdapter;
 
 public class HomePage extends AppCompatActivity {
+    User user;
     DrawerLayout dLayout;
     HomePage thisActivity = this;
 
@@ -30,19 +35,24 @@ public class HomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         setToolBar();
-        //test code for RecyclerView
-        RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
-        List<RecyclerTest> countryList = new ArrayList<RecyclerTest>();
-        RecyclerTest temp = new RecyclerTest("Italy", 60);
-        countryList.add(temp);
-        temp = new RecyclerTest("Germany", 100);
-        countryList.add(temp);
-        RecyclerTestAdapter ca = new RecyclerTestAdapter(countryList);
-        rv.setAdapter(ca);
-        //layout
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        rv.setLayoutManager(llm);
+
+
+        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.new_group);
+        myFab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent = new Intent(HomePage.this, CreateGroup_step1.class);
+                myIntent.putExtra("id", user.getId()); //Optional parameters
+                HomePage.this.startActivity(myIntent);
+            }
+        });
+
+
+        //TODO : Inserire un loading che termina al caricamento di tutti i dati non sarebbe male
+
+        initializeUser();
+        showGroups();
+
+
     }
 
     private void setToolBar() {
@@ -101,9 +111,9 @@ public class HomePage extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else if (itemId == R.id.logout) {
-                    //TODO: insert user id
+
                     Intent myIntent = new Intent(HomePage.this, Logout.class);
-                    myIntent.putExtra("id", 1); //Optional parameters
+                    myIntent.putExtra("id", user.getId()); //Optional parameters
                     HomePage.this.startActivity(myIntent);
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
@@ -122,5 +132,62 @@ public class HomePage extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    private void initializeUser(){
+        Intent intent = getIntent();
+        Integer id = intent.getIntExtra("id", 0);
+
+        user = new User(id);
+    }
+
+    private void showGroups(){
+        try {
+            Thread thread = new Thread() {
+                public void run() {
+                    try {
+                        ArrayList<Group> groups = user.getGroups();
+
+                        RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
+                        final List<RecyclerTest> countryList = new ArrayList<RecyclerTest>();
+
+
+                        for (int i=0; i< groups.size();i++){
+                            String members = new String();
+                            //USE THIS TO RETRIVE BITMAP IMAGE (NON HO IDEA DI COME STAMPARLA A VIDEO XD)
+                            //groups.get(i).getPicture();
+
+                            for (int j=0; j < groups.get(i).getMembers().size(); j++){
+                                members += groups.get(i).getMembers().get(j).getNickname();
+                                if (j+1 < groups.get(i).getMembers().size())
+                                    members += ", ";
+
+                            }
+                            System.out.println("members: "+members);
+                            RecyclerTest temp = new RecyclerTest(groups.get(i).getName(),  members);
+                            countryList.add(temp);
+
+                            //Da implementare: quando uno clicca su un gruppo si apre l'activity corrispondete.
+                            // all'activity si passa l'id del gruppo e l'id dell'utente
+
+                            RecyclerTestAdapter ca = new RecyclerTestAdapter(countryList);
+                            rv.setAdapter(ca);
+                            //layout
+                            LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
+                            llm.setOrientation(LinearLayoutManager.VERTICAL);
+                            rv.setLayoutManager(llm);
+
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            thread.start();
+    } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

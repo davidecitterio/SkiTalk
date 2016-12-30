@@ -1,6 +1,7 @@
 package it.polimi.dima.skitalk.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,43 +61,58 @@ public class Login extends Activity {
             @Override
             public void onClick(View v) {
 
-                final ProgressDialog progressDialog = new ProgressDialog(Login.this,
-                        ProgressDialog.STYLE_SPINNER);
-                progressDialog.setIndeterminate(true);
-                progressDialog.setMessage(getString(R.string.authenticating));
-                progressDialog.show();
-                System.out.println("cliccato");
-                //http request to the server
-                String user = username.getText().toString();
-                String pass = password.getText().toString();
+                if (username.getText().toString().trim().length() > 0 && password.getText().toString().trim().length() > 0) {
+                    final ProgressDialog progressDialog = new ProgressDialog(Login.this,
+                            ProgressDialog.STYLE_SPINNER);
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage(getString(R.string.authenticating));
+                    progressDialog.show();
+                    System.out.println("cliccato");
+                    //http request to the server
+                    String user = username.getText().toString();
+                    String pass = password.getText().toString();
 
-                HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/login.php",
-                        "email="+user+"&password="+pass);
-                Thread t = new Thread(request);
-                t.start();
-                JSONObject response = request.getResponse();
+                    HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/login.php",
+                            "email=" + user + "&password=" + pass);
+                    Thread t = new Thread(request);
+                    t.start();
+                    JSONObject response = request.getResponse();
 
-                try {
-                    // if wrong credentials
-                    if(response.getInt("id") == -1) {
-                        System.out.println("wrong credentials");
-                        Toast.makeText(getApplicationContext(), "Wrong Credentials",Toast.LENGTH_SHORT).show();
+                    try {
+                        // if wrong credentials
+                        if (response.getInt("id") == -1) {
+                            System.out.println("wrong credentials");
+                            progressDialog.dismiss();
+
+                            AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
+                            alert.setTitle(R.string.wrong_credentials_title);
+                            alert.setMessage(R.string.wrong_credentials_text);
+                            alert.setPositiveButton("OK", null);
+                            alert.show();
+                        }
+                        // if correct credentials
+                        else {
+
+                            System.out.println("L'id dell'user è: " + response.getInt("id"));
+
+                            saveLogin(response.getInt("id"));
+
+                            //start homepage activity
+                            Intent myIntent = new Intent(Login.this, HomePage.class);
+                            myIntent.putExtra("id", response.getInt("id")); //Optional parameters
+                            Login.this.startActivity(myIntent);
+                            progressDialog.dismiss();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                    // if correct credentials
-                    else{
-                        Toast.makeText(getApplicationContext(), "Redirecting...",Toast.LENGTH_SHORT).show();
-                        System.out.println("L'id dell'user è: "+response.getInt("id"));
-
-                        saveLogin(response.getInt("id"));
-
-                        //start homepage activity
-                        Intent myIntent = new Intent(Login.this, HomePage.class);
-                        myIntent.putExtra("id", response.getInt("id")); //Optional parameters
-                        Login.this.startActivity(myIntent);
-                        progressDialog.dismiss();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                }
+                else {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
+                    alert.setTitle(R.string.wrong_credentials_title);
+                    alert.setMessage(R.string.wrong_credentials_text);
+                    alert.setPositiveButton("OK", null);
+                    alert.show();
                 }
             }
         });

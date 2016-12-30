@@ -6,9 +6,9 @@ package it.polimi.dima.skitalk.temp;
 
 public class RecyclerTest {
     protected String name;
-    protected double population;
+    protected String population;
 
-    public RecyclerTest(String name, double population) {
+    public RecyclerTest(String name, String population) {
         this.name = name;
         this.population = population;
     }

@@ -6,6 +6,12 @@
     <string name="search">Search</string>
     <string name="no_account">No account yet? Create one</string>
     <string name="authenticating">Authenticating...</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="wrong_credentials_title">Wrong Credential</string>
+    <string name="wrong_credentials_text">Please insert valid username and password.</string>
+    <string name="signin_problem_title">There is a problem</string>
+    <string name="signin_problem_text">Please fill al the fields.</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="loading">Loading content..</string>
+    <string name="create_group_problem_title">Ouch!</string>
+    <string name="create_group_problem_text">Insert at least one person in your group.</string>
 </resources>

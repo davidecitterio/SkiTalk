@@ -1,6 +1,7 @@
 package it.polimi.dima.skitalk.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -42,29 +43,42 @@ public class SignIn extends Activity {
             @Override
             public void onClick(View v) {
 
-                HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/addUser.php",
-                        "email="+email.getText().toString()+"&nickname"+nickname.getText().toString()+"&password="+password.getText().toString());
-                Thread t = new Thread(request);
-                t.start();
-                JSONObject response = request.getResponse();
+                if (email.getText().toString().trim().length() > 0 && password.getText().toString().trim().length() > 0
+                        && nickname.getText().toString().trim().length() > 0) {
 
-                try {
-                    saveLogin(response.getInt("id"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
+                    HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/addUser.php",
+                            "email=" + email.getText().toString() + "&nickname" + nickname.getText().toString() + "&password=" + password.getText().toString());
+                    Thread t = new Thread(request);
+                    t.start();
+                    JSONObject response = request.getResponse();
+
+                    try {
+                        saveLogin(response.getInt("id"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    //start homepage activity
+                    Intent myIntent = new Intent(SignIn.this, HomePage.class);
+                    try {
+                        myIntent.putExtra("id", response.getInt("id")); //Optional parameters
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SignIn.this.startActivity(myIntent);
+
                 }
-
-                //start homepage activity
-                Intent myIntent = new Intent(SignIn.this, HomePage.class);
-                try {
-                    myIntent.putExtra("id", response.getInt("id")); //Optional parameters
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                else{
+                    AlertDialog.Builder alert = new AlertDialog.Builder(SignIn.this);
+                    alert.setTitle(R.string.signin_problem_title);
+                    alert.setMessage(R.string.signin_problem_text);
+                    alert.setPositiveButton("OK", null);
+                    alert.show();
                 }
-                SignIn.this.startActivity(myIntent);
-
             }
         });
+
     }
 
     // save login info of this user

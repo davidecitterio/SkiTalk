@@ -7,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -24,7 +23,7 @@ public class Group {
     private Bitmap picture;
     private int isBusy;
     private int idBusy;
-    private ArrayList<Integer> users = new ArrayList<Integer>();
+    private ArrayList<User> users = new ArrayList<User>();
 
 
     // built group starting from id
@@ -95,7 +94,7 @@ public class Group {
         JSONArray users = request.getArrayResponse();
         for (int i=0; i< users.length(); i++){
            // inserisco tutti gli utenti, io incluso...
-            this.users.add(users.getJSONObject(i).getInt("id"));
+            this.users.add(new User(users.getJSONObject(i).getInt("id"), 0));
         }
 
     }
@@ -131,5 +130,9 @@ public class Group {
 
     public Bitmap getPicture(){
         return picture;
+    }
+
+    public ArrayList<User> getMembers(){
+        return users;
     }
 }
