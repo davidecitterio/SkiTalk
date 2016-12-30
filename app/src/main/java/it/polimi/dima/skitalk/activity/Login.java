@@ -1,6 +1,7 @@
 package it.polimi.dima.skitalk.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,7 +32,8 @@ import static android.content.ContentValues.TAG;
 
 public class Login extends Activity {
 
-    Button login,signin;
+    Button login;
+    TextView signin;
     EditText username,password;
 
     TextView tx1;
@@ -49,7 +51,7 @@ public class Login extends Activity {
 
     public void doLogin(){
         login = (Button)findViewById(R.id.login_button);
-        signin = (Button)findViewById(R.id.signin_button);
+        signin = (TextView) findViewById(R.id.signin_link);
         username = (EditText)findViewById(R.id.username);
         password = (EditText)findViewById(R.id.password);
 
@@ -59,7 +61,11 @@ public class Login extends Activity {
             @Override
             public void onClick(View v) {
 
-                // INSERISCI QUI IL CERCHIETTO DI LOADING
+                final ProgressDialog progressDialog = new ProgressDialog(Login.this,
+                        ProgressDialog.STYLE_SPINNER);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setMessage(getString(R.string.authenticating));
+                progressDialog.show();
                 System.out.println("cliccato");
                 //http request to the server
                 String user = username.getText().toString();
@@ -88,6 +94,7 @@ public class Login extends Activity {
                         Intent myIntent = new Intent(Login.this, HomePage.class);
                         myIntent.putExtra("id", response.getInt("id")); //Optional parameters
                         Login.this.startActivity(myIntent);
+                        progressDialog.dismiss();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
