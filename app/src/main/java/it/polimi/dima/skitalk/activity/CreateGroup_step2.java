@@ -2,40 +2,47 @@ package it.polimi.dima.skitalk.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.temp.RecyclerTest;
+import it.polimi.dima.skitalk.temp.RecyclerTestAdapter;
 import it.polimi.dima.skitalk.temp.UploadPicture;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by Davide on 30/12/2016.
  */
 
 public class CreateGroup_step2 extends Activity{
-    Button create, addUser;
-    String name;
+    Button create, search, addUser;
+    EditText search_user;
+    String name, encodedImage;
     Bitmap picture;
     int numOfUsers = 0;
-    String pictureName;
-    int id, groupId;
+    int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,9 @@ public class CreateGroup_step2 extends Activity{
         System.out.println(id);
         System.out.println(name);
         picture = (Bitmap) intent.getParcelableExtra("picture");
+        encodedImage = encodeToBase64(picture, Bitmap.CompressFormat.JPEG, 50);
+
+        search_user = (EditText) findViewById(R.id.search_user);
 
         ImageView imageView = (ImageView) findViewById(R.id.picture);
         imageView.setImageBitmap(picture);
@@ -55,13 +65,15 @@ public class CreateGroup_step2 extends Activity{
         TextView nameGroup = (TextView) findViewById(R.id.nameGroup);
         nameGroup.setText(name);
 
-        //addUser = (Button) findViewById(R.id.add_user);
-        /*addUser.setOnClickListener(new View.OnClickListener() {
+
+
+        search = (Button) findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addNewUser();
+                searchUser(search_user.getText().toString());
             }
-        });*/
+        });
 
         create = (Button) findViewById(R.id.create);
         create.setOnClickListener(new View.OnClickListener() {
@@ -87,9 +99,26 @@ public class CreateGroup_step2 extends Activity{
 
     public void createGroup(){
 
-        Integer picName = 1000 + (int)(Math.random() * ((5000 - 1000) + 1));
-        pictureName = picName.toString();
-        new Upload(picture, pictureName).execute();
+        //generate hashMap to store encodedImage and the name
+        HashMap<String,String> detail = new HashMap<>();
+        detail.put("name", name);
+        detail.put("image", encodedImage);
+        detail.put("id", String.valueOf(id));
+
+
+        try {
+            UploadPicture upload = new UploadPicture("http://skitalk.altervista.org/php/addGroup.php", hashMapToUrl(detail));
+            Thread t = new Thread(upload);
+            t.start();
+            JSONObject response = upload.getResponse();
+            try {
+                System.out.println(response.getInt("id"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private String hashMapToUrl(HashMap<String, String> params) throws UnsupportedEncodingException {
@@ -101,69 +130,58 @@ public class CreateGroup_step2 extends Activity{
             else
                 result.append("&");
 
-            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append(entry.getKey());
             result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            result.append(entry.getValue());
         }
 
         return result.toString();
     }
 
-
-    //async task to upload image
-    private class Upload extends AsyncTask<Void,Void,String> {
-        private Bitmap image;
-        private String name;
-
-
-        public Upload(Bitmap image,String name){
-            this.image = image;
-            this.name = name;
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            //compress the image to jpg format
-            image.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
-            /*
-            * encode image to base64 so that it can be picked by saveImage.php file
-            * */
-            String encodeImage = Base64.encodeToString(byteArrayOutputStream.toByteArray(),Base64.DEFAULT);
-
-            //generate hashMap to store encodedImage and the name
-            HashMap<String,String> detail = new HashMap<>();
-            detail.put("name", name);
-            detail.put("image", encodeImage);
-
-            try{
-                //convert this HashMap to encodedUrl to send to php file
-                String dataToSend = hashMapToUrl(detail);
-                //make a Http request and send data to saveImage.php file
-
-
-                UploadPicture upload = new UploadPicture("http://skitalk.altervista.org/php/uploadGroupPicture.php",dataToSend);
-                Thread t = new Thread(upload);
-                t.start();
-
-
-                //return the response
-                return "ok";
-
-            }catch (Exception e){
-                e.printStackTrace();
-                Log.e(TAG,"ERROR  "+e);
-                return null;
-            }
-        }
-
-
-
-        @Override
-        protected void onPostExecute(String s) {
-            //show image uploaded
-            Toast.makeText(getApplicationContext(),"Image Uploaded",Toast.LENGTH_SHORT).show();
-        }
+    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality)
+    {
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        image.compress(compressFormat, quality, byteArrayOS);
+        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.URL_SAFE);
     }
+
+    public  void searchUser(String user){
+        final ProgressDialog progressDialog = new ProgressDialog(CreateGroup_step2.this,
+                ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.authenticating));
+        progressDialog.show();
+
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/searchUser.php", "nickname="+user);
+        Thread t = new Thread(request);
+        t.start();
+        JSONArray response = request.getArrayResponse();
+
+        RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
+        final List<RecyclerTest> countryList = new ArrayList<RecyclerTest>();
+
+        String members = new String();
+
+        for (int i=0; i<response.length(); i++){
+            RecyclerTest temp = null;
+            try {
+                temp = new RecyclerTest(response.getJSONObject(i).getString("nickname"),  members);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            countryList.add(temp);
+        }
+
+        progressDialog.dismiss();
+
+        RecyclerTestAdapter ca = new RecyclerTestAdapter(countryList);
+        rv.setAdapter(ca);
+        //layout
+        LinearLayoutManager llm = new LinearLayoutManager(CreateGroup_step2.this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        rv.setLayoutManager(llm);
+
+    }
+
 
 }

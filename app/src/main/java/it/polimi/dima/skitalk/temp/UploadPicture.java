@@ -53,7 +53,6 @@ import java.net.URL;
 
                 int responseCode = con.getResponseCode();
                 System.out.println("\nSending 'POST' request to URL : " + targetURL);
-                System.out.println("Post parameters : " + urlParameters);
                 System.out.println("Response Code : " + responseCode);
 
                 BufferedReader in = new BufferedReader(

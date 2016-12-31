@@ -16,6 +16,37 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+        <EditText android:id="@+id/search_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Type the nickname of a user"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:layout_marginLeft="16dp"
+        android:scrollbars="vertical"/>
+
+    <Button
+        android:id="@+id/search"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@color/primary_dark"
+        android:textColor="@color/icons"
+        android:padding="12dp"
+        android:text="SEARCH"/>
+
+
     <Button
         android:id="@+id/create"
         android:layout_width="fill_parent"
