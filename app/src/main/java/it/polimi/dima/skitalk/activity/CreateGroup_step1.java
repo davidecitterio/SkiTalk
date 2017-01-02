@@ -5,8 +5,10 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,6 +40,10 @@ public class CreateGroup_step1 extends Activity{
         Intent intent = getIntent();
         final Integer id = intent.getIntExtra("id", 0);
 
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.setTitleTextColor(Color.WHITE);
+        tb.setTitle(getString(R.string.new_group));
+
         selectpicture = (Button) findViewById(R.id.select_picture);
         selectpicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,7 +58,7 @@ public class CreateGroup_step1 extends Activity{
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (name.getText().toString().length() > 0){
+                if ((name.getText().toString().length() > 0) && (picture != null)){
 
                     Intent myIntent = new Intent(CreateGroup_step1.this, CreateGroup_step2.class);
                     Bundle extras = new Bundle();

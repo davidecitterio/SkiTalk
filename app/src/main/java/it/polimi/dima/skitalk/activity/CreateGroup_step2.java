@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -29,7 +31,7 @@ import java.util.Map;
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.temp.RecyclerTest;
-import it.polimi.dima.skitalk.temp.RecyclerTestAdapter;
+import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 import it.polimi.dima.skitalk.temp.UploadPicture;
 
 /**
@@ -48,6 +50,10 @@ public class CreateGroup_step2 extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group_step_2);
+
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.setTitleTextColor(Color.WHITE);
+        tb.setTitle(getString(R.string.new_group));
 
         Intent intent = getIntent();
         id = intent.getIntExtra("id", 0);
@@ -145,7 +151,7 @@ public class CreateGroup_step2 extends Activity{
         return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.URL_SAFE);
     }
 
-    public  void searchUser(String user){
+    public void searchUser(String user){
         final ProgressDialog progressDialog = new ProgressDialog(CreateGroup_step2.this,
                 ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(true);
@@ -158,7 +164,7 @@ public class CreateGroup_step2 extends Activity{
         JSONArray response = request.getArrayResponse();
 
         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
-        final List<RecyclerTest> countryList = new ArrayList<RecyclerTest>();
+        /*final List<RecyclerTest> countryList = new ArrayList<RecyclerTest>();
 
         String members = new String();
 
@@ -174,12 +180,12 @@ public class CreateGroup_step2 extends Activity{
 
         progressDialog.dismiss();
 
-        RecyclerTestAdapter ca = new RecyclerTestAdapter(countryList);
+        RecyclerGroupAdapter ca = new RecyclerGroupAdapter(countryList);
         rv.setAdapter(ca);
         //layout
         LinearLayoutManager llm = new LinearLayoutManager(CreateGroup_step2.this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
-        rv.setLayoutManager(llm);
+        rv.setLayoutManager(llm);*/
 
     }
 

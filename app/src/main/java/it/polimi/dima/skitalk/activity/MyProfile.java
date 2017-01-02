@@ -64,17 +64,21 @@ public class MyProfile extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
 
                 int itemId = menuItem.getItemId();
-                Intent intent;
+                Intent intent, myIntent;
 
                 if (itemId == R.id.home_page) {
-                    intent = new Intent(thisActivity, HomePage.class);
-                    startActivity(intent);
+                    myIntent = new Intent(thisActivity, HomePage.class);
+                    intent = getIntent();
+                    Integer id = intent.getIntExtra("id", 0);
+                    myIntent.putExtra("id", id);
+                    startActivity(myIntent);
                 }
                 else if (itemId == R.id.logout) {
-                    //TODO: insert user id
-                    Intent myIntent = new Intent(MyProfile.this, Logout.class);
-                    myIntent.putExtra("id", 1); //Optional parameters
-                    MyProfile.this.startActivity(myIntent);
+                    myIntent = new Intent(MyProfile.this, Logout.class);
+                    intent = getIntent();
+                    Integer id = intent.getIntExtra("id", 0);
+                    myIntent.putExtra("id", id);
+                    startActivity(myIntent);
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
                 }

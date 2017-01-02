@@ -135,4 +135,14 @@ public class Group {
     public ArrayList<User> getMembers(){
         return users;
     }
+
+    public String getMembersString() {
+        String members = new String();
+        for (int j=0; j < users.size(); j++){
+            members += users.get(j).getNickname();
+            if (j+1 < users.size())
+                members += ", ";
+        }
+        return members;
+    }
 }

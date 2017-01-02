@@ -22,7 +22,7 @@ import it.polimi.dima.model.Group;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.temp.RecyclerTest;
-import it.polimi.dima.skitalk.temp.RecyclerTestAdapter;
+import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 
 public class HomePage extends AppCompatActivity {
     User user;
@@ -104,15 +104,15 @@ public class HomePage extends AppCompatActivity {
 
                 //Fragment frag = null;
                 int itemId = menuItem.getItemId();
-                Intent intent;
+                Intent myIntent;
 
                 if (itemId == R.id.my_profile) {
-                    intent = new Intent(thisActivity, MyProfile.class);
-                    startActivity(intent);
+                    myIntent = new Intent(thisActivity, MyProfile.class);
+                    myIntent.putExtra("id", user.getId()); //Optional parameters
+                    HomePage.this.startActivity(myIntent);
                 }
                 else if (itemId == R.id.logout) {
-
-                    Intent myIntent = new Intent(HomePage.this, Logout.class);
+                    myIntent = new Intent(HomePage.this, Logout.class);
                     myIntent.putExtra("id", user.getId()); //Optional parameters
                     HomePage.this.startActivity(myIntent);
                 } else {
@@ -147,30 +147,16 @@ public class HomePage extends AppCompatActivity {
                 public void run() {
                     try {
                         ArrayList<Group> groups = user.getGroups();
-
                         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
-                        final List<RecyclerTest> countryList = new ArrayList<RecyclerTest>();
-
 
                         for (int i=0; i< groups.size();i++){
-                            String members = new String();
                             //USE THIS TO RETRIVE BITMAP IMAGE (NON HO IDEA DI COME STAMPARLA A VIDEO XD)
                             //groups.get(i).getPicture();
-
-                            for (int j=0; j < groups.get(i).getMembers().size(); j++){
-                                members += groups.get(i).getMembers().get(j).getNickname();
-                                if (j+1 < groups.get(i).getMembers().size())
-                                    members += ", ";
-
-                            }
-                            System.out.println("members: "+members);
-                            RecyclerTest temp = new RecyclerTest(groups.get(i).getName(),  members);
-                            countryList.add(temp);
 
                             //Da implementare: quando uno clicca su un gruppo si apre l'activity corrispondete.
                             // all'activity si passa l'id del gruppo e l'id dell'utente
 
-                            RecyclerTestAdapter ca = new RecyclerTestAdapter(countryList);
+                            RecyclerGroupAdapter ca = new RecyclerGroupAdapter(groups);
                             rv.setAdapter(ca);
                             //layout
                             LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
