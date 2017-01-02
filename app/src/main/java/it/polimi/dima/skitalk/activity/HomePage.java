@@ -1,28 +1,34 @@
 package it.polimi.dima.skitalk.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewParent;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import it.polimi.dima.model.Group;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
-import it.polimi.dima.skitalk.temp.RecyclerTest;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
+import it.polimi.dima.skitalk.util.DividerItemDecoration;
+import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
 public class HomePage extends AppCompatActivity {
     User user;
@@ -36,7 +42,7 @@ public class HomePage extends AppCompatActivity {
         setContentView(R.layout.activity_home_page);
         setToolBar();
 
-
+        //create groups button
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.new_group);
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -46,13 +52,9 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
-
-        //TODO : Inserire un loading che termina al caricamento di tutti i dati non sarebbe male
-
+        //loading groups
         initializeUser();
         showGroups();
-
-
     }
 
     private void setToolBar() {
@@ -77,7 +79,7 @@ public class HomePage extends AppCompatActivity {
         String btnName = null;
         setNavigationDrawer();
 
-        switch(itemId) {
+        switch (itemId) {
             /*
             case R.id.menu_settings:
                 btnName = "Settings";
@@ -110,8 +112,7 @@ public class HomePage extends AppCompatActivity {
                     myIntent = new Intent(thisActivity, MyProfile.class);
                     myIntent.putExtra("id", user.getId()); //Optional parameters
                     HomePage.this.startActivity(myIntent);
-                }
-                else if (itemId == R.id.logout) {
+                } else if (itemId == R.id.logout) {
                     myIntent = new Intent(HomePage.this, Logout.class);
                     myIntent.putExtra("id", user.getId()); //Optional parameters
                     HomePage.this.startActivity(myIntent);
@@ -134,14 +135,14 @@ public class HomePage extends AppCompatActivity {
         });
     }
 
-    private void initializeUser(){
+    private void initializeUser() {
         Intent intent = getIntent();
         Integer id = intent.getIntExtra("id", 0);
 
         user = new User(id);
     }
 
-    private void showGroups(){
+    private void showGroups() {
         try {
             Thread thread = new Thread() {
                 public void run() {
@@ -149,15 +150,21 @@ public class HomePage extends AppCompatActivity {
                         ArrayList<Group> groups = user.getGroups();
                         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
 
-                        for (int i=0; i< groups.size();i++){
+                        for (int i = 0; i < groups.size(); i++) {
                             //USE THIS TO RETRIVE BITMAP IMAGE (NON HO IDEA DI COME STAMPARLA A VIDEO XD)
                             //groups.get(i).getPicture();
 
                             //Da implementare: quando uno clicca su un gruppo si apre l'activity corrispondete.
                             // all'activity si passa l'id del gruppo e l'id dell'utente
 
+                            //modify this for item spacing
+                            int spacing = 16;
                             RecyclerGroupAdapter ca = new RecyclerGroupAdapter(groups);
                             rv.setAdapter(ca);
+                            rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
+                            rv.addItemDecoration(
+                                    new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
+                                            R.drawable.item_decorator), spacing * 2));
                             //layout
                             LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
                             llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -172,8 +179,9 @@ public class HomePage extends AppCompatActivity {
                 }
             };
             thread.start();
-    } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

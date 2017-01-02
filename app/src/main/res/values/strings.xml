@@ -20,4 +20,5 @@
     <string name="new_group">New Group</string>
     <string name="user_name_hint">Type the nickname of a user</string>
     <string name="create_group">CREATE</string>
+    <string name="loading_user">Loading user data...</string>
 </resources>
