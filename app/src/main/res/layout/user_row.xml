@@ -36,9 +36,10 @@
         android:id="@+id/add_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:checked="false"
         android:layout_gravity="center_vertical"
-        android:text="ADD"
+        android:text="@string/add"
         android:background="@color/primary_dark"
         android:textColor="@color/icons" />
 </LinearLayout>

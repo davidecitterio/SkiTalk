@@ -1,6 +1,9 @@
 package it.polimi.dima.skitalk.activity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,6 +26,7 @@ import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
+import it.polimi.dima.skitalk.util.RecyclerItemListener;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
 public class HomePage extends AppCompatActivity {
@@ -49,7 +53,6 @@ public class HomePage extends AppCompatActivity {
 
         //loading groups
         initializeUser();
-        showGroups();
     }
 
     private void setToolBar() {
@@ -134,7 +137,66 @@ public class HomePage extends AppCompatActivity {
         Intent intent = getIntent();
         Integer id = intent.getIntExtra("id", 0);
 
-        user = new User(id, getApplicationContext());
+        new InitializeUser().execute(id);
+    }
+
+    private class InitializeUser extends AsyncTask<Integer, Void, Boolean> {
+
+        ProgressDialog progressDialog = new ProgressDialog(HomePage.this,
+                ProgressDialog.STYLE_SPINNER);
+        Context c;
+
+        @Override
+        protected Boolean doInBackground(Integer... params) {
+            user = new User(params[0], c);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean result) {
+            if (result) {
+                ArrayList<Group> groups = user.getGroups();
+                RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
+
+                for (int i = 0; i < groups.size(); i++) {
+
+                    //modify this for item spacing
+                    int spacing = 16;
+                    RecyclerGroupAdapter ca = new RecyclerGroupAdapter(groups);
+                    rv.setAdapter(ca);
+                    rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
+                    rv.addItemDecoration(
+                            new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
+                                    R.drawable.item_decorator), spacing * 2));
+                    //layout
+                    LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
+                    llm.setOrientation(LinearLayoutManager.VERTICAL);
+                    rv.setLayoutManager(llm);
+                    rv.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), rv,
+                            new RecyclerItemListener.RecyclerTouchListener() {
+                                public void onClickItem(View v, int position) {
+                                    Intent myIntent = new Intent(HomePage.this, GroupActivity.class);
+                                    HomePage.this.startActivity(myIntent);
+                                }
+
+                                public void onLongClickItem(View v, int position) {
+
+                                }
+                            }));
+                }
+                progressDialog.dismiss();
+            }
+            else
+                System.out.println("Nooooooooo");
+        }
+
+        @Override
+        protected void onPreExecute() {
+            c = getApplicationContext();
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage(getString(R.string.loading));
+            progressDialog.show();
+        }
     }
 
     private void showGroups() {

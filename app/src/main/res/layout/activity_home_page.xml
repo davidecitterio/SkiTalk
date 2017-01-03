@@ -37,6 +37,7 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:src="@drawable/ic_group_add" />
+            <!--app:layout_behavior="it.polimi.dima.skitalk.util.ScrollFABBehavior"-->
 
     </android.support.design.widget.CoordinatorLayout>
 

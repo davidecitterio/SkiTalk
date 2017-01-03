@@ -27,4 +27,10 @@
     <string name="already_inserted_user_text">You have already select this user.</string>
     <string name="creating_group">Creating group..</string>
     <string name="adding_members">Adding members..</string>
+    <string name="add">ADD</string>
+    <string name="tab_talk">Talk</string>
+    <string name="tab_map">Map</string>
+    <string name="leave_group">Leave group</string>
+    <string name="mute">Mute</string>
+    <string name="settings">Settings</string>
 </resources>
