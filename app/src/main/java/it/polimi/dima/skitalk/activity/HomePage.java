@@ -1,6 +1,5 @@
 package it.polimi.dima.skitalk.activity;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,14 +11,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
@@ -139,10 +134,11 @@ public class HomePage extends AppCompatActivity {
         Intent intent = getIntent();
         Integer id = intent.getIntExtra("id", 0);
 
-        user = new User(id);
+        user = new User(id, getApplicationContext());
     }
 
     private void showGroups() {
+
         try {
             Thread thread = new Thread() {
                 public void run() {
@@ -151,11 +147,6 @@ public class HomePage extends AppCompatActivity {
                         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
 
                         for (int i = 0; i < groups.size(); i++) {
-                            //USE THIS TO RETRIVE BITMAP IMAGE (NON HO IDEA DI COME STAMPARLA A VIDEO XD)
-                            //groups.get(i).getPicture();
-
-                            //Da implementare: quando uno clicca su un gruppo si apre l'activity corrispondete.
-                            // all'activity si passa l'id del gruppo e l'id dell'utente
 
                             //modify this for item spacing
                             int spacing = 16;
@@ -179,9 +170,11 @@ public class HomePage extends AppCompatActivity {
                 }
             };
             thread.start();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
 }

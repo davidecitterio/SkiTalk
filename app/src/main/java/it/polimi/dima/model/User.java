@@ -1,13 +1,23 @@
 package it.polimi.dima.model;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -28,55 +38,77 @@ public class User {
     private Integer isOnline;
     private Coords coords;
     private ArrayList<Group> groups = new ArrayList<Group>();
+    private Context c;
 
     //public constructor
-    public User (int id)  {
+    public User (int id, Context c)  {
         this.id = id;
-        HttpRequest request = new HttpRequest(address+"getUser.php", "id="+id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONObject user = request.getResponse();
+        this.c = c;
 
-        try {
-            name = user.getString("name");
-            surname = user.getString("surname");
-            email = user.getString("email");
-            nickname = user.getString("nickname");
-            pictureURL = user.getString("picture");
-            ip = user.getString("ip");
-            isOnline = user.getInt("isOnline");
-            coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
-            setPicture();
-            setGroups();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        if (!alreadyExist("SkiTalkUserInfo")) {
+            HttpRequest request = new HttpRequest(address + "getUser.php", "id=" + id);
+            Thread t = new Thread(request);
+            t.start();
+            JSONObject user = request.getResponse();
 
-    }
+            saveUserInfo(user, c);
 
-    public User (int id, int n)  {
-        this.id = id;
-        HttpRequest request = new HttpRequest(address+"getUser.php", "id="+id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONObject user = request.getResponse();
-
-        try {
-            nickname = user.getString("nickname");
-            if (n!=0){
+            try {
                 name = user.getString("name");
                 surname = user.getString("surname");
                 email = user.getString("email");
+                nickname = user.getString("nickname");
                 pictureURL = user.getString("picture");
                 ip = user.getString("ip");
                 isOnline = user.getInt("isOnline");
                 coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
                 setPicture();
+                setGroups();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+        else
+            loadUser(c);
 
+    }
+
+    public User (int id, int n)  {
+        this.id = id;
+
+            HttpRequest request = new HttpRequest(address + "getUser.php", "id=" + id);
+            Thread t = new Thread(request);
+            t.start();
+            JSONObject user = request.getResponse();
+
+            try {
+                nickname = user.getString("nickname");
+                if (n != 0) {
+                    name = user.getString("name");
+                    surname = user.getString("surname");
+                    email = user.getString("email");
+                    pictureURL = user.getString("picture");
+                    ip = user.getString("ip");
+                    isOnline = user.getInt("isOnline");
+                    coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
+                    setPicture();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+    }
+
+    // built user starting from json object, used for short-info user instance
+    public User(JSONObject user) throws JSONException {
+
+        id = user.getInt("id");
+        name = user.getString("name");
+        surname = user.getString("surname");
+        nickname = user.getString("nickname");
+        pictureURL = user.getString("picture");
+        setPicture();
     }
 
 
@@ -168,13 +200,19 @@ public class User {
 
     //set groups of the user
     public void setGroups() throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroups.php", "id="+id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONArray groups = request.getArrayResponse();
-        for (int i=0; i < groups.length(); i++) {
-            this.groups.add(new Group(groups.getJSONObject(i).getInt("id")));
-        }
+        //if (!alreadyExist("SkiTalkUserGroupsInfo")){
+            HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroups.php", "id="+id);
+            Thread t = new Thread(request);
+            t.start();
+            JSONArray groups = request.getArrayResponse();
+            saveGroups(groups);
+            for (int i=0; i < groups.length(); i++) {
+                this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
+            }
+        //}
+        //else
+        //    loadGroups();
+
     }
 
     public void setPicture(){
@@ -234,4 +272,128 @@ public class User {
         return groups;
     }
 
+
+
+
+    public void loadUser(Context c){
+        BufferedReader input = null;
+        File file = null;
+        JSONArray jsonArr;
+        JSONObject userInfo;
+
+        try {
+            file = new File(c.getCacheDir(), "SkiTalkUserInfo"); // Pass getFilesDir() and "MyFile" to read file
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            System.out.println("Cache info: "+buffer.toString());
+
+            try {
+
+                userInfo = new JSONObject(buffer.toString());
+                System.out.println("Cache info: "+userInfo);
+                    nickname = userInfo.getString("nickname");
+                    System.out.println("Nickname is: "+nickname);
+                    name = userInfo.getString("name");
+                    surname = userInfo.getString("surname");
+                    email = userInfo.getString("email");
+                    pictureURL = userInfo.getString("picture");
+                    ip = userInfo.getString("ip");
+                    isOnline = userInfo.getInt("isOnline");
+                    coords = new Coords(userInfo.getDouble("latitude"), userInfo.getDouble("longitude"));
+                    setPicture();
+                    setGroups();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+
+
+            Log.d(TAG, buffer.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void saveUserInfo(JSONObject user, Context c){
+        String content = String.valueOf(user);
+
+        System.out.println("Save values: "+content);
+        File file;
+        FileOutputStream outputStream;
+        try {
+            // file = File.createTempFile("MyCache", null, getCacheDir());
+            file = new File(c.getCacheDir(), "SkiTalkUserInfo");
+
+            outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean alreadyExist(String name){
+        File file = new File(c.getCacheDir(), name);
+        if (file.exists())
+            return true;
+        else
+            return false;
+    }
+
+    public void loadGroups(){
+        BufferedReader input = null;
+        File file = null;
+        JSONArray jsonArr;
+        JSONObject userInfo;
+
+        try {
+            file = new File(c.getCacheDir(), "SkiTalkUserGroupsInfo"); // Pass getFilesDir() and "MyFile" to read file
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            JSONArray groups = new JSONArray(buffer.toString());
+            for (int i=0; i < groups.length(); i++) {
+                this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void saveGroups(JSONArray groups){
+        String content = String.valueOf(groups);
+
+        System.out.println("Save values: "+content);
+        File file;
+        FileOutputStream outputStream;
+        try {
+            // file = File.createTempFile("MyCache", null, getCacheDir());
+            file = new File(c.getCacheDir(), "SkiTalkUserGroupsInfo");
+
+            outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
+

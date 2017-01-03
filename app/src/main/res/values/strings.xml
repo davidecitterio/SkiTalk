@@ -21,4 +21,10 @@
     <string name="user_name_hint">Type the nickname of a user</string>
     <string name="create_group">CREATE</string>
     <string name="loading_user">Loading user data...</string>
+    <string name="no_users_found_title">Ooops!</string>
+    <string name="no_users_found_text">There are no user with that nickname.</string>
+    <string name="already_inserted_user_title">Oooops!</string>
+    <string name="already_inserted_user_text">You have already select this user.</string>
+    <string name="creating_group">Creating group..</string>
+    <string name="adding_members">Adding members..</string>
 </resources>

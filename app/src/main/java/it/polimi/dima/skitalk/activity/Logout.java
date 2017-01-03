@@ -31,6 +31,12 @@ public class Logout extends Activity {
         File cacheFile = new File(getApplicationContext().getCacheDir(), "SkiTalkLoginInfo");
         cacheFile.delete();
 
+        cacheFile = new File(getApplicationContext().getCacheDir(), "SkiTalkUserInfo");
+        cacheFile.delete();
+
+        cacheFile = new File(getApplicationContext().getCacheDir(), "SkiTalkGroupInfo");
+        cacheFile.delete();
+
 
         setOffline(id);
 

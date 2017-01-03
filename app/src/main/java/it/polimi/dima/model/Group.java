@@ -1,11 +1,18 @@
 package it.polimi.dima.model;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 
@@ -24,19 +31,26 @@ public class Group {
     private int isBusy;
     private int idBusy;
     private ArrayList<User> users = new ArrayList<User>();
+    private Context c;
 
 
     // built group starting from id
-    public Group(int id) throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupInfo.php", "id="+id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONObject group = request.getResponse();
-        this.id = group.getInt("id");
-        name = group.getString("name");
-        pictureURL = group.getString("picture");
-        isBusy = group.getInt("isBusy");
-        idBusy = group.getInt("idBusy");
+    public Group(int id, Context c) throws JSONException {
+        this.c = c;
+        this.id = id;
+        if (!alreadyExistGroup()) {
+            HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupInfo.php", "id=" + id);
+            Thread t = new Thread(request);
+            t.start();
+            JSONObject group = request.getResponse();
+            saveGroup(group);
+            name = group.getString("name");
+            pictureURL = group.getString("picture");
+            isBusy = group.getInt("isBusy");
+            idBusy = group.getInt("idBusy");
+        }
+        else
+            loadGroup();
         setPicture();
         setMembers();
     }
@@ -144,5 +158,63 @@ public class Group {
                 members += ", ";
         }
         return members;
+    }
+
+    public boolean alreadyExistGroup(){
+        File file = new File(c.getCacheDir(), "SkiTalkGroup"+id);
+        if (file.exists()){
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public void loadGroup(){
+        BufferedReader input = null;
+        File file = null;
+        JSONArray jsonArr;
+        JSONObject userInfo;
+
+        try {
+            file = new File(c.getCacheDir(), "SkiTalkGroup"+id); // Pass getFilesDir() and "MyFile" to read file
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            JSONObject group = new JSONObject(buffer.toString());
+            name = group.getString("name");
+            pictureURL = group.getString("picture");
+            isBusy = group.getInt("isBusy");
+            idBusy = group.getInt("idBusy");
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void saveGroup(JSONObject group){
+        String content = String.valueOf(group);
+
+        System.out.println("Save values: "+content);
+        File file;
+        FileOutputStream outputStream;
+        try {
+            // file = File.createTempFile("MyCache", null, getCacheDir());
+            file = new File(c.getCacheDir(), "SkiTalkGroup"+id);
+
+            outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

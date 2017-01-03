@@ -102,6 +102,7 @@ public class Login extends Activity {
                             myIntent.putExtra("id", response.getInt("id")); //Optional parameters
                             Login.this.startActivity(myIntent);
                             progressDialog.dismiss();
+                            finish();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -123,6 +124,7 @@ public class Login extends Activity {
                 //start sign in activity
                 Intent myIntent = new Intent(Login.this, SignIn.class);
                 Login.this.startActivity(myIntent);
+
             }
         });
 
@@ -156,6 +158,7 @@ public class Login extends Activity {
             Intent myIntent = new Intent(Login.this, HomePage.class);
             myIntent.putExtra("id", Integer.parseInt(buffer.toString())); //Optional parameters
             Login.this.startActivity(myIntent);
+            finish();
 
             Log.d(TAG, buffer.toString());
         } catch (IOException e) {
