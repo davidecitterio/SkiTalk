@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     tools:context="it.polimi.dima.skitalk.activity.TalkFragment">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/talk"
+    <Button
+        android:id="@+id/rec"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|center"
-        android:src="@drawable/ic_talk" />
+        android:layout_gravity="top|center"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:background="@drawable/ic_talk" />
 
 </android.support.design.widget.CoordinatorLayout>

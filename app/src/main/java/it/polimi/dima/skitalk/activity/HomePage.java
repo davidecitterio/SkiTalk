@@ -1,5 +1,6 @@
 package it.polimi.dima.skitalk.activity;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -40,6 +42,12 @@ public class HomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         setToolBar();
+
+
+        //REQUEST PERMISSION FOR LOCATION IN MAPS
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                0);
 
         //create groups button
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.new_group);
@@ -155,7 +163,7 @@ public class HomePage extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean result) {
             if (result) {
-                ArrayList<Group> groups = user.getGroups();
+                final ArrayList<Group> groups = user.getGroups();
                 RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
 
                 for (int i = 0; i < groups.size(); i++) {
@@ -176,6 +184,11 @@ public class HomePage extends AppCompatActivity {
                             new RecyclerItemListener.RecyclerTouchListener() {
                                 public void onClickItem(View v, int position) {
                                     Intent myIntent = new Intent(HomePage.this, GroupActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putInt("userId",user.getId());
+                                    extras.putInt("groupId",groups.get(position).getId());
+                                    System.out.println("passo id group: "+groups.get(position).getId());
+                                    myIntent.putExtras(extras);
                                     HomePage.this.startActivity(myIntent);
                                 }
 

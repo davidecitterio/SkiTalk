@@ -1,4 +1,7 @@
 <resources>
+    <string name="google_maps_api_key">AIzaSyDpEJ0rTp4MI3EBgSZN6-RrzH8kw-Kyj5A</string>
+
+
     <string name="app_name">Ski Talk</string>
     <string name="home_page">Home Page</string>
     <string name="my_profile">My Profile</string>
