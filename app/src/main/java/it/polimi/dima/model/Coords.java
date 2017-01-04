@@ -7,30 +7,26 @@ package it.polimi.dima.model;
 public class Coords {
 
 
-    private Float latitude;
-    private Float longitude;
+    private Double latitude;
+    private Double longitude;
 
     public Coords (Double latitude, Double longitude) {
-        this.latitude = latitude.floatValue();
-        this.longitude = longitude.floatValue();
-    }
-
-    public Float getLatitude() {
-        return latitude;
-    }
-
-    public Float getLongitude() {
-        return longitude;
-    }
-
-    public void setCoords(Float latitude, Float longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+
     public void setCoords(Double latitude, Double longitude) {
-        this.latitude = latitude.floatValue();
-        this.longitude = longitude.floatValue();
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
 }

@@ -33,6 +33,7 @@ public class GroupActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private Integer userId, groupId;
     private Group group;
+    Bundle bundle = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,9 @@ public class GroupActivity extends AppCompatActivity {
         userId = intent.getIntExtra("userId", 0);
         groupId = intent.getIntExtra("groupId", 0);
 
+        bundle.putInt("groupId", groupId);
+        bundle.putInt("userId",userId);
+
         try {
             group = new Group(groupId, getApplicationContext());
         } catch (JSONException e) {
@@ -50,6 +54,7 @@ public class GroupActivity extends AppCompatActivity {
         }
 
         System.out.println("name is "+group.getName());
+
 
         toolbar = (Toolbar) findViewById(R.id.toolbar2);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -96,6 +101,7 @@ public class GroupActivity extends AppCompatActivity {
         }
 
         public void addFragment(Fragment fragment, String title) {
+            fragment.setArguments(bundle);
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }

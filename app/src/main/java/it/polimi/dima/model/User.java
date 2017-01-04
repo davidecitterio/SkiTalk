@@ -83,14 +83,14 @@ public class User {
 
             try {
                 nickname = user.getString("nickname");
+                name = user.getString("name");
+                surname = user.getString("surname");
+                coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
+                email = user.getString("email");
+                pictureURL = user.getString("picture");
+                ip = user.getString("ip");
+                isOnline = user.getInt("isOnline");
                 if (n != 0) {
-                    name = user.getString("name");
-                    surname = user.getString("surname");
-                    email = user.getString("email");
-                    pictureURL = user.getString("picture");
-                    ip = user.getString("ip");
-                    isOnline = user.getInt("isOnline");
-                    coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
                     setPicture();
                 }
             } catch (JSONException e) {
