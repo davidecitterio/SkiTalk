@@ -2,10 +2,13 @@ package it.polimi.dima.skitalk.adapter;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -29,12 +32,14 @@ public class RecyclerGroupAdapter extends
         public TextView groupName;
         public TextView groupMembers;
         public ImageView picture;
+        public SwitchCompat swtch;
 
         public MyViewHolder(View view) {
             super(view);
             groupName = (TextView) view.findViewById(R.id.groupName);
             groupMembers = (TextView) view.findViewById(R.id.groupMembers);
             picture = (ImageView) view.findViewById(R.id.picture);
+            swtch = (SwitchCompat) view.findViewById(R.id.groupSwitch);
         }
     }
 
@@ -44,10 +49,29 @@ public class RecyclerGroupAdapter extends
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
+        final int pos = position;
         Group c = groupList.get(position);
         holder.groupName.setText(c.getName());
         holder.groupMembers.setText(c.getMembersString());
         holder.picture.setImageBitmap(getResizedBitmap(c.getPicture(), 100));
+        holder.swtch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                /*SwitchCompat sw = (SwitchCompat) buttonView;
+                LinearLayout ll = (LinearLayout) sw.getParent();
+                RecyclerView rec = (RecyclerView) ll.getParent();
+                if(isChecked)
+                    for(int i=0; i < rec.getChildCount(); i++)
+                        if(i != pos) {
+                            MyViewHolder itemHolder = (MyViewHolder) rec.findViewHolderForAdapterPosition(i);
+                            if(itemHolder.swtch.isChecked()) {
+                                itemHolder.swtch.setChecked(false);
+                                notifyItemChanged(i);
+
+                            }
+                        }*/
+            }
+        });
     }
 
     @Override

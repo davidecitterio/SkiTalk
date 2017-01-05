@@ -1,5 +1,6 @@
 package it.polimi.dima.skitalk.activity;
 
+import android.app.TaskStackBuilder;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -58,7 +60,7 @@ public class GroupActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar2);
         toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setTitle(group.getName());
+        toolbar.setTitle(" "+group.getName());
         toolbar.setLogo(new BitmapDrawable(getApplicationContext().getResources(), getResizedBitmap(group.getPicture(), 48)));
 
         setSupportActionBar(toolbar);
@@ -122,19 +124,28 @@ public class GroupActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        String btnName = null;
 
         switch (itemId) {
-            /*
-            case R.id.menu_settings:
-                btnName = "Settings";
-                break;
-            */
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            case R.id.mute:
+
+                return true;
+
+            case R.id.settings:
+
+                return true;
+
+            case R.id.leave_group:
+
+                return true;
         }
 
         /*Snackbar.make(layout, "Button " + btnName,
                 Snackbar.LENGTH_SHORT).show();*/
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
