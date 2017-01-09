@@ -11,11 +11,13 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,10 +33,11 @@ import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.RecyclerItemListener;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
-public class HomePage extends AppCompatActivity {
+public class HomePage extends AppCompatActivity implements SearchView.OnQueryTextListener {
     User user;
     DrawerLayout dLayout;
     HomePage thisActivity = this;
+    RecyclerGroupAdapter ca;
 
 
     @Override
@@ -76,6 +79,9 @@ public class HomePage extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home_page_menu, menu);
+        final MenuItem searchItem = menu.findItem(R.id.menu_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(this);
         return true;
     }
 
@@ -170,7 +176,7 @@ public class HomePage extends AppCompatActivity {
 
                     //modify this for item spacing
                     int spacing = 16;
-                    RecyclerGroupAdapter ca = new RecyclerGroupAdapter(groups);
+                    ca = new RecyclerGroupAdapter(groups);
                     rv.setAdapter(ca);
                     rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
                     rv.addItemDecoration(
@@ -251,5 +257,16 @@ public class HomePage extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    public boolean onQueryTextChange(String query) {
+        ca.getFilter().filter(query);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
 
 }

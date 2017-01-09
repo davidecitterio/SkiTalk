@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.polimi.dima.model.Group;
@@ -21,9 +23,48 @@ import it.polimi.dima.skitalk.R;
  */
 
 public class RecyclerGroupAdapter extends
-        RecyclerView.Adapter<RecyclerGroupAdapter.MyViewHolder> {
+        RecyclerView.Adapter<RecyclerGroupAdapter.MyViewHolder> implements Filterable{
 
+    private List<Group> originalGroupList;
     private List<Group> groupList;
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                groupList = (List<Group>) results.values;
+                RecyclerGroupAdapter.this.notifyDataSetChanged();
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<Group> filteredResults = null;
+                if (constraint.length() == 0) {
+                    filteredResults = originalGroupList;
+                } else {
+                    filteredResults = getFilteredResults(constraint.toString().toLowerCase());
+                }
+
+                FilterResults results = new FilterResults();
+                results.values = filteredResults;
+
+                return results;
+            }
+        };
+    }
+
+    protected List<Group> getFilteredResults(String constraint) {
+        List<Group> results = new ArrayList<>();
+
+        for (Group item : originalGroupList) {
+            if (item.getName().toLowerCase().contains(constraint)) {
+                results.add(item);
+            }
+        }
+        return results;
+    }
 
     /**
      * View holder class
@@ -44,7 +85,9 @@ public class RecyclerGroupAdapter extends
     }
 
     public RecyclerGroupAdapter(List<Group> groupList) {
+
         this.groupList = groupList;
+        this.originalGroupList = groupList;
     }
 
     @Override
