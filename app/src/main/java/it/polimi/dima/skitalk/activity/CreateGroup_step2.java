@@ -12,12 +12,24 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import it.polimi.dima.model.HttpRequest;
@@ -45,7 +57,7 @@ public class CreateGroup_step2 extends Activity{
     Button create, search, addUser;
     EditText search_user;
     static TextView members;
-    String name, encodedImage;
+    String name;
     Bitmap picture;
     static ArrayList<User>tempUsers = new ArrayList<>();
     static ArrayList<Integer>users = new ArrayList<>();
@@ -66,17 +78,38 @@ public class CreateGroup_step2 extends Activity{
         System.out.println(id);
         System.out.println(name);
         picture = (Bitmap) intent.getParcelableExtra("picture");
-        encodedImage = encodeToBase64(picture, Bitmap.CompressFormat.JPEG, 50);
 
         search_user = (EditText) findViewById(R.id.search_user);
-
-        members = (TextView) findViewById(R.id.members);
 
         ImageView imageView = (ImageView) findViewById(R.id.picture);
         imageView.setImageBitmap(picture);
 
         TextView nameGroup = (TextView) findViewById(R.id.nameGroup);
         nameGroup.setText(name);
+
+        members = (TextView) findViewById(R.id.members);
+        members.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (members.getText().toString().length()>0){
+                    System.out.println("s è: "+members.getText());
+                    String[] separated = members.getText().toString().split(";");
+                    System.out.println("separated lenght: "+separated.length);
+
+                    addTempUser(Integer.valueOf(separated[separated.length-1]));
+                }
+            }
+
+        });
 
 
 
@@ -135,32 +168,14 @@ public class CreateGroup_step2 extends Activity{
 
 
     public void createGroup(){
+
         new CreateGroup().execute("");
+        Intent myIntent = new Intent(CreateGroup_step2.this, GroupActivity.class);
+        myIntent.putExtra("id", idGroup); //Optional parameters
+        CreateGroup_step2.this.startActivity(myIntent);
+        finish();
     }
 
-    private String hashMapToUrl(HashMap<String, String> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        for(Map.Entry<String, String> entry : params.entrySet()){
-            if (first)
-                first = false;
-            else
-                result.append("&");
-
-            result.append(entry.getKey());
-            result.append("=");
-            result.append(entry.getValue());
-        }
-
-        return result.toString();
-    }
-
-    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality)
-    {
-        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-        image.compress(compressFormat, quality, byteArrayOS);
-        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.URL_SAFE);
-    }
 
     public void searchUser(String user){
         final ProgressDialog progressDialog = new ProgressDialog(CreateGroup_step2.this,
@@ -246,17 +261,119 @@ public class CreateGroup_step2 extends Activity{
         for (int i = 0; i < tempUsers.size(); i++){
             if (tempUsers.get(i).getId() == id){
                 users.add(tempUsers.get(i).getId());
-                if (members.getText().toString().length() > 0)
-                    members.append(", "+tempUsers.get(i).getName()+" "+tempUsers.get(i).getSurname()+" ("+tempUsers.get(i).getNickname()+")");
-                else
-                    members.append(tempUsers.get(i).getName()+" "+tempUsers.get(i).getSurname()+" ("+tempUsers.get(i).getNickname()+")");
-                tempUsers.remove(i);
-                System.out.println("Switched");
+                members.append(id+";");
                 return;
             }
 
         }
     }
+
+    public void addTempUser(final int userId){
+
+        LinearLayout ll = (LinearLayout) findViewById(R.id.userButtons);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0,0,0,10);
+        Button but = new Button(this);
+        but.setId(userId);
+        but.setLayoutParams(params);
+        but.setPadding(25,0,25,0);
+        but.setAllCaps(false);
+        but.setText(getUser(userId).getName()+" "+getUser(userId).getSurname());
+        removeTempUser(userId);
+        but.setTextColor(Color.WHITE);
+        but.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_remove, 0);
+        but.setBackgroundColor(getResources().getColor(R.color.primary));
+        ll.addView(but, params);
+        Button but1;
+        but1 = (Button) findViewById(userId);
+
+        but1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Button but = (Button) findViewById(userId);
+                but.setVisibility(View.GONE);
+                removeUser(userId);
+            }
+        });
+    }
+
+    public User getUser(int id){
+        for (int i = 0; i < users.size(); i++){
+            if (tempUsers.get(i).getId() == id)
+                return tempUsers.get(i);
+        }
+        return null;
+    }
+
+    public void removeUser(int id){
+        for (int i = 0; i < users.size(); i++){
+            if (users.get(i) == id)
+                users.remove(i);
+        }
+
+    }
+
+    public void removeTempUser(int id){
+        for (int i = 0; i < tempUsers.size(); i++){
+            if (tempUsers.get(i).getId() == id)
+                tempUsers.remove(i);
+        }
+
+    }
+
+    public String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    private void uploadImage(){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://skitalk.altervista.org/php/editGroupPicture.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+
+                        //Showing toast message of the response
+                        Toast.makeText(CreateGroup_step2.this, s , Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                        //Showing toast
+                        Toast.makeText(CreateGroup_step2.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                //Converting Bitmap to String
+                String image = getStringImage(picture);
+
+                //Creating parameters
+                Map<String,String> params = new Hashtable<String, String>();
+
+                //Adding parameters
+                params.put("picture", image);
+                params.put("name", "pic_"+idGroup);
+                params.put("id", String.valueOf(idGroup));
+
+                //returning parameters
+                return params;
+            }
+        };
+
+        //Creating a Request Queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+
+    }
+
 
 
     private class CreateGroup extends AsyncTask<String, Void, Boolean> {
@@ -267,20 +384,8 @@ public class CreateGroup_step2 extends Activity{
 
         @Override
         protected Boolean doInBackground(String... params) {
-            //generate hashMap to store encodedImage and the name
-            HashMap<String,String> detail = new HashMap<>();
-            detail.put("name", name);
-            detail.put("image", encodedImage);
-            detail.put("id", String.valueOf(id));
-
 
             try {
-
-                /*UploadPicture upload = new UploadPicture("http://skitalk.altervista.org/php/addGroup.php", hashMapToUrl(detail));
-                Thread t = new Thread(upload);
-                t.start();
-                JSONObject response = upload.getResponse();*/
-
                 HttpRequest request= new HttpRequest("http://skitalk.altervista.org/php/addGroup.php",
                         "name="+ URLEncoder.encode(name, "UTF-8")+"&id="+id);
                 Thread tr = new Thread(request);
@@ -288,12 +393,12 @@ public class CreateGroup_step2 extends Activity{
                 JSONObject response = request.getResponse();
 
                 idGroup = response.getInt("id");
-                tr.join();
+
+                uploadImage();
+
                 return true;
 
-            }  catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
+            }   catch (JSONException e) {
                 e.printStackTrace();
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -348,10 +453,6 @@ public class CreateGroup_step2 extends Activity{
             if (success)
                 progressDialog2.dismiss();
                 //TODO: launch the group activity HERE!
-            Intent myIntent = new Intent(CreateGroup_step2.this, HomePage.class);
-            myIntent.putExtra("id", id); //Optional parameters
-            CreateGroup_step2.this.startActivity(myIntent);
-            finish();
         }
 
         @Override

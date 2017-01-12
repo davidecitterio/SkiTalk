@@ -100,7 +100,7 @@ public class CreateGroup_step1 extends Activity{
                 InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
                 picture = BitmapFactory.decodeStream(inputStream);
 
-                picture = getResizedBitmap(picture, 200);
+                picture = getResizedBitmap(picture, 300);
 
                 ImageView imageView = (ImageView) findViewById(R.id.picture);
                 imageView.setImageBitmap(picture);

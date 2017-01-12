@@ -25,6 +25,7 @@ public class RecyclerAddUserAdapter extends
 
     private List<User> userList;
 
+
     /**
      * View holder class
      * */
@@ -43,7 +44,9 @@ public class RecyclerAddUserAdapter extends
     }
 
     public RecyclerAddUserAdapter(List<User> groupList) {
+
         this.userList = groupList;
+
     }
 
     @Override
