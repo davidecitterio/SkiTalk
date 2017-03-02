@@ -32,7 +32,7 @@ public class Group {
     private int idBusy;
     private ArrayList<User> users = new ArrayList<User>();
     private Context c;
-
+    private boolean isActive;
 
     // built group starting from id
     public Group(int id, Context c) throws JSONException {
@@ -53,6 +53,7 @@ public class Group {
             loadGroup();
         setPicture();
         setMembers();
+        isActive = false;
     }
 
     // built group starting from id
@@ -216,5 +217,13 @@ public class Group {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 }

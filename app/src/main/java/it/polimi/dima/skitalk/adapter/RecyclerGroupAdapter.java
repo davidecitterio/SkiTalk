@@ -10,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -97,24 +98,7 @@ public class RecyclerGroupAdapter extends
         holder.groupName.setText(c.getName());
         holder.groupMembers.setText(c.getMembersString());
         holder.picture.setImageBitmap(getResizedBitmap(c.getPicture(), 100));
-        holder.swtch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                /*SwitchCompat sw = (SwitchCompat) buttonView;
-                LinearLayout ll = (LinearLayout) sw.getParent();
-                RecyclerView rec = (RecyclerView) ll.getParent();
-                if(isChecked)
-                    for(int i=0; i < rec.getChildCount(); i++)
-                        if(i != pos) {
-                            MyViewHolder itemHolder = (MyViewHolder) rec.findViewHolderForAdapterPosition(i);
-                            if(itemHolder.swtch.isChecked()) {
-                                itemHolder.swtch.setChecked(false);
-                                notifyItemChanged(i);
-
-                            }
-                        }*/
-            }
-        });
+        holder.swtch.setChecked(c.isActive());
     }
 
     @Override

@@ -18,27 +18,30 @@ public class RecyclerItemListener
 
     public interface RecyclerTouchListener {
         public void onClickItem(View v, int position) ;
-        public void onLongClickItem(View v, int position);
+        public void onClickSwitch(View v, int position) ;
     }
 
     public RecyclerItemListener(Context ctx, final RecyclerView rv,
-                                final RecyclerTouchListener listener) {
+                                final RecyclerTouchListener listener, final int width) {
         this.listener = listener;
         gd = new GestureDetector(ctx,
                 new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public void onLongPress(MotionEvent e) {
-                        // We find the view
-                        View v = rv.findChildViewUnder(e.getX(), e.getY());
-                        // Notify the even
-                        listener.onLongClickItem(v, rv.getChildAdapterPosition(v));
+
                     }
 
                     @Override
                     public boolean onSingleTapUp(MotionEvent e) {
-                        View v = rv.findChildViewUnder(e.getX(), e.getY());
-                        // Notify the even
-                        listener.onClickItem(v, rv.getChildAdapterPosition(v));
+                        if(e.getX() < width) {
+                            View v = rv.findChildViewUnder(e.getX(), e.getY());
+                            // Notify the even
+                            listener.onClickItem(v, rv.getChildAdapterPosition(v));
+                        } else {
+                            View v = rv.findChildViewUnder(e.getX(), e.getY());
+                            // Notify the even
+                            listener.onClickSwitch(v, rv.getChildAdapterPosition(v));
+                        }
                         return true;
                     }
                 });

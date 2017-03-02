@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,10 +20,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
@@ -162,7 +167,25 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            user = new User(params[0], c);
+            /*SharedPreferences sharedPref = thisActivity.getPreferences(Context.MODE_PRIVATE);
+            int savedUserId = sharedPref.getInt(getString(R.string.saved_user_id), -1);
+
+            if(savedUserId == -1 || savedUserId != params[0]) {
+                //retrieve user info*/
+                user = new User(params[0], c);
+                /*//save user info in local storage
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(getString(R.string.saved_user_id), user.getId());
+                editor.putString(getString(R.string.saved_user_name), user.getName());
+                editor.putString(getString(R.string.saved_user_surname), user.getSurname());
+                editor.putString(getString(R.string.saved_user_nickname), user.getNickname());
+                editor.putString(getString(R.string.saved_user_email), user.getEmail());
+                editor.putString(getString(R.string.saved_user_picture_url), user.getPictureURL());
+                editor.commit();
+            } else {
+
+            }*/
+
             return true;
         }
 
@@ -171,38 +194,81 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             if (result) {
                 final ArrayList<Group> groups = user.getGroups();
                 RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
+                final SharedPreferences sharedPref = thisActivity.getPreferences(Context.MODE_PRIVATE);
+                //modify this for item spacing
+                int spacing = 96;
+                ca = new RecyclerGroupAdapter(groups);
+                rv.setAdapter(ca);
+                rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
+                rv.addItemDecoration(
+                        new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
+                                R.drawable.item_decorator), spacing));
+                //layout
+                LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
+                llm.setOrientation(LinearLayoutManager.VERTICAL);
+                rv.setLayoutManager(llm);
+                rv.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), rv,
+                        new RecyclerItemListener.RecyclerTouchListener() {
+                            public void onClickItem(View v, int position) {
+                                Intent myIntent = new Intent(HomePage.this, GroupActivity.class);
+                                Bundle extras = new Bundle();
+                                extras.putInt("userId",user.getId());
+                                extras.putInt("groupId",groups.get(position).getId());
+                                System.out.println("passo id group: "+groups.get(position).getId());
+                                myIntent.putExtras(extras);
+                                HomePage.this.startActivity(myIntent);
+                            }
 
-                for (int i = 0; i < groups.size(); i++) {
-
-                    //modify this for item spacing
-                    int spacing = 16;
-                    ca = new RecyclerGroupAdapter(groups);
-                    rv.setAdapter(ca);
-                    rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
-                    rv.addItemDecoration(
-                            new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
-                                    R.drawable.item_decorator), spacing * 2));
-                    //layout
-                    LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
-                    llm.setOrientation(LinearLayoutManager.VERTICAL);
-                    rv.setLayoutManager(llm);
-                    rv.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), rv,
-                            new RecyclerItemListener.RecyclerTouchListener() {
-                                public void onClickItem(View v, int position) {
-                                    Intent myIntent = new Intent(HomePage.this, GroupActivity.class);
-                                    Bundle extras = new Bundle();
-                                    extras.putInt("userId",user.getId());
-                                    extras.putInt("groupId",groups.get(position).getId());
-                                    System.out.println("passo id group: "+groups.get(position).getId());
-                                    myIntent.putExtras(extras);
-                                    HomePage.this.startActivity(myIntent);
+                            public void onClickSwitch(View v, int position) {
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                //set switch checked and save id
+                                SwitchCompat swtch  = (SwitchCompat) v.findViewById(R.id.groupSwitch);
+                                if(swtch.isChecked()) {
+                                    swtch.setChecked(false);
+                                    groups.get(position).setActive(false);
+                                    editor.putInt(getString(R.string.saved_active_group_id), -1);
+                                    editor.commit();
+                                } else {
+                                    swtch.setChecked(true);
+                                    groups.get(position).setActive(true);
+                                    editor.putInt(getString(R.string.saved_active_group_id), groups.get(position).getId());
+                                    editor.commit();
                                 }
-
-                                public void onLongClickItem(View v, int position) {
-
+                                //set other groups non active
+                                for(int i = 0; i < groups.size(); i++) {
+                                    if(i != position)
+                                        groups.get(i).setActive(false);
+                                    //System.out.println("   " + i + " : " + groups.get(i).isActive());
                                 }
-                            }));
+                                //set other visible switches unchecked
+                                RecyclerView rec = (RecyclerView) v.getParent();
+                                System.out.println("pos: "+position+" on "+rec.getChildCount()+", checked: "+swtch.isChecked());
+                                if(swtch.isChecked())
+                                    for(int i = 0; i < groups.size(); i++)
+                                        //change the state of visible switches
+                                        if(i != position) {
+                                            RecyclerGroupAdapter.MyViewHolder child = (RecyclerGroupAdapter.MyViewHolder) rec.findViewHolderForAdapterPosition(i);
+                                            if(child != null) {
+                                                SwitchCompat sw = child.swtch;
+                                                if (sw.isChecked()) {
+                                                    sw.setChecked(false);
+                                                }
+                                            } else {
+                                                //notify item changed for non visible switches
+                                                ca.notifyItemChanged(i);
+                                            }
+                                        }
+                            }
+                        }, getScreenWidth()-192));
+                //show which group is active
+                int savedActiveGroupID = sharedPref.getInt(getString(R.string.saved_active_group_id), -1);
+                if(savedActiveGroupID != -1) {
+                    for(Group g : groups) {
+                        if(g.getId() == savedActiveGroupID)
+                            g.setActive(true);
+                    }
                 }
+
                 progressDialog.dismiss();
             }
             else
@@ -215,6 +281,14 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             progressDialog.setIndeterminate(true);
             progressDialog.setMessage(getString(R.string.loading));
             progressDialog.show();
+        }
+
+        private int getScreenWidth() {
+            Display display = getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int width = size.x;
+            return width;
         }
     }
 

@@ -28,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp"
             android:layout_marginLeft="16dp"
+            android:dividerHeight="16dp"
             android:scrollbars="vertical"/>
 
         <android.support.design.widget.FloatingActionButton
