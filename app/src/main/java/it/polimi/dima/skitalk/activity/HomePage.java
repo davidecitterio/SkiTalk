@@ -167,25 +167,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            /*SharedPreferences sharedPref = thisActivity.getPreferences(Context.MODE_PRIVATE);
-            int savedUserId = sharedPref.getInt(getString(R.string.saved_user_id), -1);
-
-            if(savedUserId == -1 || savedUserId != params[0]) {
-                //retrieve user info*/
-                user = new User(params[0], c);
-                /*//save user info in local storage
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt(getString(R.string.saved_user_id), user.getId());
-                editor.putString(getString(R.string.saved_user_name), user.getName());
-                editor.putString(getString(R.string.saved_user_surname), user.getSurname());
-                editor.putString(getString(R.string.saved_user_nickname), user.getNickname());
-                editor.putString(getString(R.string.saved_user_email), user.getEmail());
-                editor.putString(getString(R.string.saved_user_picture_url), user.getPictureURL());
-                editor.commit();
-            } else {
-
-            }*/
-
+            user = new User(params[0], c);
             return true;
         }
 
@@ -242,7 +224,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                                 }
                                 //set other visible switches unchecked
                                 RecyclerView rec = (RecyclerView) v.getParent();
-                                System.out.println("pos: "+position+" on "+rec.getChildCount()+", checked: "+swtch.isChecked());
+                                //System.out.println("pos: "+position+" on "+rec.getChildCount()+", checked: "+swtch.isChecked());
                                 if(swtch.isChecked())
                                     for(int i = 0; i < groups.size(); i++)
                                         //change the state of visible switches

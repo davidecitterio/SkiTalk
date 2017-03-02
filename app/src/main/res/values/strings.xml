@@ -35,6 +35,12 @@
     <string name="leave_group">Leave group</string>
     <string name="mute">Mute</string>
     <string name="settings">Settings</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="nickname">Nickname</string>
+    <string name="save">Save</string>
 
     <string name="saved_active_group_id">saved_active_group_id</string>
 </resources>
