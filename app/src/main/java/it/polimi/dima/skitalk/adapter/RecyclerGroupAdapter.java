@@ -78,7 +78,7 @@ public class RecyclerGroupAdapter extends
             super(view);
             groupName = (TextView) view.findViewById(R.id.groupName);
             groupMembers = (TextView) view.findViewById(R.id.groupMembers);
-            picture = (CircleImageView) view.findViewById(R.id.groupPicture);
+            picture = (CircleImageView) view.findViewById(R.id.group_toolbar_picture);
             swtch = (SwitchCompat) view.findViewById(R.id.groupSwitch);
         }
     }

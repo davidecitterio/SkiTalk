@@ -1,18 +1,18 @@
 package it.polimi.dima.skitalk.adapter;
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.Utils;
 
 import static it.polimi.dima.skitalk.activity.CreateGroup_step2.switchUser;
 
@@ -31,14 +31,14 @@ public class RecyclerAddUserAdapter extends
      * */
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView name, nickname;
-        public ImageView picture;
+        public CircleImageView picture;
         public Button addUser;
 
         public MyViewHolder(View view) {
             super(view);
             name = (TextView) view.findViewById(R.id.name);
             nickname = (TextView) view.findViewById(R.id.nickname);
-            picture = (ImageView) view.findViewById(R.id.groupPicture);
+            picture = (CircleImageView) view.findViewById(R.id.group_toolbar_picture);
             addUser = (Button) view.findViewById(R.id.add_user);
         }
     }
@@ -54,7 +54,7 @@ public class RecyclerAddUserAdapter extends
         User c = userList.get(position);
         holder.name.setText(c.getName()+" "+c.getSurname());
         holder.nickname.setText(c.getNickname());
-        holder.picture.setImageBitmap(getResizedBitmap(c.getPicture(), 100));
+        holder.picture.setImageBitmap(Utils.getResizedBitmap(c.getPicture(), 100));
         holder.addUser.setTag(c.getId());
 
         System.out.println("id è: "+ holder.addUser.getTag());
@@ -78,21 +78,5 @@ public class RecyclerAddUserAdapter extends
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.user_row, parent, false);
         return new RecyclerAddUserAdapter.MyViewHolder(v);
-    }
-
-    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-
-        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 }

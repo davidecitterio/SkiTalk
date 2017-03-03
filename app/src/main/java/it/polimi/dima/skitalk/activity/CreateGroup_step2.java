@@ -18,7 +18,6 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
@@ -81,7 +81,7 @@ public class CreateGroup_step2 extends Activity{
 
         search_user = (EditText) findViewById(R.id.search_user);
 
-        ImageView imageView = (ImageView) findViewById(R.id.groupPicture);
+        CircleImageView imageView = (CircleImageView) findViewById(R.id.group_toolbar_picture);
         imageView.setImageBitmap(picture);
 
         TextView nameGroup = (TextView) findViewById(R.id.nameGroup);
@@ -235,23 +235,19 @@ public class CreateGroup_step2 extends Activity{
                             return;
                         }
 
-                        for (int i = 0; i < tempUsers.size(); i++) {
-
-                            //modify this for item spacing
-                            System.out.println(tempUsers.size());
-                            int spacing = 16;
-                            RecyclerAddUserAdapter ca = new RecyclerAddUserAdapter(tempUsers);
-                            rv.setAdapter(ca);
-                            rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
-                            rv.addItemDecoration(
-                                    new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
-                                            R.drawable.item_decorator), spacing * 2));
-                            //layout
-                            LinearLayoutManager llm = new LinearLayoutManager(CreateGroup_step2.this);
-                            llm.setOrientation(LinearLayoutManager.VERTICAL);
-                            rv.setLayoutManager(llm);
-
-                        }
+                        //modify this for item spacing
+                        System.out.println(tempUsers.size());
+                        int spacing = getResources().getInteger(R.integer.group_creation_recycler_spacing);
+                        RecyclerAddUserAdapter ca = new RecyclerAddUserAdapter(tempUsers);
+                        rv.setAdapter(ca);
+                        rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
+                        rv.addItemDecoration(
+                                new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
+                                        R.drawable.item_decorator), spacing));
+                        //layout
+                        LinearLayoutManager llm = new LinearLayoutManager(CreateGroup_step2.this);
+                        llm.setOrientation(LinearLayoutManager.VERTICAL);
+                        rv.setLayoutManager(llm);
             }
         });
     }

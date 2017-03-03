@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -206,7 +207,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         private void showGroups() {
             final ArrayList<Group> groups = user.getGroups();
             RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
-            final SharedPreferences sharedPref = thisActivity.getPreferences(Context.MODE_PRIVATE);
+            final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(thisActivity);;
             //modify this for item spacing
             int spacing = thisActivity.getResources().getInteger(R.integer.home_recycler_spacing);
             ca = new RecyclerGroupAdapter(groups);

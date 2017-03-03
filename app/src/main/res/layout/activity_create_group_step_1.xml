@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:fitsSystemWindows="true">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/home_toolbar"/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
@@ -30,10 +30,10 @@
             android:layout_width="match_parent"
             android:layout_height="32dp"/>
 
-        <ImageView
-            android:id="@+id/groupPicture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/group_toolbar_picture"
+            android:layout_width="@dimen/group_creation_picture"
+            android:layout_height="@dimen/group_creation_picture"
             android:src="@drawable/logo"
             android:layout_gravity="center_horizontal"/>
 

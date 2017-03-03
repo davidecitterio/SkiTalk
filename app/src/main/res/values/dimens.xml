@@ -5,5 +5,8 @@
     <dimen name="row_group_picture">48dp</dimen>
     <dimen name="drawer_picture">76dp</dimen>
     <dimen name="profile_picture">128dp</dimen>
+    <dimen name="group_creation_picture">96dp</dimen>
+    <dimen name="group_toolbar">48dp</dimen>
+    <dimen name="group_toolbar_active">24dp</dimen>
 
 </resources>

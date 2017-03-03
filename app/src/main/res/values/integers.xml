@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="home_recycler_spacing">96</integer>
+    <integer name="group_creation_recycler_spacing">48</integer>
+    <integer name="group_bar_picture_dimension">96</integer>
 </resources>

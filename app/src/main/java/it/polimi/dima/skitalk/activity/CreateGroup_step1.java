@@ -12,11 +12,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.skitalk.R;
 
 /**
@@ -102,7 +102,7 @@ public class CreateGroup_step1 extends Activity{
 
                 picture = getResizedBitmap(picture, 300);
 
-                ImageView imageView = (ImageView) findViewById(R.id.groupPicture);
+                CircleImageView imageView = (CircleImageView) findViewById(R.id.group_toolbar_picture);
                 imageView.setImageBitmap(picture);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

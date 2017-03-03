@@ -10,7 +10,7 @@
         android:layout_height="match_parent"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/groupPicture"
+        android:id="@+id/group_toolbar_picture"
         android:layout_width="@dimen/row_group_picture"
         android:layout_height="@dimen/row_group_picture"
         android:src="@drawable/logo"
