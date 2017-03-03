@@ -18,6 +18,8 @@ public class VerticalSpacingDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+        if(parent.getChildAdapterPosition(view) == 0)
+            outRect.top = (int)(spacing * 2/3);
         outRect.bottom = spacing;
     }
 }

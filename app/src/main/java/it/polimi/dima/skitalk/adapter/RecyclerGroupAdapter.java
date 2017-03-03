@@ -1,23 +1,21 @@
 package it.polimi.dima.skitalk.adapter;
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.Group;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.Utils;
 
 /**
  * Created by Max on 29/12/2016.
@@ -73,14 +71,14 @@ public class RecyclerGroupAdapter extends
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView groupName;
         public TextView groupMembers;
-        public ImageView picture;
+        public CircleImageView picture;
         public SwitchCompat swtch;
 
         public MyViewHolder(View view) {
             super(view);
             groupName = (TextView) view.findViewById(R.id.groupName);
             groupMembers = (TextView) view.findViewById(R.id.groupMembers);
-            picture = (ImageView) view.findViewById(R.id.picture);
+            picture = (CircleImageView) view.findViewById(R.id.groupPicture);
             swtch = (SwitchCompat) view.findViewById(R.id.groupSwitch);
         }
     }
@@ -97,7 +95,7 @@ public class RecyclerGroupAdapter extends
         Group c = groupList.get(position);
         holder.groupName.setText(c.getName());
         holder.groupMembers.setText(c.getMembersString());
-        holder.picture.setImageBitmap(getResizedBitmap(c.getPicture(), 100));
+        holder.picture.setImageBitmap(Utils.getResizedBitmap(c.getPicture(), 100));
         holder.swtch.setChecked(c.isActive());
     }
 
@@ -111,21 +109,5 @@ public class RecyclerGroupAdapter extends
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row, parent, false);
         return new MyViewHolder(v);
-    }
-
-    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-
-        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 }

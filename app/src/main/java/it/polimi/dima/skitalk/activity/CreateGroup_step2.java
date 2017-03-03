@@ -81,7 +81,7 @@ public class CreateGroup_step2 extends Activity{
 
         search_user = (EditText) findViewById(R.id.search_user);
 
-        ImageView imageView = (ImageView) findViewById(R.id.picture);
+        ImageView imageView = (ImageView) findViewById(R.id.groupPicture);
         imageView.setImageBitmap(picture);
 
         TextView nameGroup = (TextView) findViewById(R.id.nameGroup);

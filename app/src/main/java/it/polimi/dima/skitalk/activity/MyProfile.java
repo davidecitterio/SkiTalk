@@ -3,7 +3,6 @@ package it.polimi.dima.skitalk.activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -16,11 +15,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.Utils;
 
 public class MyProfile extends AppCompatActivity {
     DrawerLayout dLayout;
@@ -31,7 +31,7 @@ public class MyProfile extends AppCompatActivity {
     TextView userNickname;
     TextView userEmail;
     TextView userPassword;
-    ImageView userPicture;
+    CircleImageView userPicture;
     Button login;
 
     @Override
@@ -44,7 +44,7 @@ public class MyProfile extends AppCompatActivity {
         userSurname = (TextView) findViewById(R.id.myprofile_surname);
         userNickname = (TextView) findViewById(R.id.myprofile_nickname);
         userEmail = (TextView) findViewById(R.id.myprofile_email);
-        userPicture = (ImageView) findViewById(R.id.myprofile_picture);
+        userPicture = (CircleImageView) findViewById(R.id.myprofile_picture);
         login = (Button)findViewById(R.id.login_button);
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -88,11 +88,12 @@ public class MyProfile extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean result) {
             if (result) {
+                loadDrawerHeader();
                 userName.setText(user.getName());
                 userSurname.setText(user.getSurname());
                 userNickname.setText(user.getNickname());
                 userEmail.setText(user.getEmail());
-                userPicture.setImageBitmap(getResizedBitmap(user.getPicture(), 256));
+                userPicture.setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
                 progressDialog.dismiss();
             }
             else
@@ -107,20 +108,11 @@ public class MyProfile extends AppCompatActivity {
             progressDialog.show();
         }
 
-        public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-            int width = image.getWidth();
-            int height = image.getHeight();
+        private void loadDrawerHeader() {
+            ((TextView) findViewById(R.id.drawer_name)).setText(user.getName()+" "+user.getSurname());
+            ((TextView) findViewById(R.id.drawer_email)).setText(user.getEmail());
+            ((CircleImageView) findViewById(R.id.drawer_image)).setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
 
-            float bitmapRatio = (float) width / (float) height;
-            if (bitmapRatio > 1) {
-                width = maxSize;
-                height = (int) (width / bitmapRatio);
-            } else {
-                height = maxSize;
-                width = (int) (height * bitmapRatio);
-            }
-
-            return Bitmap.createScaledBitmap(image, width, height, true);
         }
     }
 

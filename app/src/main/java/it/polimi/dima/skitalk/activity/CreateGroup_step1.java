@@ -102,7 +102,7 @@ public class CreateGroup_step1 extends Activity{
 
                 picture = getResizedBitmap(picture, 300);
 
-                ImageView imageView = (ImageView) findViewById(R.id.picture);
+                ImageView imageView = (ImageView) findViewById(R.id.groupPicture);
                 imageView.setImageBitmap(picture);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

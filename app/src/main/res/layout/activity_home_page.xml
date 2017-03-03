@@ -10,7 +10,6 @@
     tools:context=".activity.HomePage"
     >
 
-
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -26,7 +25,7 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="56dp"
             android:dividerHeight="16dp"
             android:scrollbars="vertical"/>
 
@@ -46,6 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        app:headerLayout="@layout/drawer_header"
         app:menu="@menu/nav_items"/>
 
 

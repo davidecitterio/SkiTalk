@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,16 +27,20 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.Group;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.RecyclerItemListener;
+import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
 public class HomePage extends AppCompatActivity implements SearchView.OnQueryTextListener {
@@ -174,83 +179,8 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         @Override
         protected void onPostExecute(final Boolean result) {
             if (result) {
-                final ArrayList<Group> groups = user.getGroups();
-                RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
-                final SharedPreferences sharedPref = thisActivity.getPreferences(Context.MODE_PRIVATE);
-                //modify this for item spacing
-                int spacing = 96;
-                ca = new RecyclerGroupAdapter(groups);
-                rv.setAdapter(ca);
-                rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
-                rv.addItemDecoration(
-                        new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
-                                R.drawable.item_decorator), spacing));
-                //layout
-                LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
-                llm.setOrientation(LinearLayoutManager.VERTICAL);
-                rv.setLayoutManager(llm);
-                rv.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), rv,
-                        new RecyclerItemListener.RecyclerTouchListener() {
-                            public void onClickItem(View v, int position) {
-                                Intent myIntent = new Intent(HomePage.this, GroupActivity.class);
-                                Bundle extras = new Bundle();
-                                extras.putInt("userId",user.getId());
-                                extras.putInt("groupId",groups.get(position).getId());
-                                System.out.println("passo id group: "+groups.get(position).getId());
-                                myIntent.putExtras(extras);
-                                HomePage.this.startActivity(myIntent);
-                            }
-
-                            public void onClickSwitch(View v, int position) {
-                                SharedPreferences.Editor editor = sharedPref.edit();
-                                //set switch checked and save id
-                                SwitchCompat swtch  = (SwitchCompat) v.findViewById(R.id.groupSwitch);
-                                if(swtch.isChecked()) {
-                                    swtch.setChecked(false);
-                                    groups.get(position).setActive(false);
-                                    editor.putInt(getString(R.string.saved_active_group_id), -1);
-                                    editor.commit();
-                                } else {
-                                    swtch.setChecked(true);
-                                    groups.get(position).setActive(true);
-                                    editor.putInt(getString(R.string.saved_active_group_id), groups.get(position).getId());
-                                    editor.commit();
-                                }
-                                //set other groups non active
-                                for(int i = 0; i < groups.size(); i++) {
-                                    if(i != position)
-                                        groups.get(i).setActive(false);
-                                    //System.out.println("   " + i + " : " + groups.get(i).isActive());
-                                }
-                                //set other visible switches unchecked
-                                RecyclerView rec = (RecyclerView) v.getParent();
-                                //System.out.println("pos: "+position+" on "+rec.getChildCount()+", checked: "+swtch.isChecked());
-                                if(swtch.isChecked())
-                                    for(int i = 0; i < groups.size(); i++)
-                                        //change the state of visible switches
-                                        if(i != position) {
-                                            RecyclerGroupAdapter.MyViewHolder child = (RecyclerGroupAdapter.MyViewHolder) rec.findViewHolderForAdapterPosition(i);
-                                            if(child != null) {
-                                                SwitchCompat sw = child.swtch;
-                                                if (sw.isChecked()) {
-                                                    sw.setChecked(false);
-                                                }
-                                            } else {
-                                                //notify item changed for non visible switches
-                                                ca.notifyItemChanged(i);
-                                            }
-                                        }
-                            }
-                        }, getScreenWidth()-192));
-                //show which group is active
-                int savedActiveGroupID = sharedPref.getInt(getString(R.string.saved_active_group_id), -1);
-                if(savedActiveGroupID != -1) {
-                    for(Group g : groups) {
-                        if(g.getId() == savedActiveGroupID)
-                            g.setActive(true);
-                    }
-                }
-
+                loadDrawerHeader();
+                showGroups();
                 progressDialog.dismiss();
             }
             else
@@ -263,6 +193,93 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             progressDialog.setIndeterminate(true);
             progressDialog.setMessage(getString(R.string.loading));
             progressDialog.show();
+        }
+
+        private void loadDrawerHeader() {
+            TextView textName = (TextView) findViewById(R.id.drawer_name);
+            textName.setText(user.getName()+" "+user.getSurname());
+            TextView textEmail = (TextView) findViewById(R.id.drawer_email);
+            textEmail.setText(user.getEmail());
+            ((CircleImageView) findViewById(R.id.drawer_image)).setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
+        }
+
+        private void showGroups() {
+            final ArrayList<Group> groups = user.getGroups();
+            RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
+            final SharedPreferences sharedPref = thisActivity.getPreferences(Context.MODE_PRIVATE);
+            //modify this for item spacing
+            int spacing = thisActivity.getResources().getInteger(R.integer.home_recycler_spacing);
+            ca = new RecyclerGroupAdapter(groups);
+            rv.setAdapter(ca);
+            rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
+            rv.addItemDecoration(
+                    new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
+                            R.drawable.item_decorator), spacing));
+            //layout
+            LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            rv.setLayoutManager(llm);
+            rv.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), rv,
+                    new RecyclerItemListener.RecyclerTouchListener() {
+                        public void onClickItem(View v, int position) {
+                            Intent myIntent = new Intent(HomePage.this, GroupActivity.class);
+                            Bundle extras = new Bundle();
+                            extras.putInt("userId",user.getId());
+                            extras.putInt("groupId",groups.get(position).getId());
+                            System.out.println("passo id group: "+groups.get(position).getId());
+                            myIntent.putExtras(extras);
+                            HomePage.this.startActivity(myIntent);
+                        }
+
+                        public void onClickSwitch(View v, int position) {
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            //set switch checked and save id
+                            SwitchCompat swtch  = (SwitchCompat) v.findViewById(R.id.groupSwitch);
+                            if(swtch.isChecked()) {
+                                swtch.setChecked(false);
+                                groups.get(position).setActive(false);
+                                editor.putInt(getString(R.string.saved_active_group_id), -1);
+                                editor.commit();
+                            } else {
+                                swtch.setChecked(true);
+                                groups.get(position).setActive(true);
+                                editor.putInt(getString(R.string.saved_active_group_id), groups.get(position).getId());
+                                editor.commit();
+                            }
+                            //set other groups non active
+                            for(int i = 0; i < groups.size(); i++) {
+                                if(i != position)
+                                    groups.get(i).setActive(false);
+                                //System.out.println("   " + i + " : " + groups.get(i).isActive());
+                            }
+                            //set other visible switches unchecked
+                            RecyclerView rec = (RecyclerView) v.getParent();
+                            //System.out.println("pos: "+position+" on "+rec.getChildCount()+", checked: "+swtch.isChecked());
+                            if(swtch.isChecked())
+                                for(int i = 0; i < groups.size(); i++)
+                                    //change the state of visible switches
+                                    if(i != position) {
+                                        RecyclerGroupAdapter.MyViewHolder child = (RecyclerGroupAdapter.MyViewHolder) rec.findViewHolderForAdapterPosition(i);
+                                        if(child != null) {
+                                            SwitchCompat sw = child.swtch;
+                                            if (sw.isChecked()) {
+                                                sw.setChecked(false);
+                                            }
+                                        } else {
+                                            //notify item changed for non visible switches
+                                            ca.notifyItemChanged(i);
+                                        }
+                                    }
+                        }
+                    }, getScreenWidth()-192));
+            //show which group is active
+            int savedActiveGroupID = sharedPref.getInt(getString(R.string.saved_active_group_id), -1);
+            if(savedActiveGroupID != -1) {
+                for(Group g : groups) {
+                    if(g.getId() == savedActiveGroupID)
+                        g.setActive(true);
+                }
+            }
         }
 
         private int getScreenWidth() {

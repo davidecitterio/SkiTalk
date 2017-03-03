@@ -38,7 +38,7 @@ public class RecyclerAddUserAdapter extends
             super(view);
             name = (TextView) view.findViewById(R.id.name);
             nickname = (TextView) view.findViewById(R.id.nickname);
-            picture = (ImageView) view.findViewById(R.id.picture);
+            picture = (ImageView) view.findViewById(R.id.groupPicture);
             addUser = (Button) view.findViewById(R.id.add_user);
         }
     }
