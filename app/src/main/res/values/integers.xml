@@ -3,4 +3,5 @@
     <integer name="home_recycler_spacing">96</integer>
     <integer name="group_creation_recycler_spacing">48</integer>
     <integer name="group_bar_picture_dimension">96</integer>
+    <integer name="row_group_picture_bitmap">200</integer>
 </resources>

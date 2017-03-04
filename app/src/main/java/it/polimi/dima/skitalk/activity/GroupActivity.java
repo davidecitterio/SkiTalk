@@ -120,9 +120,7 @@ public class GroupActivity extends AppCompatActivity {
 
         switch (itemId) {
             case android.R.id.home:
-                Intent myIntent = new Intent(GroupActivity.this, HomePage.class);
-                myIntent.putExtra("id", userId);
-                GroupActivity.this.startActivity(myIntent);
+                goBackToHome();
                 return true;
 
             case R.id.mute:
@@ -141,6 +139,11 @@ public class GroupActivity extends AppCompatActivity {
         /*Snackbar.make(layout, "Button " + btnName,
                 Snackbar.LENGTH_SHORT).show();*/
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        goBackToHome();
     }
 
     private void loadGroup() {
@@ -204,5 +207,11 @@ public class GroupActivity extends AppCompatActivity {
             ((ImageView) findViewById(R.id.group_toolbar_active)).setImageDrawable(getResources().getDrawable(R.drawable.ic_active_group));
         else
             ((ImageView) findViewById(R.id.group_toolbar_active)).setImageDrawable(null);
+    }
+
+    private void goBackToHome() {
+        Intent myIntent = new Intent(GroupActivity.this, HomePage.class);
+        myIntent.putExtra("id", userId);
+        GroupActivity.this.startActivity(myIntent);
     }
 }

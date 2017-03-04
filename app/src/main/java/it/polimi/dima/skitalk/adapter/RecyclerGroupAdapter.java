@@ -2,7 +2,6 @@ package it.polimi.dima.skitalk.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +98,7 @@ public class RecyclerGroupAdapter extends
         Group c = groupList.get(position);
         holder.groupName.setText(c.getName());
         holder.groupMembers.setText(c.getMembersString());
-        holder.picture.setImageBitmap(Utils.getResizedBitmap(c.getPicture(), 100));
+        holder.picture.setImageBitmap(Utils.getResizedBitmap(c.getPicture(), 200));
         holder.swtch.setChecked(c.isActive());
         holder.myBackground.setSelected(false);
     }
