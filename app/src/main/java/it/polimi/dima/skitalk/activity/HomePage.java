@@ -223,6 +223,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             rv.addOnItemTouchListener(new RecyclerItemListener(getApplicationContext(), rv,
                     new RecyclerItemListener.RecyclerTouchListener() {
                         public void onClickItem(View v, int position) {
+                            v.setSelected(true);
                             Intent myIntent = new Intent(HomePage.this, GroupActivity.class);
                             Bundle extras = new Bundle();
                             extras.putInt("userId",user.getId());

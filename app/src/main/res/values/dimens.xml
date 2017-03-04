@@ -8,5 +8,6 @@
     <dimen name="group_creation_picture">96dp</dimen>
     <dimen name="group_toolbar">48dp</dimen>
     <dimen name="group_toolbar_active">24dp</dimen>
+    <dimen name="row_group_name_size">16sp</dimen>
 
 </resources>

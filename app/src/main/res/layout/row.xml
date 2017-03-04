@@ -3,7 +3,8 @@
     android:id="@+id/groupRow"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/selector_row">
 
     <View
         android:layout_width="16dp"
@@ -29,6 +30,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/groupName"
             android:textStyle="bold"
+            android:textSize="@dimen/row_group_name_size"
             />
 
         <TextView

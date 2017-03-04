@@ -120,7 +120,9 @@ public class GroupActivity extends AppCompatActivity {
 
         switch (itemId) {
             case android.R.id.home:
-                onBackPressed();
+                Intent myIntent = new Intent(GroupActivity.this, HomePage.class);
+                myIntent.putExtra("id", userId);
+                GroupActivity.this.startActivity(myIntent);
                 return true;
 
             case R.id.mute:
