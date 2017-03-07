@@ -19,7 +19,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -88,23 +87,18 @@ public class MapFragment extends Fragment {
                     //mMap.setMyLocationEnabled(true);
                 }
 
-                //LatLng userPosition = new LatLng(user.getCoords().getLatitude(), user.getCoords().getLongitude());
-
-
-                googleMap.animateCamera(CameraUpdateFactory.zoomTo(5));
-
-                LatLng position;
 
                 for (int i=0; i< group.getMembers().size(); i++){
-                    position = new LatLng(group.getMembers().get(i).getCoords().getLatitude(), group.getMembers().get(i).getCoords().getLongitude());
-                    googleMap.addMarker(new MarkerOptions().position(position)
+                    googleMap.addMarker(new MarkerOptions().position(new LatLng(group.getMembers().get(i).getCoords().getLatitude(), group.getMembers().get(i).getCoords().getLongitude()))
                             .title(group.getMembers().get(i).getName()+" "+group.getMembers().get(i).getSurname())
                             .visible(true)
-                            .snippet("Is skiing.")
-                            .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(getActivity(), marker))));
-                    //.icon(BitmapDescriptorFactory.fromBitmap(user.getPicture())));
+                            .snippet("Is skiing."+group.getMembers().get(i).getCoords().getLatitude()+"  "+group.getMembers().get(i).getCoords().getLongitude())
+                            );
 
+
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(user.getCoords().getLatitude(), user.getCoords().getLongitude())));
                 }
+
 
             }
         });

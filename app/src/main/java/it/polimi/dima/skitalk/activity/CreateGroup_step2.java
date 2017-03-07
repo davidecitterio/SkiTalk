@@ -170,10 +170,7 @@ public class CreateGroup_step2 extends Activity{
     public void createGroup(){
 
         new CreateGroup().execute("");
-        Intent myIntent = new Intent(CreateGroup_step2.this, GroupActivity.class);
-        myIntent.putExtra("id", idGroup); //Optional parameters
-        CreateGroup_step2.this.startActivity(myIntent);
-        finish();
+
     }
 
 
@@ -275,7 +272,7 @@ public class CreateGroup_step2 extends Activity{
         but.setLayoutParams(params);
         but.setPadding(25,0,25,0);
         but.setAllCaps(false);
-        but.setText(getUser(userId).getName()+" "+getUser(userId).getSurname());
+        but.setText(getUser(userId).getName()+" "+getUser(userId).getSurname()+" ("+getUser(userId).getNickname()+")");
         removeTempUser(userId);
         but.setTextColor(Color.WHITE);
         but.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_remove, 0);
@@ -332,8 +329,7 @@ public class CreateGroup_step2 extends Activity{
                     @Override
                     public void onResponse(String s) {
 
-                        //Showing toast message of the response
-                        Toast.makeText(CreateGroup_step2.this, s , Toast.LENGTH_LONG).show();
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -389,6 +385,8 @@ public class CreateGroup_step2 extends Activity{
                 JSONObject response = request.getResponse();
 
                 idGroup = response.getInt("id");
+
+                System.out.println("id of the new group is: "+idGroup);
 
                 uploadImage();
 
@@ -448,7 +446,14 @@ public class CreateGroup_step2 extends Activity{
         protected void onPostExecute(final Boolean success) {
             if (success)
                 progressDialog2.dismiss();
-                //TODO: launch the group activity HERE!
+            Intent myIntent = new Intent(CreateGroup_step2.this, GroupActivity.class);
+            Bundle extras = new Bundle();
+            extras.putInt("userId",id);
+            extras.putInt("groupId",idGroup);
+            myIntent.putExtras(extras);
+            CreateGroup_step2.this.startActivity(myIntent);
+
+            finish();
         }
 
         @Override

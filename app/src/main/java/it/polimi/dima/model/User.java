@@ -1,7 +1,6 @@
 package it.polimi.dima.model;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -16,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-
 
 import static android.content.ContentValues.TAG;
 
@@ -206,13 +204,14 @@ public class User {
             Thread t = new Thread(request);
             t.start();
             JSONArray groups = request.getArrayResponse();
-            saveGroups(groups);
-            for (int i=0; i < groups.length(); i++) {
-                this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
+
+            if(groups.getJSONObject(0).getInt("id") != -1){
+                saveGroups(groups);
+                for (int i=0; i < groups.length(); i++) {
+                    this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
+                }
             }
-        //}
-        //else
-        //    loadGroups();
+
     }
 
     public void setPicture(){

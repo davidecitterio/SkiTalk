@@ -48,7 +48,7 @@ public class SignIn extends Activity {
 
 
                     HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/addUser.php",
-                            "email=" + email.getText().toString() + "&nickname" + nickname.getText().toString() + "&password=" + password.getText().toString());
+                            "email=" + email.getText().toString() + "&nickname=" + nickname.getText().toString() + "&password=" + password.getText().toString());
                     Thread t = new Thread(request);
                     t.start();
                     JSONObject response = request.getResponse();
