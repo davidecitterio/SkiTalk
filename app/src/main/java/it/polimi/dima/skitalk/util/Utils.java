@@ -1,8 +1,12 @@
 package it.polimi.dima.skitalk.util;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.util.Base64;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -48,5 +52,19 @@ public class Utils {
     public static boolean fileAlreadyExist(Context c, String name) {
         File file = new File(c.getCacheDir(), name);
         return file.exists();
+    }
+
+    public static void pickImage(Activity ac) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        ac.startActivityForResult(intent, 100);
+    }
+
+    public static String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
     }
 }

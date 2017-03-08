@@ -31,26 +31,16 @@
             android:layout_height="32dp"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/group_toolbar_picture"
+            android:id="@+id/group_picture"
             android:layout_width="@dimen/group_creation_picture"
             android:layout_height="@dimen/group_creation_picture"
-            android:src="@drawable/logo"
+            android:src="@mipmap/ic_add_image"
             android:layout_gravity="center_horizontal"/>
-
-        <Button
-            android:id="@+id/select_picture"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:background="@color/primary_dark"
-            android:textColor="@color/icons"
-            android:padding="12dp"
-            android:text="@string/select_picture"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginTop="32dp"
             android:background="@android:color/darker_gray"/>
 
         <Button

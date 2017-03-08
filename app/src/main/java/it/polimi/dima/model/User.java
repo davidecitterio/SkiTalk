@@ -81,7 +81,7 @@ public class User {
         }
     }
 
-    private void saveUserInfo(JSONObject user, Context c) {
+    public static void saveUserInfo(JSONObject user, Context c) {
         String content = String.valueOf(user);
 
         System.out.println("Save values: " + content);
@@ -156,7 +156,7 @@ public class User {
     }
 
     private void setPicture() {
-        File cacheFile = new File(c.getCacheDir(), ""+pictureURL.hashCode());;
+        File cacheFile = new File(c.getCacheDir(), ""+pictureURL.hashCode());
         // Open input stream to the cache file
         FileInputStream fis = null;
         try {
@@ -174,6 +174,13 @@ public class User {
         t.start();
         picture = pic.getPicture();
         Utils.putBitmapInDiskCache(c, pictureURL, picture);
+    }
+
+    private void downloadTempPicture() {
+        PictureDownloader pic = new PictureDownloader(getPictureURL());
+        Thread t = new Thread(pic);
+        t.start();
+        picture = pic.getPicture();
     }
 
     public User(int id, int n) {
@@ -207,9 +214,8 @@ public class User {
         name = user.getString("name");
         surname = user.getString("surname");
         nickname = user.getString("nickname");
-        email = user.getString("email");
         pictureURL = user.getString("picture");
-        downloadPicture();
+        downloadTempPicture();
     }
 
 

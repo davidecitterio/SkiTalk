@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.MyProfile" />
+        <activity android:name=".activity.MyProfileEdit" />
         <activity android:name=".activity.HomePage" />
         <activity android:name=".activity.Logout" />
         <activity android:name=".activity.SignIn" />

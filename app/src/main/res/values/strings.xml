@@ -42,6 +42,7 @@
     <string name="surname">Surname</string>
     <string name="nickname">Nickname</string>
     <string name="save">Save</string>
+    <string name="edit">Edit</string>
 
     <string name="saved_active_group_id">saved_active_group_id</string>
 </resources>

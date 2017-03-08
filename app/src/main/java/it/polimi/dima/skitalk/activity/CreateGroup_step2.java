@@ -47,6 +47,7 @@ import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerAddUserAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
+import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
 /**
@@ -232,8 +233,8 @@ public class CreateGroup_step2 extends Activity{
                             return;
                         }
 
-                        //modify this for item spacing
                         System.out.println(tempUsers.size());
+                        //modify this for item spacing
                         int spacing = getResources().getInteger(R.integer.group_creation_recycler_spacing);
                         RecyclerAddUserAdapter ca = new RecyclerAddUserAdapter(tempUsers);
                         rv.setAdapter(ca);
@@ -315,14 +316,6 @@ public class CreateGroup_step2 extends Activity{
 
     }
 
-    public String getStringImage(Bitmap bmp){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return encodedImage;
-    }
-
     private void uploadImage(){
         StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://skitalk.altervista.org/php/editGroupPicture.php",
                 new Response.Listener<String>() {
@@ -343,7 +336,7 @@ public class CreateGroup_step2 extends Activity{
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 //Converting Bitmap to String
-                String image = getStringImage(picture);
+                String image = Utils.getStringImage(picture);
 
                 //Creating parameters
                 Map<String,String> params = new Hashtable<String, String>();

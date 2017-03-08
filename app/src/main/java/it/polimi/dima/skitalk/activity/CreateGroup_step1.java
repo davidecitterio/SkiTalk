@@ -18,14 +18,16 @@ import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.Utils;
 
 /**
  * Created by Davide on 30/12/2016.
  */
 
-public class CreateGroup_step1 extends Activity{
-
-    Button next, selectpicture;
+public class CreateGroup_step1 extends Activity {
+    private final Activity thisActivity = this;
+    Button next;
+    CircleImageView selectpicture;
     EditText name;
     Bitmap picture;
     String picturePath;
@@ -44,11 +46,11 @@ public class CreateGroup_step1 extends Activity{
         tb.setTitleTextColor(Color.WHITE);
         tb.setTitle(getString(R.string.new_group));
 
-        selectpicture = (Button) findViewById(R.id.select_picture);
+        selectpicture = (CircleImageView) findViewById(R.id.group_picture);
         selectpicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pickImage();
+                Utils.pickImage(thisActivity);
             }
         });
 
@@ -80,14 +82,6 @@ public class CreateGroup_step1 extends Activity{
         });
     }
 
-
-
-    public void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, 100);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -100,30 +94,13 @@ public class CreateGroup_step1 extends Activity{
                 InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
                 picture = BitmapFactory.decodeStream(inputStream);
 
-                picture = getResizedBitmap(picture, 300);
+                picture = Utils.getResizedBitmap(picture, 300);
 
-                CircleImageView imageView = (CircleImageView) findViewById(R.id.group_toolbar_picture);
-                imageView.setImageBitmap(picture);
+                selectpicture.setImageBitmap(picture);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
             //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
         }
-    }
-
-    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-        }
-
-        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 }
