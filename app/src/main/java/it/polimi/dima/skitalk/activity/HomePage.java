@@ -49,6 +49,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     DrawerLayout dLayout;
     HomePage thisActivity = this;
     RecyclerGroupAdapter ca;
+    Context c;
 
 
     @Override
@@ -169,11 +170,10 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
         ProgressDialog progressDialog = new ProgressDialog(HomePage.this,
                 ProgressDialog.STYLE_SPINNER);
-        Context c;
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            user = new User(params[0], c);
+            user = new User(params[0], c, false);
             return true;
         }
 

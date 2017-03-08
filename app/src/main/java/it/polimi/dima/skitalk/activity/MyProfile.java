@@ -80,7 +80,7 @@ public class MyProfile extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            user = new User(params[0], c);
+            user = new User(params[0], c, true);
 
             return true;
         }

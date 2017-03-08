@@ -2,6 +2,7 @@ package it.polimi.dima.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,10 +11,13 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+
+import it.polimi.dima.skitalk.util.Utils;
 
 
 /**
@@ -35,25 +39,99 @@ public class Group {
     private boolean isActive;
 
     // built group starting from id
-    public Group(int id, Context c) throws JSONException {
+    public Group(int id, Context c, boolean cached) throws JSONException {
         this.c = c;
         this.id = id;
-        if (!alreadyExistGroup()) {
-            HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupInfo.php", "id=" + id);
-            Thread t = new Thread(request);
-            t.start();
-            JSONObject group = request.getResponse();
-            saveGroup(group);
+
+        if(cached && Utils.fileAlreadyExist(c, "SkiTalkGroupInfo"+id))
+            loadGroup();
+        else
+            downloadGroup();
+        isActive = false;
+    }
+
+    private void loadGroup(){
+        BufferedReader input = null;
+        File file = null;
+
+        try {
+            file = new File(c.getCacheDir(), "SkiTalkGroupInfo"+id); // Pass getFilesDir() and "MyFile" to read file
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            JSONObject group = new JSONObject(buffer.toString());
             name = group.getString("name");
             pictureURL = group.getString("picture");
             isBusy = group.getInt("isBusy");
             idBusy = group.getInt("idBusy");
+            setPicture();
+            setMembers();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        else
-            loadGroup();
-        setPicture();
-        setMembers();
-        isActive = false;
+    }
+
+    private void downloadGroup() {
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupInfo.php", "id=" + id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject group = request.getResponse();
+        saveGroup(group);
+        try {
+            name = group.getString("name");
+            pictureURL = group.getString("picture");
+            isBusy = group.getInt("isBusy");
+            idBusy = group.getInt("idBusy");
+            downloadPicture();
+            setMembers();
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveGroup(JSONObject group){
+        String content = String.valueOf(group);
+
+        System.out.println("Save values: "+content);
+        File file;
+        FileOutputStream outputStream;
+        try {
+            file = new File(c.getCacheDir(), "SkiTalkGroupInfo"+id);
+
+            outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setPicture() {
+        File cacheFile = new File(c.getCacheDir(), ""+pictureURL.hashCode());;
+        // Open input stream to the cache file
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(cacheFile);
+            picture = BitmapFactory.decodeStream(fis);
+            System.out.println("Picture loaded from cache");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void downloadPicture() {
+        PictureDownloader pic = new PictureDownloader(getPictureURL());
+        Thread t = new Thread(pic);
+        t.start();
+        picture = pic.getPicture();
+        Utils.putBitmapInDiskCache(c, pictureURL, picture);
     }
 
     // built group starting from id
@@ -63,10 +141,27 @@ public class Group {
         pictureURL = group.getString("picture");
         isBusy = group.getInt("isBusy");
         idBusy = group.getInt("idBusy");
-        setPicture();
+        downloadPicture();
         setMembers();
     }
 
+    //set all members of the group (only the id of the users)
+    private void setMembers() throws JSONException {
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupMembers.php", "id="+id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONArray users = request.getArrayResponse();
+        for (int i=0; i< users.length(); i++){
+            // inserisco tutti gli utenti, io incluso...
+            this.users.add(new User(users.getJSONObject(i).getInt("id"), 0));
+        }
+
+    }
+
+    public void clearCache() {
+        File file = new File(c.getCacheDir(), "SkiTalkGroupInfo"+id); // Pass getFilesDir() and "MyFile" to read file
+        file.delete();
+    }
 
     // return true if the group is busy
     public boolean isBusy(){
@@ -99,26 +194,6 @@ public class Group {
         t.start();
         JSONObject response = request.getResponse();
         setGroup(response);
-    }
-
-    //set all members of the group (only the id of the users)
-    public void setMembers() throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupMembers.php", "id="+id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONArray users = request.getArrayResponse();
-        for (int i=0; i< users.length(); i++){
-           // inserisco tutti gli utenti, io incluso...
-            this.users.add(new User(users.getJSONObject(i).getInt("id"), 0));
-        }
-
-    }
-
-    public void setPicture(){
-        PictureDownloader pic = new PictureDownloader(getPictureURL());
-        Thread t = new Thread(pic);
-        t.start();
-        picture = pic.getPicture();
     }
 
     //getters
@@ -159,64 +234,6 @@ public class Group {
                 members += ", ";
         }
         return members;
-    }
-
-    public boolean alreadyExistGroup(){
-        File file = new File(c.getCacheDir(), "SkiTalkGroup"+id);
-        if (file.exists()){
-            return true;
-        }
-        else
-            return false;
-    }
-
-    public void loadGroup(){
-        BufferedReader input = null;
-        File file = null;
-        JSONArray jsonArr;
-        JSONObject userInfo;
-
-        try {
-            file = new File(c.getCacheDir(), "SkiTalkGroup"+id); // Pass getFilesDir() and "MyFile" to read file
-
-            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            String line;
-            StringBuffer buffer = new StringBuffer();
-            while ((line = input.readLine()) != null) {
-                buffer.append(line);
-            }
-
-            JSONObject group = new JSONObject(buffer.toString());
-            name = group.getString("name");
-            pictureURL = group.getString("picture");
-            isBusy = group.getInt("isBusy");
-            idBusy = group.getInt("idBusy");
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void saveGroup(JSONObject group){
-        String content = String.valueOf(group);
-
-        System.out.println("Save values: "+content);
-        File file;
-        FileOutputStream outputStream;
-        try {
-            // file = File.createTempFile("MyCache", null, getCacheDir());
-            file = new File(c.getCacheDir(), "SkiTalkGroup"+id);
-
-            outputStream = new FileOutputStream(file);
-            outputStream.write(content.getBytes());
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void setActive(boolean isActive) {
