@@ -38,6 +38,7 @@ import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.RecyclerItemListener;
+import it.polimi.dima.skitalk.util.ServiceUpdate;
 import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
@@ -49,17 +50,25 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     Context c;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         setToolBar();
 
+        //start the update service
+        startService(new Intent(this, ServiceUpdate.class));
 
         //REQUEST PERMISSION FOR LOCATION IN MAPS
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 0);
+        //REQUEST PERMISSION FOR MICROPHONE
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.RECORD_AUDIO},
+                0);
+
 
         //create groups button
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.new_group);
@@ -340,5 +349,9 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     public boolean onQueryTextSubmit(String query) {
         return false;
     }
+
+
+
+
 
 }

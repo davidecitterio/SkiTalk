@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.ServiceAudioReceiver;
+import it.polimi.dima.skitalk.util.ServiceUpdate;
 
 import static android.content.ContentValues.TAG;
 
@@ -154,6 +156,17 @@ public class Login extends Activity {
             }
 
             System.out.println("the id is: "+buffer);
+
+            //start update coord service
+            Intent serviceIntentCoord = new Intent(getApplicationContext(),ServiceUpdate.class);
+            serviceIntentCoord.putExtra("id", Integer.parseInt(buffer.toString()) );
+            startService(serviceIntentCoord);
+
+            //start receive audio service
+            Intent serviceIntentAudio = new Intent(getApplicationContext(),ServiceAudioReceiver.class);
+            serviceIntentAudio.putExtra("id", Integer.parseInt(buffer.toString()) );
+            startService(serviceIntentAudio);
+
             //start homepage activity
             Intent myIntent = new Intent(Login.this, HomePage.class);
             myIntent.putExtra("id", Integer.parseInt(buffer.toString())); //Optional parameters

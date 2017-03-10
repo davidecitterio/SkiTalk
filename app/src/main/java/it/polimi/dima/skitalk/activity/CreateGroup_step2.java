@@ -14,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,7 +33,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -427,8 +425,7 @@ public class CreateGroup_step2 extends Activity{
                         "idGroup="+idGroup+"&idUser="+users.get(i));
                 Thread tr = new Thread(request);
                 tr.start();
-                JSONObject resp = request.getResponse();
-                System.out.println(resp);
+
 
             }
 
