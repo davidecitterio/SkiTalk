@@ -94,10 +94,16 @@ public class RecyclerGroupAdapter extends
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        final int pos = position;
         Group c = groupList.get(position);
         holder.groupName.setText(c.getName());
-        holder.groupMembers.setText(c.getMembersString());
+
+        //adjust members string to fit the screen
+        final int MAX_STRING_LENGTH = 38;
+        String membersString = c.getMembersString();
+        if(membersString.length() > MAX_STRING_LENGTH)
+            membersString = membersString.substring(0, MAX_STRING_LENGTH - 5) + " ...";
+        holder.groupMembers.setText(membersString);
+
         holder.picture.setImageBitmap(Utils.getResizedBitmap(c.getPicture(), 200));
         holder.swtch.setChecked(c.isActive());
         holder.myBackground.setSelected(false);
@@ -111,7 +117,7 @@ public class RecyclerGroupAdapter extends
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row, parent, false);
+                .inflate(R.layout.row_home_page, parent, false);
         return new MyViewHolder(v);
     }
 }

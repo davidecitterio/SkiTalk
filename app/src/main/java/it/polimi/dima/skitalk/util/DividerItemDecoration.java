@@ -13,18 +13,23 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private Drawable mDivider;
     private int spacing;
+    private boolean lastRowDivider;
 
-    public DividerItemDecoration(Drawable divider, int spacing) {
+    public DividerItemDecoration(Drawable divider, int spacing, boolean lastRowDivider) {
         this.mDivider = divider;
         this.spacing = spacing;
+        this.lastRowDivider = lastRowDivider;
     }
 
     @Override
     public void onDrawOver(Canvas canvas, RecyclerView parent, RecyclerView.State state) {
         final int left = parent.getPaddingLeft();
         final int right = parent.getWidth() - parent.getPaddingRight();
-
-        final int childCount = parent.getChildCount();
+        final int childCount;
+        if(lastRowDivider)
+            childCount = parent.getChildCount();
+        else
+            childCount = parent.getChildCount() - 1;
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
             final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child

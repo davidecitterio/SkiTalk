@@ -28,7 +28,7 @@ public class RecyclerItemListener
                 new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public void onLongPress(MotionEvent e) {
-
+                        onSingleTapUp(e);
                     }
 
                     @Override

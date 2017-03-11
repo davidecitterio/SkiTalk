@@ -19,7 +19,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +54,7 @@ import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
  * Created by Davide on 30/12/2016.
  */
 
-public class CreateGroup_step2 extends Activity{
+public class Settings extends Activity{
     private static RecyclerAddUserAdapter tempUsersAdapter;
     private static RecyclerAddedUserAdapter membersAdapter;
     private Button create;
@@ -70,11 +69,11 @@ public class CreateGroup_step2 extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_group_step_2);
+        setContentView(R.layout.activity_settings);
 
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         tb.setTitleTextColor(Color.WHITE);
-        tb.setTitle(getString(R.string.new_group));
+        tb.setTitle(getString(R.string.settings));
 
         Intent intent = getIntent();
         id = intent.getIntExtra("id", 0);
@@ -117,7 +116,7 @@ public class CreateGroup_step2 extends Activity{
 
                 }
                 else{
-                    AlertDialog.Builder alert = new AlertDialog.Builder(CreateGroup_step2.this);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(Settings.this);
                     alert.setTitle(R.string.create_group_problem_title);
                     alert.setMessage(R.string.create_group_problem_text);
                     alert.setPositiveButton("OK", null);
@@ -146,7 +145,7 @@ public class CreateGroup_step2 extends Activity{
                 new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
                         R.drawable.item_decorator), spacing, false));
         //layout
-        LinearLayoutManager llm = new LinearLayoutManager(CreateGroup_step2.this);
+        LinearLayoutManager llm = new LinearLayoutManager(Settings.this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
     }
@@ -157,7 +156,7 @@ public class CreateGroup_step2 extends Activity{
             searchUser(search_user.getText().toString());
             showSearchResult();
         } else {
-            AlertDialog.Builder alert = new AlertDialog.Builder(CreateGroup_step2.this);
+            AlertDialog.Builder alert = new AlertDialog.Builder(Settings.this);
             alert.setTitle("Oooops.");
             alert.setMessage("You have to fill the nickname field");
             alert.setPositiveButton("OK", null);
@@ -166,7 +165,7 @@ public class CreateGroup_step2 extends Activity{
     }
 
     public void searchUser(String user){
-        final ProgressDialog progressDialog = new ProgressDialog(CreateGroup_step2.this,
+        final ProgressDialog progressDialog = new ProgressDialog(Settings.this,
                 ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage(getString(R.string.authenticating));
@@ -183,7 +182,7 @@ public class CreateGroup_step2 extends Activity{
 
             try {
                 if (response.getJSONObject(i).getInt("id") == -1) {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(CreateGroup_step2.this);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(Settings.this);
                     alert.setTitle(R.string.no_users_found_title);
                     alert.setMessage(R.string.no_users_found_text);
                     alert.setPositiveButton("OK", null);
@@ -215,7 +214,7 @@ public class CreateGroup_step2 extends Activity{
                 tempUsersAdapter.notifyDataSetChanged();
 
                 if (tempUsers.size()==0){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(CreateGroup_step2.this);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(Settings.this);
                     alert.setTitle(R.string.no_users_found_title);
                     alert.setMessage(R.string.no_users_found_text);
                     alert.setPositiveButton("OK", null);
@@ -267,7 +266,7 @@ public class CreateGroup_step2 extends Activity{
                     public void onErrorResponse(VolleyError volleyError) {
 
                         //Showing toast
-                        Toast.makeText(CreateGroup_step2.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(Settings.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
                     }
                 }){
             @Override
@@ -300,7 +299,7 @@ public class CreateGroup_step2 extends Activity{
 
     private class CreateGroup extends AsyncTask<String, Void, Boolean> {
 
-        ProgressDialog progressDialog = new ProgressDialog(CreateGroup_step2.this,
+        ProgressDialog progressDialog = new ProgressDialog(Settings.this,
                 ProgressDialog.STYLE_SPINNER);
 
 
@@ -352,7 +351,7 @@ public class CreateGroup_step2 extends Activity{
 
     private class AddMembers extends AsyncTask<String, Void, Boolean> {
 
-        ProgressDialog progressDialog2 = new ProgressDialog(CreateGroup_step2.this,
+        ProgressDialog progressDialog2 = new ProgressDialog(Settings.this,
                 ProgressDialog.STYLE_SPINNER);
 
         @Override
@@ -375,12 +374,12 @@ public class CreateGroup_step2 extends Activity{
         protected void onPostExecute(final Boolean success) {
             if (success)
                 progressDialog2.dismiss();
-            Intent myIntent = new Intent(CreateGroup_step2.this, GroupActivity.class);
+            Intent myIntent = new Intent(Settings.this, GroupActivity.class);
             Bundle extras = new Bundle();
             extras.putInt("userId",id);
             extras.putInt("groupId",idGroup);
             myIntent.putExtras(extras);
-            CreateGroup_step2.this.startActivity(myIntent);
+            Settings.this.startActivity(myIntent);
 
             finish();
         }

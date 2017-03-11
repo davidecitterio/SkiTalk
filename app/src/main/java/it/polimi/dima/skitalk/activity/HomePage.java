@@ -43,11 +43,11 @@ import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
 public class HomePage extends AppCompatActivity implements SearchView.OnQueryTextListener {
-    User user;
-    DrawerLayout dLayout;
-    HomePage thisActivity = this;
-    RecyclerGroupAdapter ca;
-    Context c;
+    private User user;
+    private DrawerLayout dLayout;
+    private HomePage thisActivity = this;
+    private RecyclerGroupAdapter ca;
+    private Context c;
 
 
 
@@ -221,7 +221,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
             rv.addItemDecoration(
                     new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
-                            R.drawable.item_decorator), spacing));
+                            R.drawable.item_decorator), spacing, true));
             //layout
             LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
             llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -298,46 +298,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             return width;
         }
     }
-
-    private void showGroups() {
-
-        try {
-            Thread thread = new Thread() {
-                public void run() {
-                    try {
-                        ArrayList<Group> groups = user.getGroups();
-                        RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
-
-                        for (int i = 0; i < groups.size(); i++) {
-
-                            //modify this for item spacing
-                            int spacing = 16;
-                            RecyclerGroupAdapter ca = new RecyclerGroupAdapter(groups);
-                            rv.setAdapter(ca);
-                            rv.addItemDecoration(new VerticalSpacingDecoration(spacing));
-                            rv.addItemDecoration(
-                                    new DividerItemDecoration(ContextCompat.getDrawable(getApplicationContext(),
-                                            R.drawable.item_decorator), spacing * 2));
-                            //layout
-                            LinearLayoutManager llm = new LinearLayoutManager(HomePage.this);
-                            llm.setOrientation(LinearLayoutManager.VERTICAL);
-                            rv.setLayoutManager(llm);
-
-                        }
-
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            thread.start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     @Override
     public boolean onQueryTextChange(String query) {
