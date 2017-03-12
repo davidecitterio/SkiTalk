@@ -13,7 +13,7 @@
     <string name="signin_problem_title">There is a problem</string>
     <string name="signin_problem_text">Please fill all the fields.</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="loading">Loading content..</string>
+    <string name="loading">Loading content...</string>
     <string name="create_group_problem_title">Ouch!</string>
     <string name="create_group_problem_text">Insert at least one person in your group.</string>
     <string name="group_name_hint">Name of the Group</string>
@@ -27,8 +27,8 @@
     <string name="no_users_found_text">There are no user with that nickname.</string>
     <string name="already_inserted_user_title">Oooops!</string>
     <string name="already_inserted_user_text">You have already select this user.</string>
-    <string name="creating_group">Creating group..</string>
-    <string name="adding_members">Adding members..</string>
+    <string name="creating_group">Creating group...</string>
+    <string name="adding_members">Adding members...</string>
     <string name="add">ADD</string>
     <string name="tab_talk">Talk</string>
     <string name="tab_map">Map</string>
@@ -45,6 +45,9 @@
     <string name="edit">Edit</string>
     <string name="members">Members:</string>
     <string name="search_results">Search results:</string>
+    <string name="default_password">default</string>
+    <string name="upload">Uploading contents...</string>
+    <string name="upload_picture">Uploading picture...</string>
 
     <string name="saved_active_group_id">saved_active_group_id</string>
 </resources>

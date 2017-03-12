@@ -25,7 +25,6 @@ import it.polimi.dima.skitalk.util.Utils;
  */
 
 
-//TODO implement picture managment
 public class Group {
 
     private Integer id;
@@ -83,7 +82,7 @@ public class Group {
         Thread t = new Thread(request);
         t.start();
         JSONObject group = request.getResponse();
-        saveGroup(group);
+        saveGroup(group, c);
         try {
             name = group.getString("name");
             pictureURL = group.getString("picture");
@@ -96,19 +95,32 @@ public class Group {
         }
     }
 
-    private void saveGroup(JSONObject group){
+    public static void saveGroup(JSONObject group, Context c){
         String content = String.valueOf(group);
 
         System.out.println("Save values: "+content);
         File file;
         FileOutputStream outputStream;
         try {
-            file = new File(c.getCacheDir(), "SkiTalkGroupInfo"+id);
+            file = new File(c.getCacheDir(), "SkiTalkGroupInfo"+group.getString("id"));
 
             outputStream = new FileOutputStream(file);
             outputStream.write(content.getBytes());
             outputStream.close();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveGroup(Group user, Context c) {
+        JSONObject g = new JSONObject();
+        try {
+            g.put("name", user.name);
+
+            saveGroup(g, c);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

@@ -46,6 +46,7 @@ import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerAddUserAdapter;
 import it.polimi.dima.skitalk.adapter.RecyclerAddedUserAdapter;
+import it.polimi.dima.skitalk.util.ActivityWithRecyclerView;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
@@ -54,7 +55,7 @@ import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
  * Created by Davide on 30/12/2016.
  */
 
-public class Settings extends Activity{
+public class Settings extends Activity implements ActivityWithRecyclerView {
     private static RecyclerAddUserAdapter tempUsersAdapter;
     private static RecyclerAddedUserAdapter membersAdapter;
     private Button create;
@@ -126,10 +127,10 @@ public class Settings extends Activity{
         });
 
         RecyclerView membersRecyclerView = (RecyclerView) findViewById(R.id.members_recycler_view);
-        membersAdapter = new RecyclerAddedUserAdapter(members);
+        membersAdapter = new RecyclerAddedUserAdapter(members, this);
         setupRecyclerView(membersRecyclerView, membersAdapter);
         RecyclerView tempUsersRecyclerView = (RecyclerView) findViewById(R.id.temp_users_recycler_view);
-        tempUsersAdapter = new RecyclerAddUserAdapter(tempUsers);
+        tempUsersAdapter = new RecyclerAddUserAdapter(tempUsers, this);
         setupRecyclerView(tempUsersRecyclerView, tempUsersAdapter);
     }
 
@@ -228,7 +229,8 @@ public class Settings extends Activity{
         });
     }
 
-    public static void addUser(int id){
+    @Override
+    public void addUser(int id){
         for (User user : tempUsers) {
             if (user.getId() == id){
                 users.add(user.getId());
@@ -241,7 +243,8 @@ public class Settings extends Activity{
         }
     }
 
-    public static void removeUser(int id){
+    @Override
+    public void removeUser(int id){
         for (User user : members) {
             if (user.getId() == id){
                 users.remove(user.getId());

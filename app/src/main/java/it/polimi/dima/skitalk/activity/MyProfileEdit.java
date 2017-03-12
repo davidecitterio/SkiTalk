@@ -20,16 +20,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,20 +34,23 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.HttpRequest;
+import it.polimi.dima.model.ImageUploader;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
 
-public class MyProfileEdit extends AppCompatActivity {
+public class MyProfileEdit extends AppCompatActivity implements Response.Listener<String> {
     private DrawerLayout dLayout;
     private MyProfileEdit thisActivity = this;
     private User user;
     private EditText userNameView, userSurnameView, userNicknameView, userEmailView, userPasswordView;
     private String userName, userSurname, userNickname, userEmail;
-    private boolean userPictureEdit;
+    private boolean userPictureEdit, updateStrings;
     private CircleImageView userPictureView;
     private Bitmap userPicture;
     private Button save;
+    private HttpRequest dataRequest;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,60 +81,36 @@ public class MyProfileEdit extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveEdit();
-                Intent myIntent = new Intent(thisActivity, MyProfile.class);
-                myIntent.putExtra("id", user.getId());
-                startActivity(myIntent);
             }
         });
         initializeUser();
     }
 
     private void saveEdit() {
-        HttpRequest request1 = null, request2 = null;
-        boolean updateStrings = !nothingHasBeenModified();
+        dataRequest = null;
+        updateStrings = !nothingHasBeenModified();
+
+        //show progress dialog
+        progressDialog = new ProgressDialog(MyProfileEdit.this,
+                ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.upload));
+        progressDialog.show();
+
         //request for strings
         if(updateStrings) {
             String params = "idUser="+user.getId()+"&name="+userNameView.getText()+"&surname="+userSurnameView.getText()+
                     "&nickname="+userNicknameView.getText()+"&email="+userEmailView.getText();
             if(!(userPasswordView.getText().toString()).equals("default"))
                 params = params + "&password="+userPasswordView.getText();
-            request1 = new HttpRequest("http://skitalk.altervista.org/php/editUser.php", params);
-            Thread t1 = new Thread(request1);
+            dataRequest = new HttpRequest("http://skitalk.altervista.org/php/editUser.php", params);
+            Thread t1 = new Thread(dataRequest);
             t1.start();
         }
-
-        //TODO caricamento immagine
-        /*QUESTO POI ANDRA' TOLTO*/userPictureEdit = false;
 
         //request for picture
         if(userPictureEdit)
             uploadImage();
-
-        if(userPictureEdit) {
-            //delete old image
-            File cacheFile = new File(thisActivity.getCacheDir(), ""+user.getPictureURL().hashCode());
-            cacheFile.delete();
-            //save new image
-            JSONObject response = request2.getResponse();
-            String pictureUrl = null;
-            try {
-                pictureUrl = response.getString("picture");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            Utils.putBitmapInDiskCache(thisActivity, pictureUrl, userPicture);
-            //save user file
-            JSONObject user = request1.getResponse();
-            try {
-                user.put("picture", pictureUrl);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            User.saveUserInfo(user, thisActivity);
-        } else if(updateStrings) {
-            JSONObject user = request1.getResponse();
-            User.saveUserInfo(user, thisActivity);
-        }
     }
 
     private boolean nothingHasBeenModified() {
@@ -148,46 +120,78 @@ public class MyProfileEdit extends AppCompatActivity {
     }
 
     private void uploadImage(){
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://skitalk.altervista.org/php/editUserPicture.php",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
+        //prepare parameters for image uploader
+        Map<String,String> params = new Hashtable<String, String>();
+        params.put("name", "user_pic_"+user.getId());
+        params.put("idUser", String.valueOf(user.getId()));
 
+        ImageUploader request = new ImageUploader(this, userPicture, "http://skitalk.altervista.org/php/editUserPicture.php", params, this);
+        Thread t = new Thread(request);
+        t.start();
 
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
+    }
 
-                        //Showing toast
-                        Toast.makeText(MyProfileEdit.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                    }
-                }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                //Converting Bitmap to String
-                String image = Utils.getStringImage(userPicture);
+    @Override
+    public void onResponse(String s) {
+        System.out.println("Response: ");
+        for(int i = 0; i < s.length(); i++)
+            System.out.print(s.charAt(i));
+        JSONObject response = null;
+        try {
+            response = (new JSONArray(s)).getJSONObject(0);
 
-                //Creating parameters
-                Map<String,String> params = new Hashtable<String, String>();
+            System.out.println("URL: "+response.toString());
+            System.out.println("Picture uploaded successfully.");
 
-                //Adding parameters
-                params.put("picture", image);
-                params.put("name", "pic_"+user.getId());
-                params.put("id", String.valueOf(user.getId()));
+            user.setPictureURL(response.getString("address"));
 
-                //returning parameters
-                return params;
+            processCacheAndFinish();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processCacheAndFinish() {
+        if(userPictureEdit && updateStrings) {
+            //CASE 1: both picture and strings data have been modified
+            //delete old image
+            File cacheFile = new File(thisActivity.getCacheDir(), ""+user.getPictureURL().hashCode());
+            cacheFile.delete();
+            //wait request1 response
+            JSONObject user = dataRequest.getResponse();
+            //save new image
+            String pictureUrl = this.user.getPictureURL();
+            Utils.putBitmapInDiskCache(thisActivity, pictureUrl, userPicture);
+            //save user file
+            try {
+                user.put("picture", pictureUrl);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        };
+            User.saveUserInfo(user, thisActivity);
+        } else if(updateStrings) {
+            //CASE 2: only string data have been modified
+            JSONObject user = dataRequest.getResponse();
+            User.saveUserInfo(user, thisActivity);
+        } else if(userPictureEdit) {
+            //CASE 3: only picture data have been modified
+            //delete old image
+            System.out.println("???????????????????");
+            File cacheFile = new File(thisActivity.getCacheDir(), ""+user.getPictureURL().hashCode());
+            cacheFile.delete();
+            //save new image
+            String pictureUrl = this.user.getPictureURL();
+            Utils.putBitmapInDiskCache(thisActivity, pictureUrl, userPicture);
+            //save new pictureURL info in cache
+            user.setPictureURL(pictureUrl);
+            User.saveUserInfo(user, thisActivity);
+        }
 
-        //Creating a Request Queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        progressDialog.dismiss();
 
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
-
+        Intent myIntent = new Intent(thisActivity, MyProfile.class);
+        myIntent.putExtra("id", user.getId());
+        startActivity(myIntent);
     }
 
     @Override

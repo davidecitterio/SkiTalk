@@ -12,9 +12,8 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.ActivityWithRecyclerView;
 import it.polimi.dima.skitalk.util.Utils;
-
-import static it.polimi.dima.skitalk.activity.CreateGroup_step2.addUser;
 
 /**
  * Created by Davide on 02/01/2017.
@@ -24,7 +23,7 @@ public class RecyclerAddUserAdapter extends
         RecyclerView.Adapter<RecyclerAddUserAdapter.MyViewHolder> {
 
     private List<User> userList;
-
+    private ActivityWithRecyclerView createGroupActivity;
 
     /**
      * View holder class
@@ -43,10 +42,9 @@ public class RecyclerAddUserAdapter extends
         }
     }
 
-    public RecyclerAddUserAdapter(List<User> groupList) {
-
+    public RecyclerAddUserAdapter(List<User> groupList, ActivityWithRecyclerView createGroupActivity) {
+        this.createGroupActivity = createGroupActivity;
         this.userList = groupList;
-
     }
 
     @Override
@@ -62,7 +60,7 @@ public class RecyclerAddUserAdapter extends
         holder.addUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addUser((int)holder.addUser.getTag());
+                createGroupActivity.addUser((int)holder.addUser.getTag());
             }
         });
     }

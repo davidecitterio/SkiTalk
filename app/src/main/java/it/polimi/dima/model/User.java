@@ -99,6 +99,24 @@ public class User {
         }
     }
 
+    public static void saveUserInfo(User user, Context c) {
+        JSONObject u = new JSONObject();
+        try {
+            u.put("name", user.name);
+            u.put("surname", user.surname);
+            u.put("nickname", user.nickname);
+            u.put("email", user.email);
+            u.put("picture", user.pictureURL);
+            u.put("isOnline", user.isOnline);
+            u.put("ip", user.ip);
+            u.put("latitude", user.coords.getLatitude());
+            u.put("longitude", user.coords.getLongitude());
+            saveUserInfo(u, c);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private boolean isUserUpdated() {
         HttpRequest newsRequest = new HttpRequest(address + "getNewsFromUser.php", "idUser=" + id);
         Thread t = new Thread(newsRequest);
@@ -169,7 +187,7 @@ public class User {
     }
 
     private void downloadPicture() {
-        PictureDownloader pic = new PictureDownloader(getPictureURL());
+        PictureDownloader pic = new PictureDownloader(pictureURL);
         Thread t = new Thread(pic);
         t.start();
         picture = pic.getPicture();
@@ -177,7 +195,7 @@ public class User {
     }
 
     private void downloadTempPicture() {
-        PictureDownloader pic = new PictureDownloader(getPictureURL());
+        PictureDownloader pic = new PictureDownloader(pictureURL);
         Thread t = new Thread(pic);
         t.start();
         picture = pic.getPicture();
@@ -335,6 +353,9 @@ public class User {
         setUser(user);
     }
 
+    public void setPictureURL(String pictureURL) {
+        this.pictureURL = pictureURL;
+    }
 
     //getters
     public String getNickname() {

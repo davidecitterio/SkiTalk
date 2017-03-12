@@ -12,9 +12,9 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.ActivityWithRecyclerView;
 import it.polimi.dima.skitalk.util.Utils;
 
-import static it.polimi.dima.skitalk.activity.CreateGroup_step2.removeUser;
 
 /**
  * Created by Davide on 02/01/2017.
@@ -24,7 +24,7 @@ public class RecyclerAddedUserAdapter extends
         RecyclerView.Adapter<RecyclerAddedUserAdapter.MyViewHolder> {
 
     private List<User> userList;
-
+    private ActivityWithRecyclerView createGroupActivity;
 
     /**
      * View holder class
@@ -43,10 +43,9 @@ public class RecyclerAddedUserAdapter extends
         }
     }
 
-    public RecyclerAddedUserAdapter(List<User> groupList) {
-
+    public RecyclerAddedUserAdapter(List<User> groupList, ActivityWithRecyclerView createGroupActivity) {
         this.userList = groupList;
-
+        this.createGroupActivity = createGroupActivity;
     }
 
     @Override
@@ -62,7 +61,7 @@ public class RecyclerAddedUserAdapter extends
         holder.removeUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                removeUser((int)holder.removeUser.getTag());
+                createGroupActivity.removeUser((int)holder.removeUser.getTag());
             }
         });
     }

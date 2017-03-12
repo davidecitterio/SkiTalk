@@ -43,10 +43,12 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.HttpRequest;
+import it.polimi.dima.model.ImageUploader;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerAddUserAdapter;
 import it.polimi.dima.skitalk.adapter.RecyclerAddedUserAdapter;
+import it.polimi.dima.skitalk.util.ActivityWithRecyclerView;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
@@ -55,7 +57,7 @@ import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
  * Created by Davide on 30/12/2016.
  */
 
-public class CreateGroup_step2 extends Activity{
+public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerView, Response.Listener<String> {
     private static RecyclerAddUserAdapter tempUsersAdapter;
     private static RecyclerAddedUserAdapter membersAdapter;
     private Button create;
@@ -66,6 +68,7 @@ public class CreateGroup_step2 extends Activity{
     private static ArrayList<User> members = new ArrayList<>();
     private static ArrayList<Integer> users = new ArrayList<>();
     private int id, idGroup;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,10 +130,10 @@ public class CreateGroup_step2 extends Activity{
         });
 
         RecyclerView membersRecyclerView = (RecyclerView) findViewById(R.id.members_recycler_view);
-        membersAdapter = new RecyclerAddedUserAdapter(members);
+        membersAdapter = new RecyclerAddedUserAdapter(members, this);
         setupRecyclerView(membersRecyclerView, membersAdapter);
         RecyclerView tempUsersRecyclerView = (RecyclerView) findViewById(R.id.temp_users_recycler_view);
-        tempUsersAdapter = new RecyclerAddUserAdapter(tempUsers);
+        tempUsersAdapter = new RecyclerAddUserAdapter(tempUsers, this);
         setupRecyclerView(tempUsersRecyclerView, tempUsersAdapter);
     }
 
@@ -229,7 +232,8 @@ public class CreateGroup_step2 extends Activity{
         });
     }
 
-    public static void addUser(int id){
+    @Override
+    public void addUser(int id){
         for (User user : tempUsers) {
             if (user.getId() == id){
                 users.add(user.getId());
@@ -242,7 +246,8 @@ public class CreateGroup_step2 extends Activity{
         }
     }
 
-    public static void removeUser(int id){
+    @Override
+    public void removeUser(int id){
         for (User user : members) {
             if (user.getId() == id){
                 users.remove(user.getId());
@@ -252,51 +257,6 @@ public class CreateGroup_step2 extends Activity{
             }
         }
     }
-
-    private void uploadImage(){
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://skitalk.altervista.org/php/editGroupPicture.php",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-
-                        //Showing toast
-                        Toast.makeText(CreateGroup_step2.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                    }
-                }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                //Converting Bitmap to String
-                String image = Utils.getStringImage(picture);
-
-                //Creating parameters
-                Map<String,String> params = new Hashtable<String, String>();
-
-                //Adding parameters
-                params.put("picture", image);
-                params.put("name", "pic_"+idGroup);
-                params.put("id", String.valueOf(idGroup));
-
-                //returning parameters
-                return params;
-            }
-        };
-
-        //Creating a Request Queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
-
-    }
-
-
 
     private class CreateGroup extends AsyncTask<String, Void, Boolean> {
 
@@ -317,8 +277,6 @@ public class CreateGroup_step2 extends Activity{
                 idGroup = response.getInt("id");
 
                 System.out.println("id of the new group is: "+idGroup);
-
-                uploadImage();
 
                 return true;
 
@@ -375,12 +333,7 @@ public class CreateGroup_step2 extends Activity{
         protected void onPostExecute(final Boolean success) {
             if (success)
                 progressDialog2.dismiss();
-            Intent myIntent = new Intent(CreateGroup_step2.this, GroupActivity.class);
-            Bundle extras = new Bundle();
-            extras.putInt("userId",id);
-            extras.putInt("groupId",idGroup);
-            myIntent.putExtras(extras);
-            CreateGroup_step2.this.startActivity(myIntent);
+            uploadImage();
 
             finish();
         }
@@ -394,5 +347,52 @@ public class CreateGroup_step2 extends Activity{
             progressDialog2.setMessage(getString(R.string.adding_members));
             progressDialog2.show();
         }
+    }
+
+    private void uploadImage(){
+        progressDialog = new ProgressDialog(CreateGroup_step2.this,
+                ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage(getString(R.string.upload_picture));
+        progressDialog.show();
+
+        //prepare parameters for image uploader
+        Map<String,String> params = new Hashtable<String, String>();
+        params.put("name", "user_pic_"+idGroup);
+        params.put("id", String.valueOf(idGroup));
+
+        ImageUploader request = new ImageUploader(this, picture, "http://skitalk.altervista.org/php/editGroupPicture.php", params, this);
+        Thread t = new Thread(request);
+        t.start();
+    }
+
+    @Override
+    public void onResponse(String s) {
+        JSONObject response = null;
+        try {
+            response = (new JSONArray(s)).getJSONObject(0);
+
+            System.out.println("URL: "+response.toString());
+            System.out.println("Picture uploaded successfully.");
+
+            String pictureURL = response.getString("address");
+            processCacheAndFinish(pictureURL);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processCacheAndFinish(String pictureURL) {
+        //TODO salvataggio info gruppo
+        //save picture in cache
+        Utils.putBitmapInDiskCache(this, pictureURL, picture);
+
+        //load new activity
+        Intent myIntent = new Intent(CreateGroup_step2.this, GroupActivity.class);
+        Bundle extras = new Bundle();
+        extras.putInt("userId",id);
+        extras.putInt("groupId",idGroup);
+        myIntent.putExtras(extras);
+        CreateGroup_step2.this.startActivity(myIntent);
     }
 }
