@@ -7,7 +7,6 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,10 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.Socket;
 
 import it.polimi.dima.skitalk.R;
 
@@ -27,17 +23,12 @@ public class TalkFragment extends Fragment{
 
     Button rec;
 
-    public byte[] buffer;
-    public static DatagramSocket socket;
-    private int port=8086;
+    AudioRecord record =null;
 
-    AudioRecord recorder;
+    boolean isPlaying=false;
 
-    private int sampleRate = 16000 ; // 44100 for music
-    private int channelConfig = AudioFormat.CHANNEL_IN_MONO;
-    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-    int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
-    private boolean status = true;
+    Socket sendAudio;
+
 
     public TalkFragment() {
         // Required empty public constructor
@@ -47,7 +38,17 @@ public class TalkFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
+        init();
+        (new Thread() {
+            @Override
+            public void run() {
+                try {
+                    recordAndPlay();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -80,75 +81,36 @@ public class TalkFragment extends Fragment{
         rec.setBackgroundResource(R.drawable.ic_talk_on);
         Vibrator v0 = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         v0.vibrate(50);
-
-        status = true;
-        startStreaming();
-
+        isPlaying=true;
+        record.startRecording();
     }
 
     public void onUp(){
         rec.setBackgroundResource(R.drawable.ic_talk);
         Vibrator v1 = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         v1.vibrate(50);
-
-        status = false;
+        isPlaying=false;
+        record.stop();
     }
 
-    public void startStreaming() {
+    private void init() {
+        int min = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        record = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 16000, AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT, min);
+    }
 
-
-        Thread streamThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-
-                    DatagramSocket socket = new DatagramSocket();
-                    Log.d("VS", "Socket Created");
-
-                    byte[] buffer = new byte[minBufSize];
-
-                    Log.d("VS","Buffer created of size " + minBufSize);
-                    DatagramPacket packet;
-
-                    final InetAddress destination = InetAddress.getByName("192.168.1.7");
-                    Log.d("VS", "Address retrieved");
-
-
-                    recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRate,channelConfig,audioFormat,minBufSize*10);
-                    Log.d("VS", "Recorder initialized");
-
-                    recorder.startRecording();
-
-
-                    while(status == true) {
-
-
-                        //reading data from MIC into buffer
-                        minBufSize = recorder.read(buffer, 0, buffer.length);
-
-                        //putting buffer in the packet
-                        packet = new DatagramPacket (buffer,buffer.length,destination,port);
-
-                        socket.send(packet);
-                        System.out.println("MinBufferSize: " +minBufSize);
-
-
-                    }
-                    recorder.release();
-
-
-
-                } catch(UnknownHostException e) {
-                    Log.e("VS", "UnknownHostException");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e("VS", "IOException");
-                }
+    private void recordAndPlay() throws IOException {
+        byte[] lin = new byte[1024];
+        int num = 0;
+        while (true){
+            while (isPlaying) {
+                num = record.read(lin, 0, 1024);
+                sendAudio = new Socket("127.0.0.1", 8086);
+                sendAudio.getOutputStream().write(lin, 0, num);
+                sendAudio.close();
             }
-
-        });
-        streamThread.start();
+        }
     }
+
 
 }

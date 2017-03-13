@@ -62,11 +62,18 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
         //REQUEST PERMISSION FOR LOCATION IN MAPS
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                0);
-        //REQUEST PERMISSION FOR MICROPHONE
-        ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.RECORD_AUDIO},
+                0);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAPTURE_AUDIO_OUTPUT},
+                0);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS},
+                0);
+
+        //REQUEST PERMISSION FOR LOCATION IN MAPS
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 0);
 
 

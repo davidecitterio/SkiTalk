@@ -1,10 +1,12 @@
 package it.polimi.dima.skitalk.util;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -16,84 +18,81 @@ import java.net.Socket;
 
 public class ServiceAudioReceiver extends IntentService {
 
-    static final int frequency = 16000;
-    static final int channelConfiguration = AudioFormat.CHANNEL_OUT_STEREO;
-    static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-    boolean isPlaying;
-    int playBufSize;
-    ServerSocket connfd;
-    AudioTrack audioTrack;
+    //AudioManager am = null;
+    AudioTrack track =null;
+    byte[] lin = new byte[1024];
+    int num = 0;
+    AudioManager am;
+    ServerSocket receiveAudio;
+    Socket sock = null;
 
     public ServiceAudioReceiver()
     {
-        super("Audio Receiver Service");
+        super("Service Audio Receiver.");
     }
 
-    @Override
-    protected void onHandleIntent(Intent in)
-    {
+    public void init(){
+        System.out.println("Start audio receive service.");
+        int maxJitter = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-        playBufSize=AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelConfiguration, audioEncoding, playBufSize, AudioTrack.MODE_STREAM);
-        audioTrack.setStereoVolume(1f, 1f);
+        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, 16000, AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_16BIT, maxJitter*50, AudioTrack.MODE_STREAM);
 
-        System.out.println("Audio Receiver Service is started.");
+        lin = new byte[1024];
+        num = 0;
+        am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        am.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        am.setSpeakerphoneOn(true);
 
 
-            byte[] buffer = new byte[playBufSize];
+        System.out.println("Prima track play.");
+        track.play();
+        System.out.println("Dopo track play.");
+    }
 
-                try {
-                    connfd = new ServerSocket(8086);
-                    System.out.println("ServerSocket opened.");
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    Intent intent = new Intent()
-                            .setAction("tw.rascov.MediaStreamer.ERROR")
-                            .putExtra("msg", e.toString());
-                    getApplication().sendBroadcast(intent);
-                    return;
-                }
-                audioTrack.play();
-                isPlaying = true;
-                Socket soc = null;
-                try {
-                    soc = connfd.accept();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                while (isPlaying) {
-                    int readSize = 0;
-                    try {
-                        readSize = soc.getInputStream().read(buffer);
-                        System.out.println("Receiving data..");
+
+    public void play(){
+
+
+            try {
+                receiveAudio = new ServerSocket(8086);
+                while (true) {
+                    num = 0;
+                    sock = receiveAudio.accept();
+                    System.out.println("Open serversocket.");
+                    if ((num = sock.getInputStream().read(lin, 0, 1024)) > 0) {
+                        System.out.println("Accetto connessioni da altri.");
+                        track.write(lin, 0, num);
+                        System.out.println("Ricevuto qualcosa: " + num);
                     }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                        Intent intent = new Intent()
-                                .setAction("tw.rascov.MediaStreamer.ERROR")
-                                .putExtra("msg", e.toString());
-                        getApplication().sendBroadcast(intent);
-                        break;
-                    }
-                    audioTrack.write(buffer, 0, readSize);
+                    sock.close();
                 }
-
-                try { connfd.close(); }
-                catch (Exception e) { e.printStackTrace(); }
-
-
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Not able to Open serversocket.");
+            }
 
     }
 
     @Override
     public void onDestroy()
     {
+        try {
+            receiveAudio.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Mi spengo, ciaone.");
-        audioTrack.stop();
-        isPlaying = false;
+
+
     }
 
+
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        init();
+        play();
+    }
 
 
 }
