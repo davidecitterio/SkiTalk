@@ -1,12 +1,10 @@
 package it.polimi.dima.skitalk.activity;
 
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
@@ -28,7 +26,6 @@ import java.util.List;
 
 import it.polimi.dima.model.Group;
 import it.polimi.dima.model.HttpRequest;
-import it.polimi.dima.skitalk.MediaButtonIntentReceiver;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
 
@@ -65,7 +62,6 @@ public class GroupActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        ((AudioManager)getSystemService(AUDIO_SERVICE)).registerMediaButtonEventReceiver(new ComponentName(this,MediaButtonIntentReceiver.class));
     }
 
     private void setupViewPager(ViewPager viewPager) {

@@ -49,6 +49,8 @@ public class TalkFragment extends Fragment{
                 }
             }
         }).start();
+
+
     }
 
     @Override
@@ -81,16 +83,21 @@ public class TalkFragment extends Fragment{
         rec.setBackgroundResource(R.drawable.ic_talk_on);
         Vibrator v0 = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         v0.vibrate(50);
-        isPlaying=true;
         record.startRecording();
+        isPlaying=true;
     }
 
     public void onUp(){
         rec.setBackgroundResource(R.drawable.ic_talk);
         Vibrator v1 = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         v1.vibrate(50);
-        isPlaying=false;
         record.stop();
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        isPlaying=false;
     }
 
     private void init() {
@@ -101,12 +108,12 @@ public class TalkFragment extends Fragment{
 
     private void recordAndPlay() throws IOException {
         byte[] lin = new byte[1024];
-        int num = 0;
         while (true){
             while (isPlaying) {
-                num = record.read(lin, 0, 1024);
                 sendAudio = new Socket("127.0.0.1", 8086);
-                sendAudio.getOutputStream().write(lin, 0, num);
+                sendAudio.getOutputStream().write(lin, 0, record.read(lin, 0, 1024));
+                sendAudio.getOutputStream().flush();
+                sendAudio.getOutputStream().close();
                 sendAudio.close();
             }
         }
