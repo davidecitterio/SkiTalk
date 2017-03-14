@@ -52,6 +52,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     private RecyclerGroupAdapter ca;
     private Context c;
     private Timer timer;
+    private UpdateUsersAndGroupsTask updateTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -310,6 +311,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     }
 
     private void scheduleUpdateTask() {
+        //updateTask = Utils.updateUsersAndGroups(c, user, ca);
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -317,7 +319,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             }
         };
         timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 0, 10000);
+        //timer.scheduleAtFixedRate(timerTask, 0, 10000);
     }
 
     @Override
@@ -335,5 +337,13 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     protected void onDestroy() {
         super.onDestroy();
         timer.cancel();
+        updateTask.cancel(true);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        timer.cancel();
+        updateTask.cancel(true);
     }
 }

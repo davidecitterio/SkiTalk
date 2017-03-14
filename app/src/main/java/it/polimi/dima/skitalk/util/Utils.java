@@ -71,9 +71,10 @@ public class Utils {
         return encodedImage;
     }
 
-    public static void updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca) {
+    public static UpdateUsersAndGroupsTask updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca) {
         System.out.println("EXECUTING UPDATE TASK");
         UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(c, user, ca);
         t.execute(user.getId());
+        return t;
     }
 }
