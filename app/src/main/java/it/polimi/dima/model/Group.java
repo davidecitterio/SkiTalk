@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import it.polimi.dima.skitalk.util.Utils;
 
@@ -38,14 +40,15 @@ public class Group {
     private boolean isActive;
 
     // built group starting from id
-    public Group(int id, Context c, boolean cached) throws JSONException {
+    public Group(int id, Context c) throws JSONException {
         this.c = c;
         this.id = id;
 
-        if(cached && Utils.fileAlreadyExist(c, "SkiTalkGroupInfo"+id))
+        if(Utils.fileAlreadyExist(c, "SkiTalkGroupInfo"+id))
             loadGroup();
         else
             downloadGroup();
+
         isActive = false;
     }
 
@@ -75,6 +78,33 @@ public class Group {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void downloadAndSaveGroup(int id, Context c) {
+        //download and save group info
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupInfo.php", "id=" + id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject group = request.getResponse();
+        saveGroup(group, c);
+        //download and save group members
+        HttpRequest membersRequest = new HttpRequest("http://skitalk.altervista.org/php/getGroupMembers.php", "id=" + id);
+        Thread t1 = new Thread(membersRequest);
+        t1.start();
+        JSONArray members = membersRequest.getArrayResponse();
+        saveMembersList(members, id, c);
+        //download and save group picture
+        String pictureURL = null;
+        try {
+            pictureURL = group.getString("picture");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        PictureDownloader pic = new PictureDownloader(pictureURL);
+        Thread t2 = new Thread(pic);
+        t2.start();
+        Bitmap picture = pic.getPicture();
+        Utils.putBitmapInDiskCache(c, pictureURL, picture);
     }
 
     private void downloadGroup() {
@@ -159,19 +189,82 @@ public class Group {
 
     //set all members of the group (only the id of the users)
     private void setMembers() throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getGroupMembers.php", "id="+id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONArray users = request.getArrayResponse();
-        for (int i=0; i< users.length(); i++){
-            // inserisco tutti gli utenti, io incluso...
-            this.users.add(new User(users.getJSONObject(i).getInt("id"), 0));
-        }
+        JSONArray members;
 
+        //get the group's members
+        if (!Utils.fileAlreadyExist(c, "SkiTalkGroupMembersInfo" + id))
+            members = downloadMembersList();
+        else
+            members = loadMembersList();
+
+        for (int i = 0; i < members.length(); i++) {
+            int idUser = members.getJSONObject(i).getInt("id");
+            this.users.add(new User(idUser, c));
+        }
     }
 
-    public void clearCache() {
-        File file = new File(c.getCacheDir(), "SkiTalkGroupInfo"+id); // Pass getFilesDir() and "MyFile" to read file
+    private JSONArray downloadMembersList() {
+        HttpRequest membersRequest = new HttpRequest("http://skitalk.altervista.org/php/getGroupMembers.php", "id=" + id);
+        Thread t1 = new Thread(membersRequest);
+        t1.start();
+        JSONArray members = membersRequest.getArrayResponse();
+        saveMembersList(members, id, c);
+        return members;
+    }
+
+    private JSONArray loadMembersList() {
+        BufferedReader input = null;
+        File file = null;
+        JSONArray membersList;
+        String cacheFileName = "SkiTalkGroupMembersInfo" + id;
+
+        try {
+            file = new File(c.getCacheDir(), cacheFileName);
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            try {
+                membersList = new JSONArray(buffer.toString());
+                System.out.println("Members list: " + membersList);
+                return membersList;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void saveMembersList(JSONArray members, int id, Context c) {
+        String content = String.valueOf(members);
+
+        File file;
+        FileOutputStream outputStream;
+        String cacheFileName = "SkiTalkGroupMembersInfo" + id;
+
+        try {
+            file = new File(c.getCacheDir(), cacheFileName);
+
+            outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clearGroupCache() {
+        File file = new File(c.getCacheDir(), "SkiTalkGroupInfo"+id);
+        file.delete();
+        file = new File(c.getCacheDir(), "SkiTalkGroupMembersInfo"+id);
         file.delete();
     }
 

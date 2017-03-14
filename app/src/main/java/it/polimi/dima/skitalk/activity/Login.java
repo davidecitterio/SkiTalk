@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.ServiceAudioReceiver;
-import it.polimi.dima.skitalk.util.ServiceUpdate;
+import it.polimi.dima.skitalk.util.ServiceUpdateCoords;
 
 import static android.content.ContentValues.TAG;
 
@@ -158,7 +158,7 @@ public class Login extends Activity {
             System.out.println("the id is: "+buffer);
 
             //start update coord service
-            Intent serviceIntentCoord = new Intent(getApplicationContext(),ServiceUpdate.class);
+            Intent serviceIntentCoord = new Intent(getApplicationContext(),ServiceUpdateCoords.class);
             serviceIntentCoord.putExtra("id", Integer.parseInt(buffer.toString()) );
             startService(serviceIntentCoord);
 

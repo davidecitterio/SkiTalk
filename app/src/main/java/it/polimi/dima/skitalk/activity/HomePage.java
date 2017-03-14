@@ -30,6 +30,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.Group;
@@ -38,7 +40,8 @@ import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.RecyclerItemListener;
-import it.polimi.dima.skitalk.util.ServiceUpdate;
+import it.polimi.dima.skitalk.util.ServiceUpdateCoords;
+import it.polimi.dima.skitalk.util.UpdateUsersAndGroupsTask;
 import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
@@ -48,8 +51,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     private HomePage thisActivity = this;
     private RecyclerGroupAdapter ca;
     private Context c;
-
-
+    private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +59,8 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         setContentView(R.layout.activity_home_page);
         setToolBar();
 
-        //start the update service
-        startService(new Intent(this, ServiceUpdate.class));
+        //start the update coords service
+        startService(new Intent(this, ServiceUpdateCoords.class));
 
         //REQUEST PERMISSION FOR LOCATION IN MAPS
         ActivityCompat.requestPermissions(this,
@@ -196,6 +198,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 loadDrawerHeader();
                 showGroups();
                 progressDialog.dismiss();
+                scheduleUpdateTask();
             }
             else
                 System.out.println("Nooooooooo");
@@ -306,6 +309,17 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         }
     }
 
+    private void scheduleUpdateTask() {
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Utils.updateUsersAndGroups(c, user, ca);
+            }
+        };
+        timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 0, 10000);
+    }
+
     @Override
     public boolean onQueryTextChange(String query) {
         ca.getFilter().filter(query);
@@ -317,8 +331,9 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         return false;
     }
 
-
-
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+    }
 }

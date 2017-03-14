@@ -144,7 +144,7 @@ public class GroupActivity extends AppCompatActivity {
 
     private void loadGroup() {
         try {
-            group = new Group(groupId, getApplicationContext(), false);
+            group = new Group(groupId, getApplicationContext());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -224,7 +224,7 @@ public class GroupActivity extends AppCompatActivity {
                         Thread t = new Thread(request);
                         t.start();
 
-                        group.clearCache();
+                        group.clearGroupCache();
                         goBackToHome();
 
                     }})

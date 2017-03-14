@@ -10,6 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import it.polimi.dima.model.User;
+import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
+
 /**
  * Created by Max on 03/03/2017.
  */
@@ -66,5 +69,11 @@ public class Utils {
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return encodedImage;
+    }
+
+    public static void updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca) {
+        System.out.println("EXECUTING UPDATE TASK");
+        UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(c, user, ca);
+        t.execute(user.getId());
     }
 }

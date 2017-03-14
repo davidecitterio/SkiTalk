@@ -10,12 +10,12 @@ import it.polimi.dima.model.HttpRequest;
  * Created by Davide on 09/03/2017.
  */
 
-public class ServiceUpdate extends IntentService {
+public class ServiceUpdateCoords extends IntentService {
 
     int userId;
     double lat = 0, lon = 0;
 
-    public ServiceUpdate()
+    public ServiceUpdateCoords()
     {
         super("Update Service");
     }

@@ -56,11 +56,12 @@
             android:value="@string/google_maps_api_key" />
 
         <service
-            android:name=".util.ServiceUpdate"
+            android:name=".util.ServiceUpdateCoords"
             android:enabled="true"/>
         <service
             android:name=".util.ServiceAudioReceiver"
             android:enabled="true"/>
+
 
     </application>
 

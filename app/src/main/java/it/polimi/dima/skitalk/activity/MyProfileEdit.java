@@ -90,13 +90,6 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
         dataRequest = null;
         updateStrings = !nothingHasBeenModified();
 
-        //show progress dialog
-        progressDialog = new ProgressDialog(MyProfileEdit.this,
-                ProgressDialog.STYLE_SPINNER);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage(getString(R.string.upload));
-        progressDialog.show();
-
         //request for strings
         if(updateStrings) {
             String params = "idUser="+user.getId()+"&name="+userNameView.getText()+"&surname="+userSurnameView.getText()+
@@ -111,6 +104,23 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
         //request for picture
         if(userPictureEdit)
             uploadImage();
+
+        //if something has been modified i show progress dialog, otherwise i simply go back to HomePage
+        if(updateStrings || userPictureEdit) {
+            progressDialog = new ProgressDialog(MyProfileEdit.this,
+                    ProgressDialog.STYLE_SPINNER);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage(getString(R.string.upload));
+            progressDialog.show();
+        } else
+            goBackHome();
+
+        /* if some string data has been modified but the picture hasn't, i won't never enter onResponse()
+        * function and so i won't never enter processCacheAndFinish() too. So, in this case i call
+        * processCacheAndFinish()
+        */
+        if(updateStrings && !userPictureEdit)
+            processCacheAndFinish();
     }
 
     private boolean nothingHasBeenModified() {
@@ -128,9 +138,9 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
         ImageUploader request = new ImageUploader(this, userPicture, "http://skitalk.altervista.org/php/editUserPicture.php", params, this);
         Thread t = new Thread(request);
         t.start();
-
     }
 
+    //this method is called IFF I MODIFIED THE PICTURE
     @Override
     public void onResponse(String s) {
         System.out.println("Response: ");
@@ -155,6 +165,7 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
         if(userPictureEdit && updateStrings) {
             //CASE 1: both picture and strings data have been modified
             //delete old image
+            System.out.println("CASE 1: both picture and strings data have been modified");
             File cacheFile = new File(thisActivity.getCacheDir(), ""+user.getPictureURL().hashCode());
             cacheFile.delete();
             //wait request1 response
@@ -168,15 +179,16 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            User.saveUserInfo(user, thisActivity);
+            User.saveUserInfo(user, thisActivity, true);
         } else if(updateStrings) {
             //CASE 2: only string data have been modified
+            System.out.println("CASE 2: only string data have been modified");
             JSONObject user = dataRequest.getResponse();
-            User.saveUserInfo(user, thisActivity);
+            User.saveUserInfo(user, thisActivity, true);
         } else if(userPictureEdit) {
             //CASE 3: only picture data have been modified
             //delete old image
-            System.out.println("???????????????????");
+            System.out.println("CASE 3: only picture data have been modified");
             File cacheFile = new File(thisActivity.getCacheDir(), ""+user.getPictureURL().hashCode());
             cacheFile.delete();
             //save new image
@@ -184,11 +196,14 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
             Utils.putBitmapInDiskCache(thisActivity, pictureUrl, userPicture);
             //save new pictureURL info in cache
             user.setPictureURL(pictureUrl);
-            User.saveUserInfo(user, thisActivity);
+            User.saveUserInfo(user, thisActivity, true);
         }
 
         progressDialog.dismiss();
+        goBackHome();
+    }
 
+    private void goBackHome() {
         Intent myIntent = new Intent(thisActivity, MyProfile.class);
         myIntent.putExtra("id", user.getId());
         startActivity(myIntent);

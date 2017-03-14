@@ -51,7 +51,7 @@ public class MapFragment extends Fragment {
         int idUser = args.getInt("userId");
         user = new User(idUser, getActivity(), true);
         try {
-            group = new Group(idGroup, getActivity(), true);
+            group = new Group(idGroup, getActivity());
         } catch (JSONException e) {
             e.printStackTrace();
         }

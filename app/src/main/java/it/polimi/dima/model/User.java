@@ -43,26 +43,61 @@ public class User {
     private ArrayList<Group> groups = new ArrayList<Group>();
     private Context c;
 
-    //public constructor
+    //constructor for main user
+    //onlyUser : if true it doesn't load the groups
     public User(int id, Context c, boolean onlyUser) {
         this.id = id;
         this.c = c;
 
         if (!Utils.fileAlreadyExist(c, "SkiTalkUserInfo"))
-            downloadUser(onlyUser);
+            downloadUser(onlyUser, true);
         else if(!isUserUpdated())
-            downloadUser(onlyUser);
+            downloadUser(onlyUser, true);
         else
-            loadUser(onlyUser);
+            loadUser(onlyUser, true);
     }
 
-    private void downloadUser(boolean onlyUser) {
-        HttpRequest request = new HttpRequest(address + "getUser.php", "id=" + id);
-        Thread t2 = new Thread(request);
+    public static void downloadAndSaveUserInfo(int id, Context c) {
+        //download and save user info
+        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getUser.php", "id=" + id);
+        Thread t = new Thread(request);
+        t.start();
+        JSONObject user = request.getResponse();
+        //i add the id
+        try {
+            user.put("id", id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        saveUserInfo(user, c, false);
+        //download and save user picture
+        String pictureURL = null;
+        try {
+            pictureURL = user.getString("picture");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        PictureDownloader pic = new PictureDownloader(pictureURL);
+        Thread t2 = new Thread(pic);
         t2.start();
+        Bitmap picture = pic.getPicture();
+        Utils.putBitmapInDiskCache(c, pictureURL, picture);
+    }
+
+    private void downloadUser(boolean onlyUser, boolean mainUser) {
+        HttpRequest request = new HttpRequest(address + "getUser.php", "id=" + id);
+        Thread t = new Thread(request);
+        t.start();
         JSONObject user = request.getResponse();
 
-        saveUserInfo(user, c);
+        //i add the id
+        try {
+            user.put("id", id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        saveUserInfo(user, c, mainUser);
 
         try {
             name = user.getString("name");
@@ -81,15 +116,33 @@ public class User {
         }
     }
 
-    public static void saveUserInfo(JSONObject user, Context c) {
+    public static void saveUserInfo(JSONObject user, Context c, boolean mainUser) {
         String content = String.valueOf(user);
 
-        System.out.println("Save values: " + content);
+        if(mainUser)
+            System.out.println("Save MAIN USER: " + content);
+        else
+            System.out.println("Save friend: " + content);
+
         File file;
         FileOutputStream outputStream;
+        String cacheFileName;
+        int id;
+        try {
+            id = user.getInt("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        if(mainUser)
+            cacheFileName = "SkiTalkUserInfo";
+        else
+            cacheFileName = "SkiTalkFriendInfo" + id;
+
         try {
             // file = File.createTempFile("MyCache", null, getCacheDir());
-            file = new File(c.getCacheDir(), "SkiTalkUserInfo");
+            file = new File(c.getCacheDir(), cacheFileName);
 
             outputStream = new FileOutputStream(file);
             outputStream.write(content.getBytes());
@@ -99,7 +152,7 @@ public class User {
         }
     }
 
-    public static void saveUserInfo(User user, Context c) {
+    public static void saveUserInfo(User user, Context c, boolean mainUser) {
         JSONObject u = new JSONObject();
         try {
             u.put("name", user.name);
@@ -111,13 +164,13 @@ public class User {
             u.put("ip", user.ip);
             u.put("latitude", user.coords.getLatitude());
             u.put("longitude", user.coords.getLongitude());
-            saveUserInfo(u, c);
+            saveUserInfo(u, c, mainUser);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private boolean isUserUpdated() {
+    private boolean isUserUpdated() {/*
         HttpRequest newsRequest = new HttpRequest(address + "getNewsFromUser.php", "idUser=" + id);
         Thread t = new Thread(newsRequest);
         t.start();
@@ -128,16 +181,23 @@ public class User {
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
-        }
+        }*/
+        return true;
     }
 
-    private void loadUser(boolean onlyUser) {
+    private void loadUser(boolean onlyUser, boolean mainUser) {
         BufferedReader input = null;
         File file = null;
         JSONObject userInfo;
+        String cacheFileName;
+
+        if(mainUser)
+            cacheFileName = "SkiTalkUserInfo";
+        else
+            cacheFileName = "SkiTalkFriendInfo" + id;
 
         try {
-            file = new File(c.getCacheDir(), "SkiTalkUserInfo"); // Pass getFilesDir() and "MyFile" to read file
+            file = new File(c.getCacheDir(), cacheFileName); // Pass getFilesDir() and "MyFile" to read file
 
             input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             String line;
@@ -161,6 +221,11 @@ public class User {
                 setPicture();
                 if(!onlyUser)
                     setGroups();
+
+                if(mainUser)
+                    System.out.println("MAIN USER loaded.");
+                else
+                    System.out.println("Friend loaded");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -201,31 +266,6 @@ public class User {
         picture = pic.getPicture();
     }
 
-    public User(int id, int n) {
-        this.id = id;
-
-        HttpRequest request = new HttpRequest(address + "getUser.php", "id=" + id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONObject user = request.getResponse();
-
-        try {
-            nickname = user.getString("nickname");
-            name = user.getString("name");
-            surname = user.getString("surname");
-            coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
-            email = user.getString("email");
-            pictureURL = user.getString("picture");
-            ip = user.getString("ip");
-            isOnline = user.getInt("isOnline");
-            if (n != 0) {
-                downloadPicture();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     // built user starting from json object, used for short-info user instance
     public User(JSONObject user) throws JSONException {
         id = user.getInt("id");
@@ -235,7 +275,6 @@ public class User {
         pictureURL = user.getString("picture");
         downloadTempPicture();
     }
-
 
     // built user starting from json object
     public void setUser(JSONObject user) throws JSONException {
@@ -250,35 +289,96 @@ public class User {
 
     }
 
-    //set groups of the user
-    private void setGroups() throws JSONException {
-        HttpRequest groupsRequest = new HttpRequest(address + "getGroups.php", "id=" + id);
-        HttpRequest newsRequest = new HttpRequest(address + "getNewsFromGroup.php", "idUser=" + id);
-        Thread t1 = new Thread(groupsRequest);
-        Thread t2 = new Thread(newsRequest);
-        t1.start();
-        t2.start();
-        JSONArray groups = groupsRequest.getArrayResponse();
-        JSONArray news = newsRequest.getArrayResponse();
-
-        for(int i = 0; i < groups.length(); i++)
-            if(contains(news, groups.getJSONObject(i)))
-                this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c, false));
-            else
-                this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c, true));
+    public void updateGroups() {
+        groups.clear();
+        try {
+            setGroups();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    private boolean contains(JSONArray container, JSONObject item) {
-        boolean isContained = false;
+    //set groups of the user
+    private void setGroups() throws JSONException {
+        JSONArray groups;
+
+        if (!Utils.fileAlreadyExist(c, "SkiTalkGroupListInfo"))
+            groups = downloadGroupList();
+        else
+            groups = loadGroupList();
+
+        for(int i = 0; i < groups.length(); i++)
+            this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
+    }
+
+    private JSONArray downloadGroupList() {
+        HttpRequest groupsRequest = new HttpRequest(address + "getGroups.php", "id=" + id);
+        Thread t1 = new Thread(groupsRequest);
+        t1.start();
+        JSONArray groups = groupsRequest.getArrayResponse();
+        saveGroupsList(groups, c);
+        return groups;
+    }
+
+    private JSONArray loadGroupList() {
+        BufferedReader input = null;
+        File file = null;
+        JSONArray groupList;
+        String cacheFileName = "SkiTalkGroupListInfo";
+
         try {
-            for (int i = 0; !isContained && i < container.length(); i++)
-                if (container.getJSONObject(i).equals(item))
-                    isContained = true;
-            return isContained;
-        } catch(JSONException e) {
+            file = new File(c.getCacheDir(), cacheFileName);
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            try {
+                groupList = new JSONArray(buffer.toString());
+                System.out.println("Group list: " + groupList);
+                return groupList;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        } catch (IOException e) {
             e.printStackTrace();
-            return true;
+            return null;
         }
+    }
+
+    public static void saveGroupsList(JSONArray groups, Context c) {
+        String content = String.valueOf(groups);
+
+        File file;
+        FileOutputStream outputStream;
+        String cacheFileName = "SkiTalkGroupListInfo";
+
+        try {
+            file = new File(c.getCacheDir(), cacheFileName);
+
+            outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //constructor of other users
+    //n : 0 if user is updated, 1 if user need to be updated
+    public User(int id, Context c) {
+        this.id = id;
+        this.c = c;
+
+        if(!Utils.fileAlreadyExist(c, "SkiTalkFriendInfo" + id))
+            downloadUser(true, false);
+        else
+            loadUser(true, false);
     }
 
     //change nickname of user
