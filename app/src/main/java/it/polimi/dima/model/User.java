@@ -191,7 +191,7 @@ public class User {
         JSONObject userInfo;
         String cacheFileName;
 
-        if(mainUser)
+        if (mainUser)
             cacheFileName = "SkiTalkUserInfo";
         else
             cacheFileName = "SkiTalkFriendInfo" + id;
@@ -219,10 +219,10 @@ public class User {
                 isOnline = userInfo.getInt("isOnline");
                 coords = new Coords(userInfo.getDouble("latitude"), userInfo.getDouble("longitude"));
                 setPicture();
-                if(!onlyUser)
+                if (!onlyUser)
                     setGroups();
 
-                if(mainUser)
+                if (mainUser)
                     System.out.println("MAIN USER loaded.");
                 else
                     System.out.println("Friend loaded");
@@ -235,7 +235,6 @@ public class User {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void setPicture() {
@@ -305,7 +304,7 @@ public class User {
         if (!Utils.fileAlreadyExist(c, "SkiTalkGroupListInfo"))
             groups = downloadGroupList();
         else
-            groups = loadGroupList();
+            groups = loadGroupList(c);
 
         for(int i = 0; i < groups.length(); i++)
             this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
@@ -320,7 +319,7 @@ public class User {
         return groups;
     }
 
-    private JSONArray loadGroupList() {
+    public static JSONArray loadGroupList(Context c) {
         BufferedReader input = null;
         File file = null;
         JSONArray groupList;

@@ -1,8 +1,10 @@
 package it.polimi.dima.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
 
 
@@ -49,7 +52,12 @@ public class Group {
         else
             downloadGroup();
 
-        isActive = false;
+        final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(c);
+        int savedActiveGroupID = sharedPref.getInt(c.getString(R.string.saved_active_group_id), -1);
+        if(savedActiveGroupID == id)
+            isActive = true;
+        else
+            isActive = false;
     }
 
     private void loadGroup(){
@@ -139,17 +147,6 @@ public class Group {
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void saveGroup(Group user, Context c) {
-        JSONObject g = new JSONObject();
-        try {
-            g.put("name", user.name);
-
-            saveGroup(g, c);
         } catch (JSONException e) {
             e.printStackTrace();
         }

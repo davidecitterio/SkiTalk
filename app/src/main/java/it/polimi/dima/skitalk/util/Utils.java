@@ -71,10 +71,26 @@ public class Utils {
         return encodedImage;
     }
 
-    public static UpdateUsersAndGroupsTask updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca) {
-        System.out.println("EXECUTING UPDATE TASK");
-        UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(c, user, ca);
+    public static UpdateUsersAndGroupsTask updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca, Object cacheLock) {
+        UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(c, user, ca, cacheLock);
         t.execute(user.getId());
         return t;
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if(dir != null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
     }
 }

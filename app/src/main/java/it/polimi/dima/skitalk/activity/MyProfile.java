@@ -31,15 +31,15 @@ import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
 
 public class MyProfile extends AppCompatActivity {
-    DrawerLayout dLayout;
-    MyProfile thisActivity = this;
-    User user;
-    TextView userName;
-    TextView userSurname;
-    TextView userNickname;
-    TextView userEmail;
-    TextView userPassword;
-    CircleImageView userPicture;
+    private DrawerLayout dLayout;
+    private MyProfile thisActivity = this;
+    private User user;
+    private TextView userName;
+    private TextView userSurname;
+    private TextView userNickname;
+    private TextView userEmail;
+    private TextView userPassword;
+    private CircleImageView userPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,8 +108,9 @@ public class MyProfile extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            user = new User(params[0], c, true);
-
+            synchronized (HomePage.cacheLock) {
+                user = new User(params[0], c, true);
+            }
             return true;
         }
 

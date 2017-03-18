@@ -19,17 +19,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +34,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import it.polimi.dima.model.Group;
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.model.ImageUploader;
 import it.polimi.dima.model.User;
@@ -69,11 +62,15 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
     private static ArrayList<Integer> users = new ArrayList<>();
     private int id, idGroup;
     private ProgressDialog progressDialog;
+    private Context c;
+    private JSONObject groupData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group_step_2);
+
+        c = getApplicationContext();
 
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         tb.setTitleTextColor(Color.WHITE);
@@ -274,8 +271,10 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
                 tr.start();
                 JSONObject response = request.getResponse();
 
-                idGroup = response.getInt("id");
+                groupData = response;
+                groupData.put("name", name);
 
+                idGroup = response.getInt("id");
                 System.out.println("id of the new group is: "+idGroup);
 
                 return true;
@@ -358,7 +357,7 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
 
         //prepare parameters for image uploader
         Map<String,String> params = new Hashtable<String, String>();
-        params.put("name", "user_pic_"+idGroup);
+        params.put("name", "group_pic_"+idGroup);
         params.put("id", String.valueOf(idGroup));
 
         ImageUploader request = new ImageUploader(this, picture, "http://skitalk.altervista.org/php/editGroupPicture.php", params, this);
@@ -383,7 +382,13 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
     }
 
     private void processCacheAndFinish(String pictureURL) {
-        //TODO salvataggio info gruppo
+        //save group in cache
+        try {
+            groupData.put("picture", pictureURL);
+            Group.saveGroup(groupData, c);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         //save picture in cache
         Utils.putBitmapInDiskCache(this, pictureURL, picture);
 

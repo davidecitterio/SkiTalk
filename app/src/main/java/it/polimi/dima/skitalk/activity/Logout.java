@@ -8,6 +8,7 @@ import java.io.File;
 
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.util.Utils;
 
 /**
  * Created by Davide on 29/12/2016.
@@ -28,15 +29,8 @@ public class Logout extends Activity {
     }
 
     public void doLogout(int id){
-        File cacheFile = new File(getApplicationContext().getCacheDir(), "SkiTalkLoginInfo");
-        cacheFile.delete();
-
-        cacheFile = new File(getApplicationContext().getCacheDir(), "SkiTalkUserInfo");
-        cacheFile.delete();
-
-        cacheFile = new File(getApplicationContext().getCacheDir(), "SkiTalkGroupInfo");
-        cacheFile.delete();
-
+        File cacheDirectory = getApplicationContext().getCacheDir();
+        Utils.deleteDir(cacheDirectory);
 
         setOffline(id);
 

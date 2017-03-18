@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,13 +53,15 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     private RecyclerGroupAdapter ca;
     private Context c;
     private Timer timer;
-    private UpdateUsersAndGroupsTask updateTask;
+    public static final Object cacheLock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         setToolBar();
+
+        c = getApplicationContext();
 
         //start the update coords service
         startService(new Intent(this, ServiceUpdateCoords.class));
@@ -189,7 +192,9 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            user = new User(params[0], c, false);
+            synchronized (cacheLock) {
+                user = new User(params[0], c, false);
+            }
             return true;
         }
 
@@ -199,7 +204,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 loadDrawerHeader();
                 showGroups();
                 progressDialog.dismiss();
-                scheduleUpdateTask();
             }
             else
                 System.out.println("Nooooooooo");
@@ -224,7 +228,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         private void showGroups() {
             final ArrayList<Group> groups = user.getGroups();
             RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view);
-            final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(thisActivity);;
+            final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(thisActivity);
             //modify this for item spacing
             int spacing = thisActivity.getResources().getInteger(R.integer.home_recycler_spacing);
             ca = new RecyclerGroupAdapter(groups);
@@ -291,14 +295,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                                     }
                         }
                     }, getScreenWidth()-192));
-            //show which group is active
-            int savedActiveGroupID = sharedPref.getInt(getString(R.string.saved_active_group_id), -1);
-            if(savedActiveGroupID != -1) {
-                for(Group g : groups) {
-                    if(g.getId() == savedActiveGroupID)
-                        g.setActive(true);
-                }
-            }
         }
 
         private int getScreenWidth() {
@@ -311,15 +307,14 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     }
 
     private void scheduleUpdateTask() {
-        //updateTask = Utils.updateUsersAndGroups(c, user, ca);
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                Utils.updateUsersAndGroups(c, user, ca);
+                Utils.updateUsersAndGroups(c, user, ca, cacheLock);
             }
         };
         timer = new Timer();
-        //timer.scheduleAtFixedRate(timerTask, 0, 10000);
+        timer.scheduleAtFixedRate(timerTask, 0, 30000);
     }
 
     @Override
@@ -337,13 +332,19 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     protected void onDestroy() {
         super.onDestroy();
         timer.cancel();
-        updateTask.cancel(true);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         timer.cancel();
-        updateTask.cancel(true);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        synchronized (cacheLock) {
+            scheduleUpdateTask();
+        }
     }
 }

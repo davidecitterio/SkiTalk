@@ -143,18 +143,20 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void loadGroup() {
-        try {
-            group = new Group(groupId, getApplicationContext());
-        } catch (JSONException e) {
-            e.printStackTrace();
+        synchronized (HomePage.cacheLock) {
+            try {
+                group = new Group(groupId, getApplicationContext());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            int savedActiveGroupID = sharedPref.getInt(getString(R.string.saved_active_group_id), -1);
+            System.out.println("active " + savedActiveGroupID);
+            if (savedActiveGroupID == group.getId())
+                group.setActive(true);
+            else
+                group.setActive(false);
         }
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);;
-        int savedActiveGroupID = sharedPref.getInt(getString(R.string.saved_active_group_id), -1);
-        System.out.println("active "+savedActiveGroupID);
-        if(savedActiveGroupID == group.getId())
-            group.setActive(true);
-        else
-            group.setActive(false);
     }
 
     private void setMute(MenuItem muteItem) {
