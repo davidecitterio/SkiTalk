@@ -187,8 +187,12 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
     private class InitializeUser extends AsyncTask<Integer, Void, Boolean> {
 
-        ProgressDialog progressDialog = new ProgressDialog(HomePage.this,
+        private ProgressDialog progressDialog = new ProgressDialog(HomePage.this,
                 ProgressDialog.STYLE_SPINNER);
+
+        private InitializeUser() {
+
+        }
 
         @Override
         protected Boolean doInBackground(Integer... params) {
@@ -314,7 +318,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             }
         };
         timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 0, 30000);
+        timer.scheduleAtFixedRate(timerTask, 30000, 30000);
     }
 
     @Override
@@ -343,8 +347,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     @Override
     protected void onStart() {
         super.onStart();
-        synchronized (cacheLock) {
-            scheduleUpdateTask();
-        }
+        scheduleUpdateTask();
     }
 }
