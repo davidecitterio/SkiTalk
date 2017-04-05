@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 import it.polimi.dima.skitalk.R;
@@ -29,6 +31,11 @@ public class TalkFragment extends Fragment{
 
     Socket sendAudio;
 
+    String url = "192.168.0.1";
+    int port = 4444;
+
+    int idGroup;
+    int idUser;
 
     public TalkFragment() {
         // Required empty public constructor
@@ -36,8 +43,12 @@ public class TalkFragment extends Fragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        idGroup = args.getInt("groupId");
+        idUser = args.getInt("userId");
+
         init();
         (new Thread() {
             @Override
@@ -102,7 +113,7 @@ public class TalkFragment extends Fragment{
 
     private void init() {
         int min = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        record = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, 16000, AudioFormat.CHANNEL_IN_MONO,
+        record = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 16000, AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, min);
     }
 
@@ -110,7 +121,14 @@ public class TalkFragment extends Fragment{
         byte[] lin = new byte[1024];
         while (true){
             while (isPlaying) {
-                sendAudio = new Socket("127.0.0.1", 8086);
+                System.out.println("Try to send.\n");
+
+                sendAudio = new Socket(url, port);
+                OutputStream out = sendAudio.getOutputStream();
+                PrintWriter send = new PrintWriter(out);
+                send.print(idUser+" "+idGroup+"\n");
+                send.flush();
+
                 sendAudio.getOutputStream().write(lin, 0, record.read(lin, 0, 1024));
                 sendAudio.getOutputStream().flush();
                 sendAudio.getOutputStream().close();
@@ -118,6 +136,8 @@ public class TalkFragment extends Fragment{
             }
         }
     }
+
+
 
 
 }

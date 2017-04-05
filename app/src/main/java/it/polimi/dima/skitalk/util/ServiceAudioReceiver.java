@@ -9,7 +9,8 @@ import android.media.AudioTrack;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
@@ -18,13 +19,14 @@ import java.net.Socket;
 
 public class ServiceAudioReceiver extends IntentService {
 
-    //AudioManager am = null;
     AudioTrack track =null;
     byte[] lin = new byte[1024];
     int num = 0;
     AudioManager am;
-    ServerSocket receiveAudio;
     Socket sock = null;
+    String url = "192.168.0.1";
+    int port = 4444;
+    int userId;
 
     public ServiceAudioReceiver()
     {
@@ -44,10 +46,8 @@ public class ServiceAudioReceiver extends IntentService {
         am.setMode(AudioManager.MODE_IN_COMMUNICATION);
         am.setSpeakerphoneOn(true);
 
-
-        System.out.println("Prima track play.");
         track.play();
-        System.out.println("Dopo track play.");
+
     }
 
 
@@ -55,17 +55,20 @@ public class ServiceAudioReceiver extends IntentService {
 
 
             try {
-                receiveAudio = new ServerSocket(8086);
+                //open socket and send my id
+                sock = new Socket(url, port);
+                OutputStream out = sock.getOutputStream();
+                PrintWriter send = new PrintWriter(out);
+                send.print(userId+"\n");
+                send.flush();
+
+
+                //loop and catch if something arrive
                 while (true) {
-                    num = 0;
-                    sock = receiveAudio.accept();
-                    System.out.println("Open serversocket.");
                     if ((num = sock.getInputStream().read(lin, 0, 1024)) > 0) {
-                        System.out.println("Accetto connessioni da altri.");
-                        track.write(lin, 0, num);
                         System.out.println("Ricevuto qualcosa: " + num);
+                        track.write(lin, 0, num);
                     }
-                    sock.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -78,7 +81,7 @@ public class ServiceAudioReceiver extends IntentService {
     public void onDestroy()
     {
         try {
-            receiveAudio.close();
+            sock.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,6 +93,7 @@ public class ServiceAudioReceiver extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+        intent.getIntExtra("id", userId);
         init();
         play();
     }

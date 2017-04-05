@@ -29,7 +29,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -42,7 +41,6 @@ import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.RecyclerItemListener;
 import it.polimi.dima.skitalk.util.ServiceUpdateCoords;
-import it.polimi.dima.skitalk.util.UpdateUsersAndGroupsTask;
 import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
@@ -54,6 +52,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     private Context c;
     private Timer timer;
     public static final Object cacheLock = new Object();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -349,4 +348,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         super.onStart();
         scheduleUpdateTask();
     }
+
+
 }
