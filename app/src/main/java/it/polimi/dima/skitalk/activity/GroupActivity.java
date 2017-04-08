@@ -163,10 +163,20 @@ public class GroupActivity extends AppCompatActivity {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);;
         SharedPreferences.Editor editor = sharedPref.edit();
         if(group.isActive()) {
+            //modify on server
+            HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setActiveGroup.php", "idUser="+userId+"&idGroup=-1");
+            Thread t = new Thread(groupsRequest);
+            t.start();
+            //modify locally
             editor.putInt(getString(R.string.saved_active_group_id), -1);
             editor.commit();
             group.setActive(false);
         } else {
+            //modify on server
+            HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setActiveGroup.php", "idUser="+userId+"&idGroup="+groupId);
+            Thread t = new Thread(groupsRequest);
+            t.start();
+            //modify locally
             editor.putInt(getString(R.string.saved_active_group_id), group.getId());
             editor.commit();
             group.setActive(true);

@@ -36,6 +36,7 @@ import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.Group;
+import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
@@ -263,11 +264,21 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                             //set switch checked and save id
                             SwitchCompat swtch  = (SwitchCompat) v.findViewById(R.id.groupSwitch);
                             if(swtch.isChecked()) {
+                                //modify on server
+                                HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setActiveGroup.php", "idUser="+user.getId()+"&idGroup=-1");
+                                Thread t = new Thread(groupsRequest);
+                                t.start();
+                                //modify locally
                                 swtch.setChecked(false);
                                 groups.get(position).setActive(false);
                                 editor.putInt(getString(R.string.saved_active_group_id), -1);
                                 editor.commit();
                             } else {
+                                //modify on server
+                                HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setActiveGroup.php", "idUser="+user.getId()+"&idGroup="+groups.get(position).getId());
+                                Thread t = new Thread(groupsRequest);
+                                t.start();
+                                //modify locally
                                 swtch.setChecked(true);
                                 groups.get(position).setActive(true);
                                 editor.putInt(getString(R.string.saved_active_group_id), groups.get(position).getId());
