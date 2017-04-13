@@ -24,7 +24,7 @@ public class ServiceAudioReceiver extends IntentService {
     int num = 0;
     AudioManager am;
     Socket sock = null;
-    String url = "127.0.0.1";
+    String url = "87.4.149.177";
     int port = 4444;
     int userId;
 
@@ -59,8 +59,9 @@ public class ServiceAudioReceiver extends IntentService {
                 sock = new Socket(url, port);
                 OutputStream out = sock.getOutputStream();
                 PrintWriter send = new PrintWriter(out);
-                send.print(userId+"\n");
+                send.write(userId+"\n");
                 send.flush();
+                System.out.println("Inviato mio id al server: "+userId);
 
 
                 //loop and catch if something arrive
@@ -93,7 +94,7 @@ public class ServiceAudioReceiver extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        intent.getIntExtra("id", userId);
+        userId = intent.getIntExtra("id", 0);
         init();
         play();
     }

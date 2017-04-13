@@ -31,8 +31,8 @@ public class TalkFragment extends Fragment{
 
     Socket sendAudio;
 
-    String url = "127.0.0.1";
-    int port = 4444;
+    String url = "87.4.149.177";
+    int port = 4544;
 
     int idGroup;
     int idUser;
@@ -103,11 +103,6 @@ public class TalkFragment extends Fragment{
         Vibrator v1 = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
         v1.vibrate(50);
         record.stop();
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         isPlaying=false;
     }
 
@@ -123,23 +118,25 @@ public class TalkFragment extends Fragment{
 
         while (true){
             if (socketAlreadyOpen && !isPlaying) {
+                sendAudio.getOutputStream().close();
                 sendAudio.close();
                 socketAlreadyOpen = false;
+                System.out.println("Close socket.");
             }
             while (isPlaying) {
                 System.out.println("Try to send.\n");
                 if (!socketAlreadyOpen) {
                     sendAudio = new Socket(url, port);
+                    OutputStream out = sendAudio.getOutputStream();
+                    PrintWriter send = new PrintWriter(out);
+                    send.write(idUser+" "+idGroup+"\n");
+                    send.flush();
                     socketAlreadyOpen = true;
+                    System.out.println("Open Socket. "+idUser+" "+idGroup+"\n");
                 }
-                OutputStream out = sendAudio.getOutputStream();
-                PrintWriter send = new PrintWriter(out);
-                send.print(idUser+" "+idGroup+"\n");
-                send.flush();
 
                 sendAudio.getOutputStream().write(lin, 0, record.read(lin, 0, 1024));
                 sendAudio.getOutputStream().flush();
-                sendAudio.getOutputStream().close();
             }
         }
     }
