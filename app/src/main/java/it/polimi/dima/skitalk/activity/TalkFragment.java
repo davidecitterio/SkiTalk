@@ -31,7 +31,7 @@ public class TalkFragment extends Fragment{
 
     Socket sendAudio;
 
-    String url = "192.168.0.1";
+    String url = "127.0.0.1";
     int port = 4444;
 
     int idGroup;
@@ -119,11 +119,19 @@ public class TalkFragment extends Fragment{
 
     private void recordAndPlay() throws IOException {
         byte[] lin = new byte[1024];
+        boolean socketAlreadyOpen = false;
+
         while (true){
+            if (socketAlreadyOpen && !isPlaying) {
+                sendAudio.close();
+                socketAlreadyOpen = false;
+            }
             while (isPlaying) {
                 System.out.println("Try to send.\n");
-
-                sendAudio = new Socket(url, port);
+                if (!socketAlreadyOpen) {
+                    sendAudio = new Socket(url, port);
+                    socketAlreadyOpen = true;
+                }
                 OutputStream out = sendAudio.getOutputStream();
                 PrintWriter send = new PrintWriter(out);
                 send.print(idUser+" "+idGroup+"\n");
@@ -132,7 +140,6 @@ public class TalkFragment extends Fragment{
                 sendAudio.getOutputStream().write(lin, 0, record.read(lin, 0, 1024));
                 sendAudio.getOutputStream().flush();
                 sendAudio.getOutputStream().close();
-                sendAudio.close();
             }
         }
     }
