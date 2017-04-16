@@ -61,6 +61,7 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
     private static ArrayList<User> members = new ArrayList<>();
     private static ArrayList<Integer> users = new ArrayList<>();
     private int id, idGroup;
+    private ProgressDialog progressDialog3;
     private Context c;
     private JSONObject groupData;
 
@@ -332,8 +333,6 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
             if (success)
                 progressDialog2.dismiss();
             uploadImage();
-
-            finish();
         }
 
         @Override
@@ -348,6 +347,12 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
     }
 
     private void uploadImage(){
+        progressDialog3 = new ProgressDialog(CreateGroup_step2.this,
+                ProgressDialog.STYLE_SPINNER);
+        progressDialog3.setIndeterminate(true);
+        progressDialog3.setMessage(getString(R.string.upload_picture));
+        progressDialog3.show();
+
         //prepare parameters for image uploader
         Map<String,String> params = new Hashtable<String, String>();
         params.put("name", "group_pic_"+idGroup);
@@ -399,6 +404,7 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
         extras.putInt("userId",id);
         extras.putInt("groupId",idGroup);
         myIntent.putExtras(extras);
+        progressDialog3.dismiss();
         CreateGroup_step2.this.startActivity(myIntent);
     }
 }
