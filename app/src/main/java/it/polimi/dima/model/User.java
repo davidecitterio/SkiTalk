@@ -40,6 +40,7 @@ public class User {
     private String ip;
     private Integer isOnline;
     private Coords coords;
+    private Integer speed;
     private ArrayList<Group> groups = new ArrayList<Group>();
     private Context c;
 
@@ -107,6 +108,7 @@ public class User {
             pictureURL = user.getString("picture");
             ip = user.getString("ip");
             isOnline = user.getInt("isOnline");
+            speed = user.getInt("speed");
             coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
             downloadPicture();
             if(!onlyUser)
@@ -163,6 +165,7 @@ public class User {
             u.put("picture", user.pictureURL);
             u.put("isOnline", user.isOnline);
             u.put("ip", user.ip);
+            u.put("speed", user.speed);
             u.put("latitude", user.coords.getLatitude());
             u.put("longitude", user.coords.getLongitude());
             saveUserInfo(u, c, mainUser);
@@ -218,6 +221,7 @@ public class User {
                 pictureURL = userInfo.getString("picture");
                 ip = userInfo.getString("ip");
                 isOnline = userInfo.getInt("isOnline");
+                speed = userInfo.getInt("speed");
                 coords = new Coords(userInfo.getDouble("latitude"), userInfo.getDouble("longitude"));
                 setPicture();
                 if (!onlyUser)
@@ -273,6 +277,7 @@ public class User {
         surname = user.getString("surname");
         nickname = user.getString("nickname");
         pictureURL = user.getString("picture");
+        speed = user.getInt("speed");
         downloadTempPicture();
     }
 
@@ -286,7 +291,7 @@ public class User {
         ip = user.getString("ip");
         isOnline = user.getInt("isOnline");
         coords.setCoords(user.getDouble("latitude"), user.getDouble("longitude"));
-
+        speed = user.getInt("speed");
     }
 
     public void updateGroups() {
@@ -493,6 +498,10 @@ public class User {
 
     public Coords getCoords() {
         return coords;
+    }
+
+    public Integer getSpeed() {
+        return speed;
     }
 
     public Integer getNumOfGroups() {

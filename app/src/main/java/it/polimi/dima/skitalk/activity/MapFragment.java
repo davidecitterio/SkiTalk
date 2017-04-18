@@ -19,11 +19,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
+
+import java.util.Random;
 
 import it.polimi.dima.model.Group;
 import it.polimi.dima.model.User;
@@ -88,16 +91,23 @@ public class MapFragment extends Fragment {
                     //mMap.setMyLocationEnabled(true);
                 }
 
-
+                String status;
+                String time;
                 for (int i=0; i< group.getMembers().size(); i++){
+
+                    if (group.getMembers().get(i).getSpeed()>0) status = "It is Skiing!";
+                    else status = "It is stopped..";
                     googleMap.addMarker(new MarkerOptions().position(new LatLng(group.getMembers().get(i).getCoords().getLatitude(), group.getMembers().get(i).getCoords().getLongitude()))
-                            .title(group.getMembers().get(i).getName()+" "+group.getMembers().get(i).getSurname())
+                            .title(group.getMembers().get(i).getName() + " " + group.getMembers().get(i).getSurname())
                             .visible(true)
-                            .snippet("Is Online.")
-                            );
+                            .snippet(status)
+                            .icon(BitmapDescriptorFactory.defaultMarker(new Random().nextInt(360)))
+
+                    );
+
                 }
                  LatLngBounds myplace = new LatLngBounds(
-                        new LatLng(user.getCoords().getLatitude()-0.3, user.getCoords().getLongitude()-0.3), new LatLng(user.getCoords().getLatitude()+0.3, user.getCoords().getLongitude()+0.3));
+                        new LatLng(user.getCoords().getLatitude()-0.002, user.getCoords().getLongitude()-0.002), new LatLng(user.getCoords().getLatitude()+0.002, user.getCoords().getLongitude()+0.002));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(myplace, 0));
 
             }
