@@ -77,10 +77,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS},
                 0);
 
-        //REQUEST PERMISSION FOR LOCATION IN MAPS
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                0);
+
 
 
         //create groups button

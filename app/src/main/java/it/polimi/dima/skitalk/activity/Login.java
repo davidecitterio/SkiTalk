@@ -1,10 +1,12 @@
 package it.polimi.dima.skitalk.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,6 +46,11 @@ public class Login extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //REQUEST PERMISSION FOR LOCATION IN MAPS
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                0);
 
         if (!checkAlreadyLoggedIn())
             doLogin();
@@ -157,10 +164,9 @@ public class Login extends Activity {
 
             System.out.println("the id is: "+buffer);
 
-            //start update coord service
-            Intent serviceIntentCoord = new Intent(getApplicationContext(),ServiceUpdateCoords.class);
-            serviceIntentCoord.putExtra("id", Integer.parseInt(buffer.toString()) );
-            startService(serviceIntentCoord);
+            Intent intService =  new Intent(Login.this, ServiceUpdateCoords.class);
+            intService.putExtra("id", Integer.parseInt(buffer.toString()));
+            startService(intService);
 
             //start receive audio service
             Intent serviceIntentAudio = new Intent(getApplicationContext(),ServiceAudioReceiver.class);

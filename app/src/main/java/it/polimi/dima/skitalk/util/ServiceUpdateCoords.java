@@ -1,8 +1,13 @@
 package it.polimi.dima.skitalk.util;
 
-import android.app.IntentService;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 
 import it.polimi.dima.model.HttpRequest;
 
@@ -10,29 +15,98 @@ import it.polimi.dima.model.HttpRequest;
  * Created by Davide on 09/03/2017.
  */
 
-public class ServiceUpdateCoords extends IntentService {
+public class ServiceUpdateCoords extends Service
+{
+    private static final String TAG = "ServiceCoordsUpdate";
+    private LocationManager mLocationManager = null;
+    private static final int LOCATION_INTERVAL = 100;
+    private static final float LOCATION_DISTANCE = 3f;
+    int id;
 
-    int userId;
-    double lat = 0, lon = 0;
-
-    public ServiceUpdateCoords()
+    private class LocationListener implements android.location.LocationListener
     {
-        super("Update Service");
+        Location mLastLocation;
+
+        public LocationListener(String provider)
+        {
+            Log.e(TAG, "LocationListener " + provider);
+            mLastLocation = new Location(provider);
+        }
+
+        @Override
+        public void onLocationChanged(Location location)
+        {
+            Log.e(TAG, "onLocationChanged: " + location);
+            mLastLocation.set(location);
+            System.out.println("Coords: "+mLastLocation.getLatitude()+" "+mLastLocation.getLongitude());
+
+            HttpRequest update = new HttpRequest("http://skitalk.altervista.org/php/" + "setUserCoords.php",
+                    "idUser=" + id+ "&long="+mLastLocation.getLongitude()+"&lat="+mLastLocation.getLatitude());
+            Thread t1 = new Thread(update);
+            t1.start();
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider)
+        {
+            Log.e(TAG, "onProviderDisabled: " + provider);
+        }
+
+        @Override
+        public void onProviderEnabled(String provider)
+        {
+            Log.e(TAG, "onProviderEnabled: " + provider);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras)
+        {
+            Log.e(TAG, "onStatusChanged: " + provider);
+        }
+    }
+
+    LocationListener[] mLocationListeners = new LocationListener[] {
+            new LocationListener(LocationManager.GPS_PROVIDER),
+            new LocationListener(LocationManager.NETWORK_PROVIDER)
+    };
+
+    @Override
+    public IBinder onBind(Intent arg0)
+    {
+        id = arg0.getIntExtra("id",0);
+        System.out.println("My id is "+id);
+        return null;
     }
 
     @Override
-    protected void onHandleIntent(Intent i)
+    public int onStartCommand(Intent intent, int flags, int startId)
     {
-        userId = i.getIntExtra("id", 0);
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
+    }
 
-        while (true) {
-            HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/editCoords.php",
-                    "idUser=" + userId + "&lat=" + getLat() + "&lon=" + getLon());
-            Thread tr = new Thread(request);
-            tr.start();
-
-            System.out.println("Coord Service is running\n");
-            SystemClock.sleep(100000);
+    @Override
+    public void onCreate()
+    {
+        initializeLocationManager();
+        try {
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    mLocationListeners[1]);
+        } catch (java.lang.SecurityException ex) {
+            Log.i(TAG, "fail to request location update, ignore", ex);
+        } catch (IllegalArgumentException ex) {
+            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+        }
+        try {
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    mLocationListeners[0]);
+        } catch (java.lang.SecurityException ex) {
+            Log.i(TAG, "fail to request location update, ignore", ex);
+        } catch (IllegalArgumentException ex) {
+            Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
 
     }
@@ -40,17 +114,23 @@ public class ServiceUpdateCoords extends IntentService {
     @Override
     public void onDestroy()
     {
-        System.out.println("Mi spengo, ciaone.");
+        Log.e(TAG, "onDestroy");
+        super.onDestroy();
+        if (mLocationManager != null) {
+            for (int i = 0; i < mLocationListeners.length; i++) {
+                try {
+                    mLocationManager.removeUpdates(mLocationListeners[i]);
+                } catch (Exception ex) {
+                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+                }
+            }
+        }
     }
 
-    public double getLat(){
-        //TODO: retrive current latitude
-        return ++lat;
+    private void initializeLocationManager() {
+        Log.e(TAG, "initializeLocationManager");
+        if (mLocationManager == null) {
+            mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        }
     }
-
-    public double getLon(){
-        //TODO: retrive current longitude
-        return ++lon;
-    }
-
 }

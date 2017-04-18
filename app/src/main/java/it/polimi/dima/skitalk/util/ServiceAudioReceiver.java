@@ -24,7 +24,7 @@ public class ServiceAudioReceiver extends IntentService {
     int num = 0;
     AudioManager am;
     Socket sock = null;
-    String url = "87.4.149.177";
+    String url = "151.48.41.220";
     int port = 4444;
     int userId;
 
@@ -45,8 +45,6 @@ public class ServiceAudioReceiver extends IntentService {
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         am.setMode(AudioManager.MODE_IN_COMMUNICATION);
         am.setSpeakerphoneOn(true);
-
-        track.play();
 
     }
 
@@ -69,6 +67,7 @@ public class ServiceAudioReceiver extends IntentService {
                     if ((num = sock.getInputStream().read(lin, 0, 1024)) > 0) {
                         System.out.println("Ricevuto qualcosa: " + num);
                         track.write(lin, 0, num);
+                        track.play();
                     }
                 }
             } catch (IOException e) {

@@ -13,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -31,7 +33,7 @@ public class TalkFragment extends Fragment{
 
     Socket sendAudio;
 
-    String url = "87.4.149.177";
+    String url = "151.48.41.220";
     int port = 4544;
 
     int idGroup;
@@ -48,6 +50,8 @@ public class TalkFragment extends Fragment{
         Bundle args = getArguments();
         idGroup = args.getInt("groupId");
         idUser = args.getInt("userId");
+
+
 
         init();
         (new Thread() {
@@ -108,13 +112,14 @@ public class TalkFragment extends Fragment{
 
     private void init() {
         int min = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        record = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 16000, AudioFormat.CHANNEL_IN_MONO,
+        record = new AudioRecord(MediaRecorder.AudioSource.MIC, 16000, AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, min);
     }
 
     private void recordAndPlay() throws IOException {
         byte[] lin = new byte[1024];
         boolean socketAlreadyOpen = false;
+        int msg;
 
         while (true){
             if (socketAlreadyOpen && !isPlaying) {
@@ -124,19 +129,35 @@ public class TalkFragment extends Fragment{
                 System.out.println("Close socket.");
             }
             while (isPlaying) {
-                System.out.println("Try to send.\n");
+
                 if (!socketAlreadyOpen) {
                     sendAudio = new Socket(url, port);
                     OutputStream out = sendAudio.getOutputStream();
                     PrintWriter send = new PrintWriter(out);
                     send.write(idUser+" "+idGroup+"\n");
                     send.flush();
-                    socketAlreadyOpen = true;
                     System.out.println("Open Socket. "+idUser+" "+idGroup+"\n");
+                    BufferedReader br = new BufferedReader(new InputStreamReader(sendAudio.getInputStream()));
+                    if (br.equals("no")){
+                        Vibrator v0 = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                        v0.vibrate(200);
+
+                        isPlaying = false;
+                        socketAlreadyOpen = false;
+                        System.out.println("Channel busy, retry later..");
+                        break;
+                    }
+
+                    else if (br.equals("ok"))
+                        socketAlreadyOpen = true;
                 }
 
-                sendAudio.getOutputStream().write(lin, 0, record.read(lin, 0, 1024));
-                sendAudio.getOutputStream().flush();
+
+                if ((msg = record.read(lin, 0, 1024)) > 0) {
+                    System.out.println("Try to send.\n");
+                    sendAudio.getOutputStream().write(lin, 0, msg);
+                    sendAudio.getOutputStream().flush();
+                }
             }
         }
     }

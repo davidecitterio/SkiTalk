@@ -20,6 +20,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
@@ -92,13 +93,12 @@ public class MapFragment extends Fragment {
                     googleMap.addMarker(new MarkerOptions().position(new LatLng(group.getMembers().get(i).getCoords().getLatitude(), group.getMembers().get(i).getCoords().getLongitude()))
                             .title(group.getMembers().get(i).getName()+" "+group.getMembers().get(i).getSurname())
                             .visible(true)
-                            .snippet("Is skiing."+group.getMembers().get(i).getCoords().getLatitude()+"  "+group.getMembers().get(i).getCoords().getLongitude())
+                            .snippet("Is Online.")
                             );
-
-
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(user.getCoords().getLatitude(), user.getCoords().getLongitude())));
                 }
-
+                 LatLngBounds myplace = new LatLngBounds(
+                        new LatLng(user.getCoords().getLatitude()-0.5, user.getCoords().getLongitude()-0.5), new LatLng(user.getCoords().getLatitude()+0.5, user.getCoords().getLongitude()+0.5));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(myplace, 0));
 
             }
         });
