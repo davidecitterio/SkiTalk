@@ -155,6 +155,7 @@ public class User {
     public static void saveUserInfo(User user, Context c, boolean mainUser) {
         JSONObject u = new JSONObject();
         try {
+            u.put("id", user.id);
             u.put("name", user.name);
             u.put("surname", user.surname);
             u.put("nickname", user.nickname);

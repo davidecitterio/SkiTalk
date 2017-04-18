@@ -9,6 +9,15 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import it.polimi.dima.model.HttpRequest;
 
 /**
@@ -19,9 +28,9 @@ public class ServiceUpdateCoords extends Service
 {
     private static final String TAG = "ServiceCoordsUpdate";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 100;
+    private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 3f;
-    int id;
+    String id;
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -44,6 +53,8 @@ public class ServiceUpdateCoords extends Service
                     "idUser=" + id+ "&long="+mLastLocation.getLongitude()+"&lat="+mLastLocation.getLatitude());
             Thread t1 = new Thread(update);
             t1.start();
+
+
 
         }
 
@@ -81,7 +92,31 @@ public class ServiceUpdateCoords extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         super.onStartCommand(intent, flags, startId);
-        id = intent.getIntExtra("id",0);
+
+        try {
+            File file = new File(getApplicationContext().getCacheDir(), "SkiTalkUserInfo"); // Pass getFilesDir() and "MyFile" to read file
+
+            BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = input.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            try {
+                JSONObject userInfo = new JSONObject(buffer.toString());
+                id = userInfo.getString("id");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            Log.d(TAG, buffer.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         System.out.println("My id is "+id);
         return START_STICKY;
     }

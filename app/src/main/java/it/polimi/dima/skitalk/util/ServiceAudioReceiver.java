@@ -38,7 +38,7 @@ public class ServiceAudioReceiver extends IntentService {
         int maxJitter = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, 16000, AudioFormat.CHANNEL_OUT_MONO,
-                AudioFormat.ENCODING_PCM_16BIT, maxJitter*50, AudioTrack.MODE_STREAM);
+                AudioFormat.ENCODING_PCM_16BIT, maxJitter, AudioTrack.MODE_STREAM);
 
         lin = new byte[1024];
         num = 0;
