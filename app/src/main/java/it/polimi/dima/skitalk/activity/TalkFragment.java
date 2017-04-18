@@ -33,7 +33,7 @@ public class TalkFragment extends Fragment{
 
     Socket sendAudio;
 
-    String url = "151.48.41.220";
+    String url = "87.2.99.216";
     int port = 4544;
 
     int idGroup;
@@ -136,9 +136,10 @@ public class TalkFragment extends Fragment{
                     PrintWriter send = new PrintWriter(out);
                     send.write(idUser+" "+idGroup+"\n");
                     send.flush();
-                    System.out.println("Open Socket. "+idUser+" "+idGroup+"\n");
                     BufferedReader br = new BufferedReader(new InputStreamReader(sendAudio.getInputStream()));
-                    if (br.equals("no")){
+                    String ack = br.readLine();
+                    System.out.println("Receive "+ack);
+                    if (ack.equals("no")){
                         Vibrator v0 = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
                         v0.vibrate(200);
 
@@ -148,8 +149,10 @@ public class TalkFragment extends Fragment{
                         break;
                     }
 
-                    else if (br.equals("ok"))
+                    else if (ack.equals("ok")){
                         socketAlreadyOpen = true;
+                        System.out.println("Open Socket. "+idUser+" "+idGroup+"\n");
+                    }
                 }
 
 

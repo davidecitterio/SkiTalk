@@ -74,8 +74,6 @@ public class ServiceUpdateCoords extends Service
     @Override
     public IBinder onBind(Intent arg0)
     {
-        id = arg0.getIntExtra("id",0);
-        System.out.println("My id is "+id);
         return null;
     }
 
@@ -83,6 +81,8 @@ public class ServiceUpdateCoords extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         super.onStartCommand(intent, flags, startId);
+        id = intent.getIntExtra("id",0);
+        System.out.println("My id is "+id);
         return START_STICKY;
     }
 
