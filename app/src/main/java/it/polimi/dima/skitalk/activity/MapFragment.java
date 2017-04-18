@@ -97,7 +97,7 @@ public class MapFragment extends Fragment {
                             );
                 }
                  LatLngBounds myplace = new LatLngBounds(
-                        new LatLng(user.getCoords().getLatitude()-0.5, user.getCoords().getLongitude()-0.5), new LatLng(user.getCoords().getLatitude()+0.5, user.getCoords().getLongitude()+0.5));
+                        new LatLng(user.getCoords().getLatitude()-0.3, user.getCoords().getLongitude()-0.3), new LatLng(user.getCoords().getLatitude()+0.3, user.getCoords().getLongitude()+0.3));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(myplace, 0));
 
             }
