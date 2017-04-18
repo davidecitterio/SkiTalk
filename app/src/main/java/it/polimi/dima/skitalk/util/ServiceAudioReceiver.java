@@ -46,6 +46,7 @@ public class ServiceAudioReceiver extends IntentService {
         am.setMode(AudioManager.MODE_IN_COMMUNICATION);
         am.setSpeakerphoneOn(true);
 
+
     }
 
 
@@ -66,8 +67,10 @@ public class ServiceAudioReceiver extends IntentService {
                 while (true) {
                     if ((num = sock.getInputStream().read(lin, 0, 1024)) > 0) {
                         System.out.println("Ricevuto qualcosa: " + num);
-                        track.write(lin, 0, num);
                         track.play();
+                        track.write(lin, 0, num);
+                        track.flush();
+
                     }
                 }
             } catch (IOException e) {
