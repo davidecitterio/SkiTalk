@@ -405,21 +405,8 @@ public class User {
     }
 
     //set user online
-    public void setOnline() throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/setUserOnline.php", "id=" + id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONObject user = request.getResponse();
-        setUser(user);
-    }
-
-    //set user offline
-    public void setOffline() throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/unsetUserOnline.php", "id=" + id);
-        Thread t = new Thread(request);
-        t.start();
-        JSONObject user = request.getResponse();
-        setUser(user);
+    public void setOnline(int onLine) {
+        isOnline = onLine;
     }
 
     //set user coords
@@ -491,9 +478,8 @@ public class User {
         return ip;
     }
 
-    public Boolean getIsOnline() {
-        if (isOnline == 1) return true;
-        else return false;
+    public boolean getIsOnline() {
+        return isOnline == 1;
     }
 
     public Coords getCoords() {

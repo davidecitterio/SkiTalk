@@ -67,6 +67,7 @@ public class GroupActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new TalkFragment(), getString(R.string.tab_talk));
+        adapter.addFragment(new MembersFragment(), getString(R.string.tab_members));
         adapter.addFragment(new MapFragment(), getString(R.string.tab_map));
         viewPager.setAdapter(adapter);
     }
@@ -241,5 +242,9 @@ public class GroupActivity extends AppCompatActivity {
 
                     }})
                 .setNegativeButton(android.R.string.no, null).show();
+    }
+
+    public Group getGroup() {
+        return group;
     }
 }

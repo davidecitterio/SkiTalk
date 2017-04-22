@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 
@@ -92,5 +93,15 @@ public class Utils {
         } else {
             return false;
         }
+    }
+
+    public static void setUserOnline(int userId, int onLine) {
+        HttpRequest request;
+        if(onLine == 1)
+            request = new HttpRequest("http://skitalk.altervista.org/php/setUserOnline.php", "id=" + userId);
+        else
+            request = new HttpRequest("http://skitalk.altervista.org/php/unsetUserOnline.php", "id=" + userId);
+        Thread t = new Thread(request);
+        t.start();
     }
 }

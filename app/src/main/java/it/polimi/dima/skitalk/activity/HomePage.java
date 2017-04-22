@@ -77,9 +77,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS},
                 0);
 
-
-
-
         //create groups button
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.new_group);
         myFab.setOnClickListener(new View.OnClickListener() {
@@ -205,6 +202,8 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 loadDrawerHeader();
                 showGroups();
                 progressDialog.dismiss();
+                //set user online on server
+                Utils.setUserOnline(user.getId(), 1);
             }
             else
                 System.out.println("Nooooooooo");
@@ -356,6 +355,5 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         super.onStart();
         scheduleUpdateTask();
     }
-
 
 }

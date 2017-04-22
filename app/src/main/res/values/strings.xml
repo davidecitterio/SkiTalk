@@ -32,6 +32,7 @@
     <string name="add">ADD</string>
     <string name="tab_talk">Talk</string>
     <string name="tab_map">Map</string>
+    <string name="tab_members">Members</string>
     <string name="leave_group">Leave group</string>
     <string name="mute">Mute</string>
     <string name="unmute">Unmute</string>
@@ -43,7 +44,7 @@
     <string name="nickname">Nickname</string>
     <string name="save">Save</string>
     <string name="edit">Edit</string>
-    <string name="members">Members:</string>
+    <string name="members_colon">Members:</string>
     <string name="search_results">Search results:</string>
     <string name="default_password">default</string>
     <string name="upload">Uploading contents...</string>

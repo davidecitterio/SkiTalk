@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/member_row"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/selector_row">
+
+    <View
+        android:layout_width="16dp"
+        android:layout_height="match_parent"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/member_picture"
+        android:layout_width="@dimen/row_group_picture"
+        android:layout_height="@dimen/row_group_picture"
+        android:src="@drawable/logo"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/member_name"
+            android:textStyle="bold"
+            android:textSize="@dimen/row_group_name_size"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/member_info"/>
+    </LinearLayout>
+
+    <ImageView android:id="@+id/member_status"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@mipmap/ic_offline"
+        android:layout_marginEnd="16dp"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0"/>
+</LinearLayout>

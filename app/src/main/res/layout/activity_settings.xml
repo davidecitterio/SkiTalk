@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginBottom="8dp"
-            android:text="@string/members"
+            android:text="@string/members_colon"
             android:textSize="16sp"
             android:textColor="@color/primary"/>
 
