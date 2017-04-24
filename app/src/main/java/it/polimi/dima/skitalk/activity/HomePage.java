@@ -149,11 +149,11 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 if (itemId == R.id.my_profile) {
                     myIntent = new Intent(thisActivity, MyProfile.class);
                     myIntent.putExtra("id", user.getId()); //Optional parameters
-                    HomePage.this.startActivity(myIntent);
+                    startActivity(myIntent);
                 } else if (itemId == R.id.logout) {
-                    myIntent = new Intent(HomePage.this, Logout.class);
+                    myIntent = new Intent(thisActivity, Logout.class);
                     myIntent.putExtra("id", user.getId()); //Optional parameters
-                    HomePage.this.startActivity(myIntent);
+                    startActivity(myIntent);
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
                 }

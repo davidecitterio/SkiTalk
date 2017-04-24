@@ -150,20 +150,16 @@ public class MyProfile extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
 
                 int itemId = menuItem.getItemId();
-                Intent intent, myIntent;
+                Intent myIntent;
 
                 if (itemId == R.id.home_page) {
                     myIntent = new Intent(thisActivity, HomePage.class);
-                    intent = getIntent();
-                    Integer id = intent.getIntExtra("id", 0);
-                    myIntent.putExtra("id", id);
+                    myIntent.putExtra("id", user.getId());
                     startActivity(myIntent);
                 }
                 else if (itemId == R.id.logout) {
-                    myIntent = new Intent(MyProfile.this, Logout.class);
-                    intent = getIntent();
-                    Integer id = intent.getIntExtra("id", 0);
-                    myIntent.putExtra("id", id);
+                    myIntent = new Intent(thisActivity, Logout.class);
+                    myIntent.putExtra("id", user.getId()); //Optional parameters
                     startActivity(myIntent);
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);

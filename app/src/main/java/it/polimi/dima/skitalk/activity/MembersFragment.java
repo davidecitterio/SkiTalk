@@ -168,6 +168,12 @@ public class MembersFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        timer.cancel();
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         scheduleUpdateTask();
