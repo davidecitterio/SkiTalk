@@ -62,7 +62,8 @@
             android:enabled="true"/>
         <service
             android:name=".util.ServiceAudioReceiver"
-            android:enabled="true"/>
+            android:enabled="true"
+            android:stopWithTask="false"/>
 
 
     </application>

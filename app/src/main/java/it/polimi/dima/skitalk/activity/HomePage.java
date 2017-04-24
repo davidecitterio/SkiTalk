@@ -202,8 +202,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 loadDrawerHeader();
                 showGroups();
                 progressDialog.dismiss();
-                //set user online on server
-                Utils.setUserOnline(user.getId(), 1);
             }
             else
                 System.out.println("Nooooooooo");

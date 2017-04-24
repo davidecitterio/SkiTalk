@@ -83,20 +83,31 @@ public class ServiceAudioReceiver extends IntentService {
     @Override
     public void onDestroy()
     {
-        try {
+        //set user offline on server
+        Thread t = Utils.setUserOnline(userId, 0);
+        /*try {
             sock.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }*/
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         System.out.println("Mi spengo, ciaone.");
-
-
     }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        stopSelf();
+    }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         userId = intent.getIntExtra("id", 0);
+        //set user online on server
+        Utils.setUserOnline(userId, 1);
         init();
         play();
     }

@@ -95,13 +95,14 @@ public class Utils {
         }
     }
 
-    public static void setUserOnline(int userId, int onLine) {
+    public static Thread setUserOnline(int userId, int onLine) {
         HttpRequest request;
         if(onLine == 1)
-            request = new HttpRequest("http://skitalk.altervista.org/php/setUserOnline.php", "id=" + userId);
+            request = new HttpRequest("http://skitalk.altervista.org/php/setUserOnline.php", "idUser=" + userId);
         else
-            request = new HttpRequest("http://skitalk.altervista.org/php/unsetUserOnline.php", "id=" + userId);
+            request = new HttpRequest("http://skitalk.altervista.org/php/unsetUserOnline.php", "idUser=" + userId);
         Thread t = new Thread(request);
         t.start();
+        return t;
     }
 }
