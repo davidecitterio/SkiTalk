@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.util.Base64;
+import android.view.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -104,5 +106,13 @@ public class Utils {
         Thread t = new Thread(request);
         t.start();
         return t;
+    }
+
+    public static int getScreenWidth(Activity a) {
+        Display display = a.getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        return width;
     }
 }

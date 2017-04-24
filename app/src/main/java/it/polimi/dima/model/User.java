@@ -375,7 +375,6 @@ public class User {
     }
 
     //constructor of other users
-    //n : 0 if user is updated, 1 if user need to be updated
     public User(int id, Context c) {
         this.id = id;
         this.c = c;

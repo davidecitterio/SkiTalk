@@ -1,6 +1,7 @@
 package it.polimi.dima.skitalk.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -302,15 +303,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                                         }
                                     }
                         }
-                    }, getScreenWidth()-192));
-        }
-
-        private int getScreenWidth() {
-            Display display = getWindowManager().getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            int width = size.x;
-            return width;
+                    }, Utils.getScreenWidth(thisActivity)-192));
         }
     }
 

@@ -1,5 +1,6 @@
 package it.polimi.dima.skitalk.activity;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerMembersAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
+import it.polimi.dima.skitalk.util.RecyclerItemListener;
 import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
 
@@ -72,6 +74,30 @@ public class MembersFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         membersRecyclerView.setLayoutManager(llm);
+        membersRecyclerView.addOnItemTouchListener(new RecyclerItemListener(getActivity().getApplicationContext(), membersRecyclerView,
+                new RecyclerItemListener.RecyclerTouchListener() {
+                    public void onClickItem(View v, int position) {
+                        v.setSelected(true);
+                        int selectedUserId = membersList.get(position).getId();
+                        if(selectedUserId != userId) {
+                            Intent myIntent = new Intent(getActivity(), OthersProfile.class);
+                            Bundle extras = new Bundle();
+                            extras.putInt("id", selectedUserId);
+                            extras.putInt("mainUserId", userId);
+                            extras.putBoolean("status", membersList.get(position).getIsOnline());
+                            myIntent.putExtras(extras);
+                            getActivity().startActivity(myIntent);
+                        } else {
+                            Intent myIntent = new Intent(getActivity(), MyProfile.class);
+                            myIntent.putExtra("id", userId); //Optional parameters
+                            getActivity().startActivity(myIntent);
+                        }
+                    }
+
+                    public void onClickSwitch(View v, int position) {
+
+                    }
+                }, Utils.getScreenWidth(getActivity())-192));
     }
 
     private void scheduleUpdateTask() {

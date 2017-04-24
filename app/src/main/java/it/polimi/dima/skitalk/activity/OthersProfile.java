@@ -1,55 +1,51 @@
 package it.polimi.dima.skitalk.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
 
-public class MyProfile extends AppCompatActivity {
+public class OthersProfile extends AppCompatActivity {
     private DrawerLayout dLayout;
-    private MyProfile thisActivity = this;
-    private User user;
+    private OthersProfile thisActivity = this;
+    private User user, mainUser;
     private TextView userNameSurname;
     private TextView userNickname;
     private TextView userEmail;
-    private TextView userPassword;
+    private TextView userStatus;
     private CircleImageView userPicture;
+    private boolean status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_profile);
+        setContentView(R.layout.activity_others_profile);
         setToolBar();
 
-        userNameSurname = (TextView) findViewById(R.id.myprofile_name_surname);
-        userNickname = (TextView) findViewById(R.id.myprofile_nickname);
-        userEmail = (TextView) findViewById(R.id.myprofile_email);
-        userPicture = (CircleImageView) findViewById(R.id.myprofile_picture);
+        userNameSurname = (TextView) findViewById(R.id.others_profile_name_surname);
+        userStatus = (TextView) findViewById(R.id.others_profile_status);
+        userNickname = (TextView) findViewById(R.id.others_profile_nickname);
+        userEmail = (TextView) findViewById(R.id.others_profile_email);
+        userPicture = (CircleImageView) findViewById(R.id.others_profile_picture);
+        status = getIntent().getBooleanExtra("status", false);
 
         initializeUser();
     }
@@ -57,14 +53,13 @@ public class MyProfile extends AppCompatActivity {
     //menu a destra
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.myprofile_menu, menu);
+        getMenuInflater().inflate(R.menu.empty_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        String btnName = null;
         setNavigationDrawer();
 
         switch(itemId) {
@@ -73,11 +68,6 @@ public class MyProfile extends AppCompatActivity {
                 dLayout.openDrawer(GravityCompat.START);
                 return true;
             }
-
-            case R.id.menu_edit:
-                Intent myIntent = new Intent(thisActivity, MyProfileEdit.class);
-                myIntent.putExtra("id", user.getId());
-                startActivity(myIntent);
         }
         return true;
     }
@@ -93,21 +83,23 @@ public class MyProfile extends AppCompatActivity {
 
     private void initializeUser() {
         Intent intent = getIntent();
-        Integer id = intent.getIntExtra("id", 0);
+        int id = intent.getIntExtra("id", 0);
+        int mainUserId = intent.getIntExtra("mainUserId", 0);
 
-        new MyProfile.InitializeUser().execute(id);
+        new OthersProfile.InitializeUser().execute(id, mainUserId);
     }
 
     private class InitializeUser extends AsyncTask<Integer, Void, Boolean> {
 
-        ProgressDialog progressDialog = new ProgressDialog(MyProfile.this,
+        ProgressDialog progressDialog = new ProgressDialog(OthersProfile.this,
                 ProgressDialog.STYLE_SPINNER);
         Context c;
 
         @Override
         protected Boolean doInBackground(Integer... params) {
             synchronized (HomePage.cacheLock) {
-                user = new User(params[0], c, true);
+                user = new User(params[0], c);
+                mainUser = new User(params[1], c, true);
             }
             return true;
         }
@@ -120,6 +112,15 @@ public class MyProfile extends AppCompatActivity {
                 userNickname.setText(user.getNickname());
                 userEmail.setText(user.getEmail());
                 userPicture.setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
+                if(status) {
+                    userStatus.setText(getString(R.string.online));
+                    userStatus.setTextColor(Color.parseColor("#05D21F"));
+                    userPicture.setBorderColor(Color.parseColor("#05D21F"));
+                    userPicture.setBorderWidth(8);
+                } else {
+                    userStatus.setText(getString(R.string.offline));
+                    userPicture.setBorderColor(Color.parseColor("#A1A1A1"));
+                }
                 progressDialog.dismiss();
             }
             else
@@ -135,9 +136,9 @@ public class MyProfile extends AppCompatActivity {
         }
 
         private void loadDrawerHeader() {
-            ((TextView) findViewById(R.id.drawer_name)).setText(user.getName()+" "+user.getSurname());
-            ((TextView) findViewById(R.id.drawer_email)).setText(user.getEmail());
-            ((CircleImageView) findViewById(R.id.drawer_image)).setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
+            ((TextView) findViewById(R.id.drawer_name)).setText(mainUser.getName()+" "+mainUser.getSurname());
+            ((TextView) findViewById(R.id.drawer_email)).setText(mainUser.getEmail());
+            ((CircleImageView) findViewById(R.id.drawer_image)).setImageBitmap(Utils.getResizedBitmap(mainUser.getPicture(), 256));
 
         }
     }
@@ -160,7 +161,7 @@ public class MyProfile extends AppCompatActivity {
                     startActivity(myIntent);
                 }
                 else if (itemId == R.id.logout) {
-                    myIntent = new Intent(MyProfile.this, Logout.class);
+                    myIntent = new Intent(OthersProfile.this, Logout.class);
                     intent = getIntent();
                     Integer id = intent.getIntExtra("id", 0);
                     myIntent.putExtra("id", id);

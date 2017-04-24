@@ -31,6 +31,11 @@
         </activity>
         <activity android:name=".activity.MyProfile" />
         <activity android:name=".activity.MyProfileEdit" />
+        <activity android:name=".activity.OthersProfile">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="it.polimi.dima.skitalk.activity.GroupActivity" />
+        </activity>
         <activity android:name=".activity.HomePage" />
         <activity android:name=".activity.Logout" />
         <activity android:name=".activity.SignIn" />

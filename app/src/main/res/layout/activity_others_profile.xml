@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activity.MyProfile"
+    tools:context=".activity.OthersProfile"
     >
 
     <LinearLayout
@@ -46,28 +46,44 @@
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         xmlns:app="http://schemas.android.com/apk/res-auto"
-                        android:id="@+id/myprofile_picture"
+                        android:id="@+id/others_profile_picture"
                         android:src="@drawable/logo"
                         android:layout_width="@dimen/profile_picture"
                         android:layout_height="@dimen/profile_picture"
                         android:layout_marginBottom="38dp"
                         android:layout_centerHorizontal="true"
-                        android:layout_above="@+id/myprofile_name_surname"
+                        android:layout_above="@+id/ll"
                         app:civ_border_width="2dp"
                         app:civ_border_color="@color/primary_text"/>
 
-                    <!-- Name and Surname Label -->
-                    <TextView
-                        android:id="@+id/myprofile_name_surname"
+                    <LinearLayout android:id="@+id/ll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal"
                         android:layout_alignParentBottom="true"
                         android:layout_marginStart="24dp"
                         android:layout_marginEnd="24dp"
-                        android:layout_marginBottom="8dp"
-                        android:textSize="@dimen/myprofile_text_size"
-                        android:textStyle="bold"
-                        android:textColor="@color/icons"/>
+                        android:layout_marginBottom="8dp">
+
+                        <!-- Name and Surname Label -->
+                        <TextView
+                            android:id="@+id/others_profile_name_surname"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="@dimen/myprofile_text_size"
+                            android:textStyle="bold"
+                            android:textColor="@color/icons"/>
+
+                        <TextView
+                            android:id="@+id/others_profile_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:textSize="@dimen/myprofile_text_size"
+                            android:textColor="@color/secondary_text" />
+
+                    </LinearLayout>
 
                 </RelativeLayout>
 
@@ -95,7 +111,7 @@
                             android:text="@string/nickname_colon" />
 
                         <TextView
-                            android:id="@+id/myprofile_nickname"
+                            android:id="@+id/others_profile_nickname"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="0"
@@ -119,7 +135,7 @@
                             android:text="@string/email_colon"/>
 
                         <TextView
-                            android:id="@+id/myprofile_email"
+                            android:id="@+id/others_profile_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="0"
