@@ -55,13 +55,7 @@ public class RecyclerMembersAdapter extends
     public void onBindViewHolder(MyViewHolder holder, int position) {
         User u = membersList.get(position);
         holder.memberName.setText(u.getName());
-
-        //adjust members string to fit the screen
-        /*final int MAX_STRING_LENGTH = 38;
-        String membersString = c.getMembersString();
-        if(membersString.length() > MAX_STRING_LENGTH)
-            membersString = membersString.substring(0, MAX_STRING_LENGTH - 5) + " ...";
-        holder.memberInfo.setText(membersString);*/
+        holder.memberInfo.setText(u.getNickname());
 
         if(u.getIsOnline())
             holder.memberStatus.setImageResource(R.mipmap.ic_online);

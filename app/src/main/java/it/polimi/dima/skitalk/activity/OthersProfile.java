@@ -159,8 +159,11 @@ public class OthersProfile extends AppCompatActivity {
                     Integer id = intent.getIntExtra("id", 0);
                     myIntent.putExtra("id", id);
                     startActivity(myIntent);
-                }
-                else if (itemId == R.id.logout) {
+                } else if (itemId == R.id.my_profile) {
+                    myIntent = new Intent(thisActivity, MyProfile.class);
+                    myIntent.putExtra("id", user.getId()); //Optional parameters
+                    startActivity(myIntent);
+                } else if (itemId == R.id.logout) {
                     myIntent = new Intent(OthersProfile.this, Logout.class);
                     intent = getIntent();
                     Integer id = intent.getIntExtra("id", 0);
