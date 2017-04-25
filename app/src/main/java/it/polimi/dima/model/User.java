@@ -3,6 +3,7 @@ package it.polimi.dima.model;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import it.polimi.dima.skitalk.util.Utils;
 
 import static android.content.ContentValues.TAG;
+import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
 
 
 /**
@@ -514,5 +516,11 @@ public class User {
         return groups;
     }
 
+    public int getAltitude(){ return altitude;}
 
+    public String getTime(){ return update_time;}
+
+    public String getLastUpdate(){
+        return DateUtils.getRelativeTimeSpanString(Long.parseLong(update_time), System.currentTimeMillis(), MINUTE_IN_MILLIS).toString();
+    }
 }

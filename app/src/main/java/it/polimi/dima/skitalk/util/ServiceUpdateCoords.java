@@ -28,7 +28,7 @@ public class ServiceUpdateCoords extends Service
 {
     private static final String TAG = "ServiceCoordsUpdate";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 100;
+    private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 3f;
     String id;
 
@@ -50,7 +50,7 @@ public class ServiceUpdateCoords extends Service
             System.out.println("Coords: "+mLastLocation.getLatitude()+" "+mLastLocation.getLongitude());
 
             HttpRequest update = new HttpRequest("http://skitalk.altervista.org/php/" + "setUserCoords.php",
-                    "idUser=" + id + "&long=" + mLastLocation.getLongitude() + "&lat=" + mLastLocation.getLatitude() + "&alti=" + mLastLocation.getAltitude() + "&speed=" + mLastLocation.getSpeed() + "&time=" + mLastLocation.getTime());
+                    "idUser=" + id + "&long=" + mLastLocation.getLongitude() + "&lat=" + mLastLocation.getLatitude() + "&alti=" + mLastLocation.getAltitude() + "&speed=" + mLastLocation.getSpeed() + "&time=" + System.currentTimeMillis());
             Thread t1 = new Thread(update);
             t1.start();
         }

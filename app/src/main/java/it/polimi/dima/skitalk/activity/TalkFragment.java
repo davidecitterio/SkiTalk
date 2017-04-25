@@ -7,6 +7,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -41,6 +42,8 @@ public class TalkFragment extends Fragment{
     int idGroup;
     int idUser;
 
+    CoordinatorLayout snackbarCoordinatorLayout;
+
     public TalkFragment() {
         // Required empty public constructor
     }
@@ -53,8 +56,6 @@ public class TalkFragment extends Fragment{
         idGroup = args.getInt("groupId");
         idUser = args.getInt("userId");
 
-
-
         init();
         (new Thread() {
             @Override
@@ -63,10 +64,8 @@ public class TalkFragment extends Fragment{
                     recordAndPlay();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Snackbar.make(getView(), "Error: Server not working.", Snackbar.LENGTH_LONG)
-                            .setAction("Retry", null)
-                            .setActionTextColor(Color.RED)
-                            .show();
+                    System.out.println("Error: server doesn't responding.");
+                    showSnackBar();
                 }
 
             }
@@ -97,6 +96,8 @@ public class TalkFragment extends Fragment{
             }
 
         });
+
+        snackbarCoordinatorLayout = (CoordinatorLayout)view.findViewById(R.id.snackbarCoordinatorLayout);
 
         return view;
     }
@@ -172,6 +173,12 @@ public class TalkFragment extends Fragment{
         }
     }
 
+    public void showSnackBar(){
+        Snackbar.make(snackbarCoordinatorLayout, "Error: Server not working.", Snackbar.LENGTH_LONG)
+                .setAction("Retry", null)
+                .setActionTextColor(Color.RED)
+                .show();
+    }
 
 
 

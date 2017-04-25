@@ -6,13 +6,18 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
@@ -91,24 +97,56 @@ public class MapFragment extends Fragment {
                     //mMap.setMyLocationEnabled(true);
                 }
 
-                String status;
+
+                String status, status1, status2;
                 String time;
                 for (int i=0; i< group.getMembers().size(); i++){
-
-                    if (group.getMembers().get(i).getSpeed()>0) status = "It is Skiing!";
-                    else status = "It is stopped..";
+                    status = "Speed: "+group.getMembers().get(i).getSpeed()+" km/h";
+                    status1 = "Altitude: "+group.getMembers().get(i).getAltitude()+" m.a.s.l.";
+                    status2 = "Last Update: "+group.getMembers().get(i).getLastUpdate();
                     googleMap.addMarker(new MarkerOptions().position(new LatLng(group.getMembers().get(i).getCoords().getLatitude(), group.getMembers().get(i).getCoords().getLongitude()))
-                            .title(group.getMembers().get(i).getName() + " " + group.getMembers().get(i).getSurname())
+                            .title(group.getMembers().get(i).getName().toUpperCase() + " " + group.getMembers().get(i).getSurname().toUpperCase())
                             .visible(true)
-                            .snippet(status)
+                            .snippet(status+"\n"+status1+"\n"+status2)
                             .icon(BitmapDescriptorFactory.defaultMarker(new Random().nextInt(360)))
 
                     );
+                    googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+                        @Override
+                        public View getInfoWindow(Marker arg0) {
+                            return null;
+                        }
+
+                        @Override
+                        public View getInfoContents(Marker marker) {
+
+                            LinearLayout info = new LinearLayout(getContext());
+                            info.setOrientation(LinearLayout.VERTICAL);
+
+                            TextView title = new TextView(getContext());
+                            title.setTextColor(Color.BLACK);
+                            title.setGravity(Gravity.CENTER);
+                            title.setTypeface(null, Typeface.BOLD);
+                            title.setText(marker.getTitle());
+
+                            TextView snippet = new TextView(getContext());
+                            snippet.setTextColor(Color.GRAY);
+                            snippet.setText(marker.getSnippet());
+
+                            info.addView(title);
+                            info.addView(snippet);
+
+                            return info;
+                        }
+                    });
 
                 }
                  LatLngBounds myplace = new LatLngBounds(
-                        new LatLng(user.getCoords().getLatitude()-0.002, user.getCoords().getLongitude()-0.002), new LatLng(user.getCoords().getLatitude()+0.002, user.getCoords().getLongitude()+0.002));
+                        new LatLng(user.getCoords().getLatitude()-0.05, user.getCoords().getLongitude()-0.05), new LatLng(user.getCoords().getLatitude()+0.05, user.getCoords().getLongitude()+0.05));
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(myplace, 0));
+                googleMap.setMyLocationEnabled(true);
+
 
             }
         });

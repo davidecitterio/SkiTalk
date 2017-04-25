@@ -1,7 +1,6 @@
 package it.polimi.dima.skitalk.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +8,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import it.polimi.dima.model.Group;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
@@ -55,7 +52,7 @@ public class RecyclerMembersAdapter extends
     public void onBindViewHolder(MyViewHolder holder, int position) {
         User u = membersList.get(position);
         holder.memberName.setText(u.getName());
-        holder.memberInfo.setText(u.getNickname());
+        holder.memberInfo.setText("Last seen "+u.getLastUpdate());
 
         if(u.getIsOnline())
             holder.memberStatus.setImageResource(R.mipmap.ic_online);
