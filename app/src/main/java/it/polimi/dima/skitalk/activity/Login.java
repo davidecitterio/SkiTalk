@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -69,61 +70,10 @@ public class Login extends Activity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Async mAuthTask;
+                mAuthTask = new Async();
+                mAuthTask.execute(username.getText().toString(), password.getText().toString());
 
-                if (username.getText().toString().trim().length() > 0 && password.getText().toString().trim().length() > 0) {
-                    final ProgressDialog progressDialog = new ProgressDialog(Login.this,
-                            ProgressDialog.STYLE_SPINNER);
-                    progressDialog.setIndeterminate(true);
-                    progressDialog.setMessage(getString(R.string.authenticating));
-                    progressDialog.show();
-                    System.out.println("cliccato");
-                    //http request to the server
-                    String user = username.getText().toString();
-                    String pass = password.getText().toString();
-
-                    HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/login.php",
-                            "email=" + user + "&password=" + pass);
-                    Thread t = new Thread(request);
-                    t.start();
-                    JSONObject response = request.getResponse();
-
-                    try {
-                        // if wrong credentials
-                        if (response.getInt("id") == -1) {
-                            System.out.println("wrong credentials");
-                            progressDialog.dismiss();
-
-                            AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
-                            alert.setTitle(R.string.wrong_credentials_title);
-                            alert.setMessage(R.string.wrong_credentials_text);
-                            alert.setPositiveButton("OK", null);
-                            alert.show();
-                        }
-                        // if correct credentials
-                        else {
-
-                            System.out.println("L'id dell'user è: " + response.getInt("id"));
-
-                            saveLogin(response.getInt("id"));
-
-                            //start homepage activity
-                            Intent myIntent = new Intent(Login.this, HomePage.class);
-                            myIntent.putExtra("id", response.getInt("id")); //Optional parameters
-                            Login.this.startActivity(myIntent);
-                            progressDialog.dismiss();
-                            finish();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
-                    alert.setTitle(R.string.wrong_credentials_title);
-                    alert.setMessage(R.string.wrong_credentials_text);
-                    alert.setPositiveButton("OK", null);
-                    alert.show();
-                }
             }
         });
 
@@ -204,6 +154,91 @@ public class Login extends Activity {
         }
     }
 
+
+    public class Async extends AsyncTask<String, Void, Boolean> {
+        final ProgressDialog progressDialog = new ProgressDialog(Login.this,
+                ProgressDialog.STYLE_SPINNER);
+        boolean result = false;
+        int id = -1;
+
+        @Override
+        protected void onPreExecute(){
+
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage(getString(R.string.authenticating));
+            progressDialog.show();
+        }
+
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            if (params[0].trim().length() > 0 && params[1].trim().length() > 0) {
+
+
+                System.out.println("cliccato");
+                //http request to the server
+                String user = params[0];
+                String pass = params[1];
+
+                HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/login.php",
+                        "email=" + user + "&password=" + pass);
+                Thread t = new Thread(request);
+                t.start();
+                JSONObject response = request.getResponse();
+
+                try {
+                    // if wrong credentials
+                    if (response.getInt("id") == -1) {
+                        System.out.println("wrong credentials");
+                        result = false;
+                        return true;
+                    }
+                    // if correct credentials
+                    else {
+
+                        System.out.println("L'id dell'user è: " + response.getInt("id"));
+
+                        saveLogin(response.getInt("id"));
+
+                        result = true;
+                        id = response.getInt("id");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                result = false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            afterLogin(result, id);
+            progressDialog.dismiss();
+        }
+
+
+    }
+
+    void afterLogin(boolean result, int id){
+        if (result){
+            //start homepage activity
+            Intent myIntent = new Intent(Login.this, HomePage.class);
+            myIntent.putExtra("id", id); //Optional parameters
+            Login.this.startActivity(myIntent);
+            finish();
+        }
+
+        else{
+            AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
+            alert.setTitle(R.string.wrong_credentials_title);
+            alert.setMessage(R.string.wrong_credentials_text);
+            alert.setPositiveButton("OK", null);
+            alert.show();
+        }
+    }
 
 }
 

@@ -188,10 +188,13 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
                     alert.setMessage(R.string.no_users_found_text);
                     alert.setPositiveButton("OK", null);
                     alert.show();
+
+                    System.out.println("searchUser: No user found for the requested nickname.");
                 }
                 else {
                     if (!alreadyPresent(response.getJSONObject(i).getInt("id")) && response.getJSONObject(i).getInt("id") != id)
                         tempUsers.add(new User(response.getJSONObject(i)));
+                        System.out.println("searchUser: add temp user "+response.getJSONObject(i).getString("nickname"));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

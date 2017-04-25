@@ -1,11 +1,13 @@
 package it.polimi.dima.skitalk.activity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -61,7 +63,12 @@ public class TalkFragment extends Fragment{
                     recordAndPlay();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Snackbar.make(getView(), "Error: Server not working.", Snackbar.LENGTH_LONG)
+                            .setAction("Retry", null)
+                            .setActionTextColor(Color.RED)
+                            .show();
                 }
+
             }
         }).start();
 

@@ -41,6 +41,9 @@ public class User {
     private Integer isOnline;
     private Coords coords;
     private Integer speed;
+    private Integer altitude;
+    private String update_time;
+
     private ArrayList<Group> groups = new ArrayList<Group>();
     private Context c;
 
@@ -109,6 +112,8 @@ public class User {
             ip = user.getString("ip");
             isOnline = user.getInt("isOnline");
             speed = user.getInt("speed");
+            altitude = user.getInt("altitude");
+            update_time = user.getString("update_time");
             coords = new Coords(user.getDouble("latitude"), user.getDouble("longitude"));
             downloadPicture();
             if(!onlyUser)
@@ -166,6 +171,8 @@ public class User {
             u.put("isOnline", user.isOnline);
             u.put("ip", user.ip);
             u.put("speed", user.speed);
+            u.put("altitude", user.altitude);
+            u.put("time", user.update_time);
             u.put("latitude", user.coords.getLatitude());
             u.put("longitude", user.coords.getLongitude());
             saveUserInfo(u, c, mainUser);
@@ -222,6 +229,8 @@ public class User {
                 ip = userInfo.getString("ip");
                 isOnline = userInfo.getInt("isOnline");
                 speed = userInfo.getInt("speed");
+                altitude = userInfo.getInt("altitude");
+                update_time = userInfo.getString("update_time");
                 coords = new Coords(userInfo.getDouble("latitude"), userInfo.getDouble("longitude"));
                 setPicture();
                 if (!onlyUser)
@@ -277,6 +286,8 @@ public class User {
         surname = user.getString("surname");
         nickname = user.getString("nickname");
         pictureURL = user.getString("picture");
+        altitude = user.getInt("altitude");
+        update_time = user.getString("update_time");
         speed = user.getInt("speed");
         downloadTempPicture();
     }
@@ -292,6 +303,8 @@ public class User {
         isOnline = user.getInt("isOnline");
         coords.setCoords(user.getDouble("latitude"), user.getDouble("longitude"));
         speed = user.getInt("speed");
+        altitude = user.getInt("altitude");
+        update_time = user.getString("update_time");
     }
 
     public void updateGroups() {

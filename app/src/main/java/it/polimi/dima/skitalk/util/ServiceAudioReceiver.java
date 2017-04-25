@@ -7,6 +7,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -76,6 +77,8 @@ public class ServiceAudioReceiver extends IntentService {
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Not able to Open serversocket.");
+                Toast.makeText(getBaseContext(),"Error: Server is not working, retry later!",
+                        Toast.LENGTH_LONG).show();
             }
 
     }
