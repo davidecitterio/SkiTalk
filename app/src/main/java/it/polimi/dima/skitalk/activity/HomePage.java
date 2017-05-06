@@ -1,12 +1,10 @@
 package it.polimi.dima.skitalk.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,7 +62,10 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         c = getApplicationContext();
 
         //start the update coords service
-        startService(new Intent(this, ServiceUpdateCoords.class));
+        Intent intent = getIntent();
+        Intent intService =  new Intent(HomePage.this, ServiceUpdateCoords.class);
+        intService.putExtra("id", intent.getIntExtra("id", 0));
+        startService(intService);
 
         //REQUEST PERMISSION FOR LOCATION IN MAPS
         ActivityCompat.requestPermissions(this,
