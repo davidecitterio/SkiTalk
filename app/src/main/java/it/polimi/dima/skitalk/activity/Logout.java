@@ -36,8 +36,9 @@ public class Logout extends Activity {
 
         //start login activity
         Intent myIntent = new Intent(Logout.this, Login.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Logout.this.startActivity(myIntent);
-
+        finish();
     }
 
     //set user offline

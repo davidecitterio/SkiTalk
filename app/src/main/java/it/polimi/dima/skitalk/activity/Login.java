@@ -82,7 +82,7 @@ public class Login extends Activity {
                 //start sign in activity
                 Intent myIntent = new Intent(Login.this, SignIn.class);
                 Login.this.startActivity(myIntent);
-
+                finish();
             }
         });
 
