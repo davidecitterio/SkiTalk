@@ -220,8 +220,10 @@ public class GroupActivity extends AppCompatActivity {
 
     private void goBackToHome() {
         Intent myIntent = new Intent(GroupActivity.this, HomePage.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.putExtra("id", userId);
         GroupActivity.this.startActivity(myIntent);
+        finish();
     }
 
     private void leaveGroup(){

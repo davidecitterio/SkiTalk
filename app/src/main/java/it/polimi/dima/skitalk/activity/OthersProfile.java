@@ -155,16 +155,22 @@ public class OthersProfile extends AppCompatActivity {
 
                 if (itemId == R.id.home_page) {
                     myIntent = new Intent(thisActivity, HomePage.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     myIntent.putExtra("id", mainUser.getId());
                     startActivity(myIntent);
+                    finish();
                 } else if (itemId == R.id.my_profile) {
                     myIntent = new Intent(thisActivity, MyProfile.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     myIntent.putExtra("id", mainUser.getId()); //Optional parameters
                     startActivity(myIntent);
+                    finish();
                 } else if (itemId == R.id.logout) {
                     myIntent = new Intent(OthersProfile.this, Logout.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     myIntent.putExtra("id", mainUser.getId());
                     startActivity(myIntent);
+                    finish();
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
                 }

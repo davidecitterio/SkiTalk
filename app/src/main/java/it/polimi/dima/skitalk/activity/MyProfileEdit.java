@@ -205,8 +205,10 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
 
     private void goBackHome() {
         Intent myIntent = new Intent(thisActivity, MyProfile.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.putExtra("id", user.getId());
         startActivity(myIntent);
+        finish();
     }
 
     @Override
@@ -235,8 +237,8 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
         setSupportActionBar(tb);
         ActionBar ab = getSupportActionBar();
         //drawer icon
-        ab.setHomeAsUpIndicator(R.mipmap.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
+        //ab.setHomeAsUpIndicator(R.mipmap.ic_menu);
+        //ab.setDisplayHomeAsUpEnabled(true);
     }
 
     private void initializeUser() {
@@ -330,13 +332,17 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
 
                 if (itemId == R.id.home_page) {
                     myIntent = new Intent(thisActivity, HomePage.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     myIntent.putExtra("id", user.getId());
                     startActivity(myIntent);
+                    finish();
                 }
                 else if (itemId == R.id.logout) {
                     myIntent = new Intent(MyProfileEdit.this, Logout.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     myIntent.putExtra("id", user.getId());
                     startActivity(myIntent);
+                    finish();
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
                 }

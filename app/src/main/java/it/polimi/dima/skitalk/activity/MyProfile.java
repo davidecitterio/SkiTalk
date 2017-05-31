@@ -154,13 +154,17 @@ public class MyProfile extends AppCompatActivity {
 
                 if (itemId == R.id.home_page) {
                     myIntent = new Intent(thisActivity, HomePage.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     myIntent.putExtra("id", user.getId());
                     startActivity(myIntent);
+                    finish();
                 }
                 else if (itemId == R.id.logout) {
                     myIntent = new Intent(thisActivity, Logout.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     myIntent.putExtra("id", user.getId()); //Optional parameters
                     startActivity(myIntent);
+                    finish();
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
                 }

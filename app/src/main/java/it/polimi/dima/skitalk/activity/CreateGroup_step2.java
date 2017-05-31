@@ -409,5 +409,6 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
         myIntent.putExtras(extras);
         progressDialog3.dismiss();
         CreateGroup_step2.this.startActivity(myIntent);
+        finish();
     }
 }

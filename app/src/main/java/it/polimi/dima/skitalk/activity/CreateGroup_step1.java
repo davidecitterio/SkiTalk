@@ -69,7 +69,7 @@ public class CreateGroup_step1 extends Activity {
                     extras.putParcelable("picture",picture);
                     myIntent.putExtras(extras);
                     CreateGroup_step1.this.startActivity(myIntent);
-
+                    finish();
                 }
                 else{
                     AlertDialog.Builder alert = new AlertDialog.Builder(CreateGroup_step1.this);
