@@ -41,6 +41,8 @@ public class TalkFragment extends Fragment{
 
     int idGroup;
     int idUser;
+    Thread t;
+    boolean quit = false;
 
     CoordinatorLayout snackbarCoordinatorLayout;
 
@@ -57,7 +59,7 @@ public class TalkFragment extends Fragment{
         idUser = args.getInt("userId");
 
         init();
-        (new Thread() {
+        t = new Thread() {
             @Override
             public void run() {
                 try {
@@ -69,8 +71,8 @@ public class TalkFragment extends Fragment{
                 }
 
             }
-        }).start();
-
+        };
+        t.start();
 
     }
 
@@ -129,7 +131,7 @@ public class TalkFragment extends Fragment{
         boolean socketAlreadyOpen = false;
         int msg;
 
-        while (true){
+        while (!quit){
             if (socketAlreadyOpen && !isPlaying) {
                 sendAudio.getOutputStream().close();
                 sendAudio.close();
@@ -171,6 +173,8 @@ public class TalkFragment extends Fragment{
                 }
             }
         }
+
+        return;
     }
 
     public void showSnackBar(){
@@ -180,6 +184,12 @@ public class TalkFragment extends Fragment{
                 .show();
     }
 
-
+    @Override
+    public void onDestroy() {
+        record.release();
+        quit = true;
+        System.out.println("Chiudo record.");
+        super.onDestroy();
+    }
 
 }

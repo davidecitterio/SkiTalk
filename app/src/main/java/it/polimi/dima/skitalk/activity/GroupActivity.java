@@ -140,7 +140,7 @@ public class GroupActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        goBackToHome();
+        super.onBackPressed();
     }
 
     private void loadGroup() {
