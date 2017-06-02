@@ -143,6 +143,7 @@ public class MembersFragment extends Fragment {
         @Override
         protected void onPostExecute(final Boolean result) {
             membersAdapter.notifyDataSetChanged();
+            ((GroupActivity)getActivity()).passUserToMap(membersList);
         }
 
         @Override

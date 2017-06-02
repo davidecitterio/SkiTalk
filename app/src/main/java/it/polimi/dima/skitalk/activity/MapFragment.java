@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 
+import java.util.List;
 import java.util.Random;
 
 import it.polimi.dima.model.Group;
@@ -41,10 +42,10 @@ import it.polimi.dima.skitalk.R;
 
 public class MapFragment extends Fragment {
 
-    MapView mMapView;
-    GoogleMap googleMap;
-    Group group;
-    User user;
+    private MapView mMapView;
+    private GoogleMap googleMap;
+    private List<User> membersList;
+    private User user;
 
 
     public MapFragment() {
@@ -60,11 +61,6 @@ public class MapFragment extends Fragment {
         int idGroup = args.getInt("groupId");
         int idUser = args.getInt("userId");
         user = new User(idUser, getActivity(), true);
-        try {
-            group = new Group(idGroup, getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -100,12 +96,12 @@ public class MapFragment extends Fragment {
 
                 String status, status1, status2;
                 String time;
-                for (int i=0; i< group.getMembers().size(); i++){
-                    status = "Speed: "+group.getMembers().get(i).getSpeed()+" km/h";
-                    status1 = "Altitude: "+group.getMembers().get(i).getAltitude()+" m.a.s.l.";
-                    status2 = "Last Update: "+group.getMembers().get(i).getLastUpdate();
-                    googleMap.addMarker(new MarkerOptions().position(new LatLng(group.getMembers().get(i).getCoords().getLatitude(), group.getMembers().get(i).getCoords().getLongitude()))
-                            .title(group.getMembers().get(i).getName().toUpperCase() + " " + group.getMembers().get(i).getSurname().toUpperCase())
+                for (int i=0; i< membersList.size(); i++){
+                    status = "Speed: "+membersList.get(i).getSpeed()+" km/h";
+                    status1 = "Altitude: "+membersList.get(i).getAltitude()+" m.a.s.l.";
+                    status2 = "Last Update: "+membersList.get(i).getLastUpdate();
+                    googleMap.addMarker(new MarkerOptions().position(new LatLng(membersList.get(i).getCoords().getLatitude(), membersList.get(i).getCoords().getLongitude()))
+                            .title(membersList.get(i).getName().toUpperCase() + " " + membersList.get(i).getSurname().toUpperCase())
                             .visible(true)
                             .snippet(status+"\n"+status1+"\n"+status2)
                             .icon(BitmapDescriptorFactory.defaultMarker(new Random().nextInt(360)))
@@ -169,6 +165,10 @@ public class MapFragment extends Fragment {
         view.draw(canvas);
 
         return bitmap;
+    }
+
+    public void setMembersList(List<User> membersList) {
+        this.membersList = membersList;
     }
 
     @Override
