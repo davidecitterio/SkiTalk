@@ -44,6 +44,7 @@ public class User {
     private Coords coords;
     private Integer speed;
     private Integer altitude;
+    private Integer km;
     private String update_time;
     private boolean isTalking;
 
@@ -436,11 +437,22 @@ public class User {
 
     //set user km
     public void setKm(int km) throws JSONException {
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/setUserKm.php", "id=" + id + "km=" + km);
-        Thread t = new Thread(request);
-        t.start();
-        JSONObject user = request.getResponse();
-        setUser(user);
+       this.km = km;
+    }
+
+    //set user altitude
+    public void setAltitude(int alt) throws JSONException {
+        this.altitude = alt;
+    }
+
+    //set user speed
+    public void setSpeed(int speed) throws JSONException {
+        this.speed = speed;
+    }
+
+    //set user cords
+    public void setCoords(double lat, double lon) throws JSONException {
+        coords.setCoords(lat, lon);
     }
 
     //set user isMoving

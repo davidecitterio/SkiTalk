@@ -16,8 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
@@ -60,18 +58,8 @@ public class OthersProfile extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        setNavigationDrawer();
-
-        switch(itemId) {
-            // Android home
-            case android.R.id.home: {
-                dLayout.openDrawer(GravityCompat.START);
-                return true;
-            }
-        }
-        return true;
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private void setToolBar() {
@@ -79,7 +67,7 @@ public class OthersProfile extends AppCompatActivity {
         setSupportActionBar(tb);
         ActionBar ab = getSupportActionBar();
         //drawer icon
-        ab.setHomeAsUpIndicator(R.mipmap.ic_menu);
+
         ab.setDisplayHomeAsUpEnabled(true);
     }
 

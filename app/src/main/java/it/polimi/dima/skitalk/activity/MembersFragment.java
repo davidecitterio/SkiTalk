@@ -135,6 +135,10 @@ public class MembersFragment extends Fragment {
                         user.setOnline(member.getInt("isOnline"));
                     user.setTalking(member.getInt("idBusy") != -1);
                     user.setLastUpdate(member.getString("update_time"));
+                    user.setKm(member.getInt("km"));
+                    user.setCoords(member.getDouble("latitude"),member.getDouble("longitude"));
+                    user.setAltitude(member.getInt("altitude"));
+                    user.setSpeed(member.getInt("speed"));
                 } catch (JSONException e) {}
             }
             return true;
