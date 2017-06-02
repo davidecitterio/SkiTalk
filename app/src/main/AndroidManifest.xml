@@ -43,7 +43,8 @@
         <activity android:name=".activity.SignIn" />
         <activity android:name=".activity.CreateGroup_step1" />
         <activity android:name=".activity.CreateGroup_step2" />
-        <activity android:name=".activity.GroupActivity">
+        <activity android:name=".activity.GroupActivity"
+                  android:launchMode="singleInstance">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.polimi.dima.skitalk.activity.HomePage" />
