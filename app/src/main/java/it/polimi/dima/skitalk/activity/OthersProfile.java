@@ -33,6 +33,7 @@ public class OthersProfile extends AppCompatActivity {
     private TextView userStatus;
     private CircleImageView userPicture;
     private boolean status;
+    private String lastUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class OthersProfile extends AppCompatActivity {
         userEmail = (TextView) findViewById(R.id.others_profile_email);
         userPicture = (CircleImageView) findViewById(R.id.others_profile_picture);
         status = getIntent().getBooleanExtra("status", false);
+        lastUpdate = getIntent().getStringExtra("lastUpdate");
 
         initializeUser();
     }
@@ -113,12 +115,14 @@ public class OthersProfile extends AppCompatActivity {
                 userEmail.setText(user.getEmail());
                 userPicture.setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
                 if(status) {
+                    userStatus.setTextSize(20);
                     userStatus.setText(getString(R.string.online));
                     userStatus.setTextColor(Color.parseColor("#05D21F"));
                     userPicture.setBorderColor(Color.parseColor("#05D21F"));
                     userPicture.setBorderWidth(8);
                 } else {
-                    userStatus.setText(getString(R.string.offline));
+                    userStatus.setTextSize(15);
+                    userStatus.setText("Last seen " + lastUpdate);
                     userPicture.setBorderColor(Color.parseColor("#A1A1A1"));
                 }
                 progressDialog.dismiss();

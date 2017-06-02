@@ -45,6 +45,7 @@ public class User {
     private Integer speed;
     private Integer altitude;
     private String update_time;
+    private boolean isTalking;
 
     private ArrayList<Group> groups = new ArrayList<Group>();
     private Context c;
@@ -54,6 +55,7 @@ public class User {
     public User(int id, Context c, boolean onlyUser) {
         this.id = id;
         this.c = c;
+        isTalking = false;
 
         if (!Utils.fileAlreadyExist(c, "SkiTalkUserInfo"))
             downloadUser(onlyUser, true);
@@ -463,6 +465,14 @@ public class User {
         this.pictureURL = pictureURL;
     }
 
+    public void setLastUpdate(String update_time) {
+        this.update_time = update_time;
+    }
+
+    public void setTalking(boolean isTalking) {
+        this.isTalking = isTalking;
+    }
+
     //getters
     public String getNickname() {
         return nickname;
@@ -522,5 +532,9 @@ public class User {
 
     public String getLastUpdate(){
         return DateUtils.getRelativeTimeSpanString(Long.parseLong(update_time), System.currentTimeMillis(), MINUTE_IN_MILLIS).toString();
+    }
+
+    public boolean isTalking() {
+        return isTalking;
     }
 }

@@ -85,6 +85,7 @@ public class MembersFragment extends Fragment {
                             extras.putInt("id", selectedUserId);
                             extras.putInt("mainUserId", userId);
                             extras.putBoolean("status", membersList.get(position).getIsOnline());
+                            extras.putString("lastUpdate", membersList.get(position).getLastUpdate());
                             myIntent.putExtras(extras);
                             getActivity().startActivity(myIntent);
                         } else {
@@ -132,6 +133,8 @@ public class MembersFragment extends Fragment {
                         user.setOnline(1);
                     else
                         user.setOnline(member.getInt("isOnline"));
+                    user.setTalking(member.getInt("idBusy") != -1);
+                    user.setLastUpdate(member.getString("update_time"));
                 } catch (JSONException e) {}
             }
             return true;

@@ -1,5 +1,6 @@
 package it.polimi.dima.skitalk.adapter;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,7 +53,18 @@ public class RecyclerMembersAdapter extends
     public void onBindViewHolder(MyViewHolder holder, int position) {
         User u = membersList.get(position);
         holder.memberName.setText(u.getName());
-        holder.memberInfo.setText("Last seen "+u.getLastUpdate());
+        if(!(u.getIsOnline()))
+            if(u.isTalking()) {
+                holder.memberInfo.setText("is talking...");
+                holder.memberInfo.setTextColor(Color.parseColor("#1976D2"));
+            } else {
+                holder.memberInfo.setText("Last seen " + u.getLastUpdate());
+                holder.memberInfo.setTextColor(Color.parseColor("#757575"));
+            }
+        else {
+            holder.memberInfo.setText("Online");
+            holder.memberInfo.setTextColor(Color.parseColor("#757575"));
+        }
 
         if(u.getIsOnline())
             holder.memberStatus.setImageResource(R.mipmap.ic_online);

@@ -32,19 +32,12 @@ public class Logout extends Activity {
         File cacheDirectory = getApplicationContext().getCacheDir();
         Utils.deleteDir(cacheDirectory);
 
-        setOffline(id);
+        Utils.setUserOnline(id, 0);
 
         //start login activity
         Intent myIntent = new Intent(Logout.this, Login.class);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Logout.this.startActivity(myIntent);
         finish();
-    }
-
-    //set user offline
-    public void setOffline(int id){
-        HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/unsetUserOnline.php", "id="+id);
-        Thread t = new Thread(request);
-        t.start();
     }
 }
