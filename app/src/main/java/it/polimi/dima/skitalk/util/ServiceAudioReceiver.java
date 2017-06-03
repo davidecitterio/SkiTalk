@@ -1,12 +1,15 @@
 package it.polimi.dima.skitalk.util;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -25,9 +28,11 @@ public class ServiceAudioReceiver extends IntentService {
     int num = 0;
     private AudioManager m_amAudioManager;
     Socket sock = null;
-    String url = "87.4.141.186";
+    String url = "95.233.40.129";
     int port = 4444;
     int userId;
+
+    private AudioIntentReceiver myReceiver;
 
     public ServiceAudioReceiver()
     {
@@ -43,10 +48,7 @@ public class ServiceAudioReceiver extends IntentService {
 
         lin = new byte[1024];
         num = 0;
-
         m_amAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        m_amAudioManager.setMode(AudioManager.STREAM_MUSIC);
-        m_amAudioManager.setSpeakerphoneOn(false);
     }
 
 
@@ -107,11 +109,37 @@ public class ServiceAudioReceiver extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+        myReceiver = new AudioIntentReceiver();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(myReceiver, filter);
+
         userId = intent.getIntExtra("id", 0);
         //set user online on server
         Utils.setUserOnline(userId, 1);
         init();
         play();
+    }
+
+    private class AudioIntentReceiver extends BroadcastReceiver {
+        @Override public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
+                int state = intent.getIntExtra("state", -1);
+                switch (state) {
+                    case 0:
+                        m_amAudioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                        m_amAudioManager.setSpeakerphoneOn(true);
+                        System.out.println("Accesi altoparlanti.");
+                        break;
+                    case 1:
+                        m_amAudioManager.setMode(AudioManager.STREAM_MUSIC);
+                        m_amAudioManager.setSpeakerphoneOn(false);
+                        System.out.println("Accese cuffie.");
+                        break;
+                    default:
+                        Log.d("Cuffie", "I have no idea what the headset state is");
+                }
+            }
+        }
     }
 
 

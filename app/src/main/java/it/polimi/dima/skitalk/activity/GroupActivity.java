@@ -63,7 +63,7 @@ public class GroupActivity extends AppCompatActivity {
     private AudioRecord record =null;
     private boolean isPlaying=false;
     private Socket sendAudio;
-    private final String url = "87.4.141.186";
+    private final String url = "95.233.40.129";
     private final int port = 4544;
     private Thread t;
     private boolean quit = false;

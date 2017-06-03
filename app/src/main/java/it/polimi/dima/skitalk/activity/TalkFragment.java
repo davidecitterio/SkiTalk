@@ -36,7 +36,7 @@ public class TalkFragment extends Fragment{
 
     Socket sendAudio;
 
-    String url = "87.4.141.186";
+    String url = "95.233.40.129";
     int port = 4544;
 
     int idGroup;
