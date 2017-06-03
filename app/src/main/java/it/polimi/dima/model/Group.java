@@ -51,13 +51,6 @@ public class Group {
             loadGroup();
         else
             downloadGroup();
-
-        final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(c);
-        int savedActiveGroupID = sharedPref.getInt(c.getString(R.string.saved_active_group_id), -1);
-        if(savedActiveGroupID == id)
-            isActive = true;
-        else
-            isActive = false;
     }
 
     private void loadGroup(){
@@ -343,6 +336,9 @@ public class Group {
     }
 
     public boolean isActive() {
+        final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(c);
+        int savedActiveGroupID = sharedPref.getInt(c.getString(R.string.saved_active_group_id), -1);
+        isActive = savedActiveGroupID == id;
         return isActive;
     }
 }

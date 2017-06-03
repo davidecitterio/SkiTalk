@@ -24,4 +24,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"  />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        android:background="@color/primary_light">
+
+        <View android:id="@+id/drawer_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000"/>
+
+        <Button
+            android:id="@+id/rec"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="4dp"
+            android:layout_gravity="top|center"
+            android:background="@drawable/ic_talk" />
+
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/snackbarCoordinatorLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.design.widget.CoordinatorLayout>
+
+    </LinearLayout>
+
 </android.support.design.widget.CoordinatorLayout>

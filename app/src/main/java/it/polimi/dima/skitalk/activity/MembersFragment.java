@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class MembersFragment extends Fragment {
     private int userId;
     private Timer timer;
     private List<User> membersList;
+    private Map<Integer, Integer> activeGroupMap;
     private Map<Integer, User> membersMap;
     private RecyclerMembersAdapter membersAdapter;
 
@@ -56,14 +58,17 @@ public class MembersFragment extends Fragment {
         membersList = ((GroupActivity) getActivity()).getGroup().getMembers();
         //create a map idUser - User
         membersMap = new HashMap<Integer, User>();
-        for(User u : membersList)
+        activeGroupMap = new HashMap<Integer, Integer>();
+        for(User u : membersList) {
             membersMap.put(u.getId(), u);
+            activeGroupMap.put(u.getId(), -1);
+        }
         setupRecyclerView();
     }
 
     private void setupRecyclerView() {
         RecyclerView membersRecyclerView = (RecyclerView) getActivity().findViewById(R.id.members_fragment_recycler_view);
-        membersAdapter = new RecyclerMembersAdapter(membersList);
+        membersAdapter = new RecyclerMembersAdapter(groupId, membersList, activeGroupMap);
         int spacing = getResources().getInteger(R.integer.member_fragment_recycler_spacing);
         membersRecyclerView.setAdapter(membersAdapter);
         membersRecyclerView.addItemDecoration(new VerticalSpacingDecoration(spacing));
@@ -139,6 +144,7 @@ public class MembersFragment extends Fragment {
                     user.setCoords(member.getDouble("latitude"),member.getDouble("longitude"));
                     user.setAltitude(member.getInt("altitude"));
                     user.setSpeed(member.getInt("speed"));
+                    activeGroupMap.put(uId, member.getInt("activeGroup"));
                 } catch (JSONException e) {}
             }
             return true;

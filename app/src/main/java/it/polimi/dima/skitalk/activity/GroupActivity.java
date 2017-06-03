@@ -1,12 +1,19 @@
 package it.polimi.dima.skitalk.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,10 +24,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import org.json.JSONException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,10 +53,21 @@ public class GroupActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private Integer userId, groupId;
     private Group group;
-    private TalkFragment talkFragment;
+    //private TalkFragment talkFragment;
     private MembersFragment membersFragment;
     private MapFragment mapFragment;
     private Bundle bundle = new Bundle();
+
+    //attributes for talk functionality
+    private Button rec;
+    private AudioRecord record =null;
+    private boolean isPlaying=false;
+    private Socket sendAudio;
+    private final String url = "87.4.141.186";
+    private final int port = 4544;
+    private Thread t;
+    private boolean quit = false;
+    private CoordinatorLayout snackbarCoordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,20 +93,21 @@ public class GroupActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        setupTalkFunctionality();
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        talkFragment = new TalkFragment();
+        //talkFragment = new TalkFragment();
         membersFragment = new MembersFragment();
         mapFragment = new MapFragment();
-        adapter.addFragment(talkFragment, getString(R.string.tab_talk));
+        //adapter.addFragment(talkFragment, getString(R.string.tab_talk));
         adapter.addFragment(membersFragment, getString(R.string.tab_members));
         adapter.addFragment(mapFragment, getString(R.string.tab_map));
         viewPager.setAdapter(adapter);
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
@@ -259,5 +287,125 @@ public class GroupActivity extends AppCompatActivity {
 
     public void passUserToMap(List<User> membersList) {
         mapFragment.setMembersList(membersList);
+    }
+
+    /************************************
+     **** TALK FUNCTIONALITY METHODS ****
+     ************************************/
+
+    private void setupTalkFunctionality() {
+        init();
+        t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    recordAndPlay();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Error: server doesn't responding.");
+                    showSnackBar();
+                }
+
+            }
+        };
+        t.start();
+
+        rec = (Button) findViewById(R.id.rec);
+        rec.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    onDown();
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    onUp();
+                }
+                return true;
+            }
+
+        });
+
+        snackbarCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.snackbarCoordinatorLayout);
+    }
+
+    public void onDown(){
+        rec.setBackgroundResource(R.drawable.ic_talk_on);
+        Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v0.vibrate(50);
+        record.startRecording();
+        isPlaying=true;
+    }
+
+    public void onUp(){
+        rec.setBackgroundResource(R.drawable.ic_talk);
+        Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v1.vibrate(50);
+        record.stop();
+        isPlaying=false;
+    }
+
+    private void init() {
+        int min = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        record = new AudioRecord(MediaRecorder.AudioSource.MIC, 16000, AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT, min);
+    }
+
+    private void recordAndPlay() throws IOException {
+        byte[] lin = new byte[1024];
+        boolean socketAlreadyOpen = false;
+        int msg;
+
+        while (!quit){
+            if (socketAlreadyOpen && !isPlaying) {
+                sendAudio.getOutputStream().close();
+                sendAudio.close();
+                socketAlreadyOpen = false;
+                System.out.println("Close socket.");
+            }
+            while (isPlaying) {
+
+                if (!socketAlreadyOpen) {
+                    sendAudio = new Socket(url, port);
+                    OutputStream out = sendAudio.getOutputStream();
+                    PrintWriter send = new PrintWriter(out);
+                    send.write(userId+" "+groupId+"\n");
+                    send.flush();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(sendAudio.getInputStream()));
+                    String ack = br.readLine();
+                    System.out.println("Receive "+ack);
+                    if (ack.equals("no")){
+                        Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                        v0.vibrate(200);
+
+                        isPlaying = false;
+                        socketAlreadyOpen = false;
+                        System.out.println("Channel busy, retry later..");
+                        break;
+                    }
+
+                    else if (ack.equals("ok")){
+                        socketAlreadyOpen = true;
+                        System.out.println("Open Socket. "+userId+" "+groupId+"\n");
+                    }
+                }
+
+
+                if ((msg = record.read(lin, 0, 1024)) > 0) {
+                    System.out.println("Try to send.\n");
+                    sendAudio.getOutputStream().write(lin, 0, msg);
+                    sendAudio.getOutputStream().flush();
+                }
+            }
+        }
+
+        return;
+    }
+
+    public void showSnackBar(){
+        Snackbar.make(snackbarCoordinatorLayout, "Error: Server not working.", Snackbar.LENGTH_LONG)
+                .setAction("Retry", null)
+                .setActionTextColor(Color.RED)
+                .show();
     }
 }

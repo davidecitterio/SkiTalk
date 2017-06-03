@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import it.polimi.dima.model.User;
@@ -23,7 +24,9 @@ import it.polimi.dima.skitalk.util.Utils;
 public class RecyclerMembersAdapter extends
         RecyclerView.Adapter<RecyclerMembersAdapter.MyViewHolder> {
 
+    private int groupId;
     private List<User> membersList;
+    private Map<Integer, Integer> activeGroupMap;
 
     /**
      * View holder class
@@ -45,29 +48,37 @@ public class RecyclerMembersAdapter extends
         }
     }
 
-    public RecyclerMembersAdapter(List<User> membersList) {
+    public RecyclerMembersAdapter(int groupId, List<User> membersList, Map<Integer, Integer> activeGroupMap) {
+        this.groupId = groupId;
         this.membersList = membersList;
+        this.activeGroupMap = activeGroupMap;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         User u = membersList.get(position);
+        int activeGroup = activeGroupMap.get(u.getId());
         holder.memberName.setText(u.getName());
-        if(!(u.getIsOnline()))
+        if(u.getIsOnline())
             if(u.isTalking()) {
                 holder.memberInfo.setText("is talking...");
                 holder.memberInfo.setTextColor(Color.parseColor("#1976D2"));
+            } else if(activeGroup == groupId) {
+                holder.memberInfo.setText("Online");
+                holder.memberInfo.setTextColor(Color.parseColor("#757575"));
             } else {
-                holder.memberInfo.setText("Last seen " + u.getLastUpdate());
+                holder.memberInfo.setText("Online in another group");
                 holder.memberInfo.setTextColor(Color.parseColor("#757575"));
             }
         else {
-            holder.memberInfo.setText("Online");
+            holder.memberInfo.setText("Last seen " + u.getLastUpdate());
             holder.memberInfo.setTextColor(Color.parseColor("#757575"));
         }
 
-        if(u.getIsOnline())
+        if(u.getIsOnline() && activeGroup == groupId)
             holder.memberStatus.setImageResource(R.mipmap.ic_online);
+        else if(u.getIsOnline())
+            holder.memberStatus.setImageResource(R.mipmap.ic_online_inactive);
         else
             holder.memberStatus.setImageResource(R.mipmap.ic_offline);
         holder.picture.setImageBitmap(Utils.getResizedBitmap(u.getPicture(), 200));

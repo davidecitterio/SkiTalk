@@ -354,6 +354,10 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                 LinearLayout child = (LinearLayout) rv.getChildAt(i);
                 child.setSelected(false);
             }
+        //notify eventually changed active group
+        System.out.println("ooooo "+ca);
+        if(ca != null)
+            ca.notifyDataSetChanged();
     }
 
 }
