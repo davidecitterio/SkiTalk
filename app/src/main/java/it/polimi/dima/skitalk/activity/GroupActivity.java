@@ -28,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import org.json.JSONException;
 
@@ -220,6 +221,7 @@ public class GroupActivity extends AppCompatActivity {
         //update menu
         setupMenu(muteItem);
         updateActiveIcon();
+        updateButton();
     }
 
     private void setupMenu(MenuItem muteItem) {
@@ -311,6 +313,12 @@ public class GroupActivity extends AppCompatActivity {
         t.start();
 
         rec = (Button) findViewById(R.id.rec);
+        setupButton();
+
+        snackbarCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.snackbarCoordinatorLayout);
+    }
+
+    private void setupButton() {
         rec.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -325,8 +333,19 @@ public class GroupActivity extends AppCompatActivity {
             }
 
         });
+        updateButton();
+    }
 
-        snackbarCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.snackbarCoordinatorLayout);
+    private void updateButton() {
+        if(group.isActive()) {
+            rec.setEnabled(true);
+            rec.setBackgroundResource(R.drawable.ic_talk);
+            ((LinearLayout) findViewById(R.id.buttonSectionLayout)).setBackgroundColor(getResources().getColor(R.color.primary_light));
+        } else {
+            rec.setEnabled(false);
+            rec.setBackgroundResource(R.drawable.ic_talk_inactive);
+            ((LinearLayout) findViewById(R.id.buttonSectionLayout)).setBackgroundColor(getResources().getColor(R.color.divider));
+        }
     }
 
     public void onDown(){
