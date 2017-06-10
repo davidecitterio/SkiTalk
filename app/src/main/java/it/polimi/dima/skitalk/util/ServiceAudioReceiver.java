@@ -28,7 +28,7 @@ public class ServiceAudioReceiver extends IntentService {
     int num = 0;
     private AudioManager m_amAudioManager;
     Socket sock = null;
-    String url = "95.233.40.129";
+    String url = "87.4.149.65";
     int port = 4444;
     int userId;
 
@@ -49,6 +49,8 @@ public class ServiceAudioReceiver extends IntentService {
         lin = new byte[1024];
         num = 0;
         m_amAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        m_amAudioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        m_amAudioManager.setSpeakerphoneOn(true);
     }
 
 

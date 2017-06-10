@@ -7,8 +7,10 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -44,10 +46,12 @@ import java.util.List;
 import it.polimi.dima.model.Group;
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.model.User;
+import it.polimi.dima.skitalk.MediaButtonIntentReceiver;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
 
-public class GroupActivity extends AppCompatActivity {
+
+public class GroupActivity extends AppCompatActivity implements MediaButtonIntentReceiver.Delegate{
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -64,11 +68,12 @@ public class GroupActivity extends AppCompatActivity {
     private AudioRecord record =null;
     private boolean isPlaying=false;
     private Socket sendAudio;
-    private final String url = "95.233.40.129";
+    private final String url = "87.4.149.65";
     private final int port = 4544;
-    private Thread t;
-    private boolean quit = false;
     private CoordinatorLayout snackbarCoordinatorLayout;
+    RecordAndPlay recordAndPlay;
+    MediaButtonIntentReceiver mb = new MediaButtonIntentReceiver();
+    boolean firstClick = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +112,8 @@ public class GroupActivity extends AppCompatActivity {
         adapter.addFragment(mapFragment, getString(R.string.tab_map));
         viewPager.setAdapter(adapter);
     }
+
+
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -297,21 +304,6 @@ public class GroupActivity extends AppCompatActivity {
 
     private void setupTalkFunctionality() {
         init();
-        t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    recordAndPlay();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("Error: server doesn't responding.");
-                    showSnackBar();
-                }
-
-            }
-        };
-        t.start();
-
         rec = (Button) findViewById(R.id.rec);
         setupButton();
 
@@ -349,6 +341,7 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     public void onDown(){
+        tone(1000, 100, 1.0);
         rec.setBackgroundResource(R.drawable.ic_talk_on);
         Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v0.vibrate(50);
@@ -357,6 +350,7 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     public void onUp(){
+        tone(1000, 100, 1.0);
         rec.setBackgroundResource(R.drawable.ic_talk);
         Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v1.vibrate(50);
@@ -364,62 +358,51 @@ public class GroupActivity extends AppCompatActivity {
         isPlaying=false;
     }
 
+    @Override
+    public void onMediaButtonSingleClick() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (firstClick){
+                    tone(1000, 100, 1.0);
+                    rec.setBackgroundResource(R.drawable.ic_talk_on);
+                    Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    v0.vibrate(50);
+                    record.startRecording();
+                    isPlaying=true;
+                    firstClick = false;
+                }
+                else{
+                    tone(1000, 100, 1.0);
+                    rec.setBackgroundResource(R.drawable.ic_talk);
+                    Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    v1.vibrate(50);
+                    record.stop();
+                    isPlaying=false;
+                    firstClick = true;
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
+    }
+
+    public static void tone(int hz, int msecs, double vol){
+        ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 150);
+        toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, hz);
+    }
+
     private void init() {
         int min = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
         record = new AudioRecord(MediaRecorder.AudioSource.MIC, 16000, AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, min);
+        recordAndPlay =new RecordAndPlay();
+        recordAndPlay.start();
     }
 
-    private void recordAndPlay() throws IOException {
-        byte[] lin = new byte[1024];
-        boolean socketAlreadyOpen = false;
-        int msg;
-
-        while (!quit){
-            if (socketAlreadyOpen && !isPlaying) {
-                sendAudio.getOutputStream().close();
-                sendAudio.close();
-                socketAlreadyOpen = false;
-                System.out.println("Close socket.");
-            }
-            while (isPlaying) {
-
-                if (!socketAlreadyOpen) {
-                    sendAudio = new Socket(url, port);
-                    OutputStream out = sendAudio.getOutputStream();
-                    PrintWriter send = new PrintWriter(out);
-                    send.write(userId+" "+groupId+"\n");
-                    send.flush();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(sendAudio.getInputStream()));
-                    String ack = br.readLine();
-                    System.out.println("Receive "+ack);
-                    if (ack.equals("no")){
-                        Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                        v0.vibrate(200);
-
-                        isPlaying = false;
-                        socketAlreadyOpen = false;
-                        System.out.println("Channel busy, retry later..");
-                        break;
-                    }
-
-                    else if (ack.equals("ok")){
-                        socketAlreadyOpen = true;
-                        System.out.println("Open Socket. "+userId+" "+groupId+"\n");
-                    }
-                }
-
-
-                if ((msg = record.read(lin, 0, 1024)) > 0) {
-                    System.out.println("Try to send.\n");
-                    sendAudio.getOutputStream().write(lin, 0, msg);
-                    sendAudio.getOutputStream().flush();
-                }
-            }
-        }
-
-        return;
-    }
 
     public void showSnackBar(){
         Snackbar.make(snackbarCoordinatorLayout, "Error: Server not working.", Snackbar.LENGTH_LONG)
@@ -427,4 +410,86 @@ public class GroupActivity extends AppCompatActivity {
                 .setActionTextColor(Color.RED)
                 .show();
     }
+
+    @Override
+    public void onDestroy() {
+        record.release();
+        recordAndPlay.stopRunning();
+        System.out.println("Chiudo record.");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume(){
+        mb.delegate = (MediaButtonIntentReceiver.Delegate) this;
+        mb.register(this);
+        super.onResume();
+    }
+
+
+    class RecordAndPlay extends Thread {
+        boolean running = false;
+        byte[] lin = new byte[1024];
+        boolean socketAlreadyOpen = false;
+        int msg;
+
+
+        public void run() {
+            running = true;
+            while(running){
+                try {
+                    if (socketAlreadyOpen && !isPlaying) {
+                        sendAudio.getOutputStream().close();
+                        sendAudio.close();
+                        socketAlreadyOpen = false;
+                        System.out.println("Close socket.");
+                    }
+                while (isPlaying) {
+
+                    if (!socketAlreadyOpen) {
+                        sendAudio = new Socket(url, port);
+                        OutputStream out = sendAudio.getOutputStream();
+                        PrintWriter send = new PrintWriter(out);
+                        send.write(userId+" "+groupId+"\n");
+                        send.flush();
+                        BufferedReader br = new BufferedReader(new InputStreamReader(sendAudio.getInputStream()));
+                        String ack = br.readLine();
+                        System.out.println("Receive "+ack);
+                        if (ack.equals("no")){
+                            Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                            v0.vibrate(200);
+
+                            isPlaying = false;
+                            socketAlreadyOpen = false;
+                            System.out.println("Channel busy, retry later..");
+                            break;
+                        }
+
+                        else if (ack.equals("ok")){
+                            socketAlreadyOpen = true;
+                            System.out.println("Open Socket. "+userId+" "+groupId+"\n");
+                        }
+                    }
+
+
+                    if ((msg = record.read(lin, 0, 1024)) > 0) {
+                        System.out.println("Try to send.\n");
+                        sendAudio.getOutputStream().write(lin, 0, msg);
+                        sendAudio.getOutputStream().flush();
+                    }
+                }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("Thread spento.");
+        }
+
+        public void stopRunning() {
+            running = false;
+        }
+    }
+
+
+
 }

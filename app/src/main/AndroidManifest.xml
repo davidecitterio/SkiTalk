@@ -51,15 +51,7 @@
                 android:value="it.polimi.dima.skitalk.activity.HomePage" />
         </activity>
 
-        <receiver android:name=".MediaButtonIntentReceiver">
-            <intent-filter android:priority="999">
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-            <intent-filter android:priority="0">
-                <action android:name="android.intent.action.VOICE_COMMAND" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
+
 
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
@@ -73,6 +65,12 @@
             android:name=".util.ServiceAudioReceiver"
             android:enabled="true"
             android:stopWithTask="false"/>
+
+        <receiver android:name=".MediaButtonIntentReceiver" >
+                <intent-filter android:priority="10000" >
+                 <action android:name="android.intent.action.MEDIA_BUTTON" />
+                </intent-filter>
+        </receiver>
 
 
     </application>
