@@ -146,7 +146,7 @@ public class MembersFragment extends Fragment {
                         user.setOnline(1);
                     else
                         user.setOnline(member.getInt("isOnline"));
-                    user.setTalking(member.getInt("idBusy") != -1);
+                    user.setTalking(member.getInt("idBusy") == uId);
                     user.setLastUpdate(member.getString("update_time"));
                     //user.setKm(member.getInt("km"));
                     user.setCoords(member.getDouble("latitude"),member.getDouble("longitude"));
