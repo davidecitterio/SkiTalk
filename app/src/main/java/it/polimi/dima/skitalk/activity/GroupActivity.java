@@ -355,7 +355,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
         Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v1.vibrate(50);
 
-        HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
+        HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/unsetUserTalking.php", "idUser="+userId+"&idGroup="+groupId);
         Thread t = new Thread(groupsRequest);
         t.start();
 
