@@ -338,27 +338,27 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
     }
 
     public void onDown(){
+        HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
+        Thread t = new Thread(groupsRequest);
+        t.start();
+
         tone(1000, 100, 1.0);
         rec.setBackgroundResource(R.drawable.ic_talk_on);
         Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v0.vibrate(50);
-        HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
-        Thread t = new Thread(groupsRequest);
-        t.start();
         record.startRecording();
         isPlaying=true;
     }
 
     public void onUp(){
-        tone(1000, 100, 1.0);
-        rec.setBackgroundResource(R.drawable.ic_talk);
-        Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        v1.vibrate(50);
-
         HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/unsetUserTalking.php", "idUser="+userId+"&idGroup="+groupId);
         Thread t = new Thread(groupsRequest);
         t.start();
 
+        tone(1000, 100, 1.0);
+        rec.setBackgroundResource(R.drawable.ic_talk);
+        Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v1.vibrate(50);
         record.stop();
         isPlaying=false;
     }
@@ -369,29 +369,27 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
             @Override
             public void run() {
                 if (firstClick){
-                    tone(1000, 100, 1.0);
-                    rec.setBackgroundResource(R.drawable.ic_talk_on);
-                    Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    v0.vibrate(50);
-
                     HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
                     Thread t = new Thread(groupsRequest);
                     t.start();
 
+                    tone(1000, 100, 1.0);
+                    rec.setBackgroundResource(R.drawable.ic_talk_on);
+                    Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    v0.vibrate(50);
                     record.startRecording();
                     isPlaying=true;
                     firstClick = false;
                 }
                 else{
-                    tone(1000, 100, 1.0);
-                    rec.setBackgroundResource(R.drawable.ic_talk);
-                    Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    v1.vibrate(50);
-
                     HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/unsetUserTalking.php", "idUser="+userId+"&idGroup="+groupId);
                     Thread t = new Thread(groupsRequest);
                     t.start();
 
+                    tone(1000, 100, 1.0);
+                    rec.setBackgroundResource(R.drawable.ic_talk);
+                    Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    v1.vibrate(50);
                     record.stop();
                     isPlaying=false;
                     firstClick = true;
