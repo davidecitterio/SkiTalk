@@ -43,6 +43,7 @@ import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 import it.polimi.dima.skitalk.util.DividerItemDecoration;
 import it.polimi.dima.skitalk.util.RecyclerItemListener;
+import it.polimi.dima.skitalk.util.ServiceAudioReceiver;
 import it.polimi.dima.skitalk.util.ServiceUpdateCoords;
 import it.polimi.dima.skitalk.util.Utils;
 import it.polimi.dima.skitalk.util.VerticalSpacingDecoration;
@@ -64,6 +65,11 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         setToolBar();
 
         c = getApplicationContext();
+
+        //start receive audio service
+        Intent serviceIntentAudio = new Intent(getApplicationContext(),ServiceAudioReceiver.class);
+        serviceIntentAudio.putExtra("id", serviceIntentAudio.getIntExtra("id", 0));
+        startService(serviceIntentAudio);
 
         //start the update coords service
         Intent intent = getIntent();

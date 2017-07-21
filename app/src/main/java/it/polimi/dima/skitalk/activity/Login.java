@@ -113,13 +113,6 @@ public class Login extends Activity {
 
             System.out.println("the id is: "+buffer);
 
-
-
-            //start receive audio service
-            Intent serviceIntentAudio = new Intent(getApplicationContext(),ServiceAudioReceiver.class);
-            serviceIntentAudio.putExtra("id", Integer.parseInt(buffer.toString()) );
-            startService(serviceIntentAudio);
-
             //start homepage activity
             Intent myIntent = new Intent(Login.this, HomePage.class);
             myIntent.putExtra("id", Integer.parseInt(buffer.toString())); //Optional parameters
