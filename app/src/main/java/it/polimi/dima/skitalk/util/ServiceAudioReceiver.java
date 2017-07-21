@@ -117,7 +117,12 @@ public class ServiceAudioReceiver extends IntentService {
 
         userId = intent.getIntExtra("id", 0);
         //set user online on server
-        Utils.setUserOnline(userId, 1);
+        Thread t = Utils.setUserOnline(userId, 1);
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         init();
         play();
     }

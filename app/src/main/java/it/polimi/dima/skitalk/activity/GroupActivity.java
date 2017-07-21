@@ -68,7 +68,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
     private AudioRecord record =null;
     private boolean isPlaying=false;
     private Socket sendAudio;
-    private final String url = "87.4.149.65";
+    private final String url = "87.4.149.39";
     private final int port = 4544;
     private CoordinatorLayout snackbarCoordinatorLayout;
     RecordAndPlay recordAndPlay;
