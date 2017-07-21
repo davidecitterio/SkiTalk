@@ -58,6 +58,9 @@ public class ServiceAudioReceiver extends IntentService {
         m_amAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         m_amAudioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         m_amAudioManager.setSpeakerphoneOn(true);
+        myReceiver = new AudioIntentReceiver();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(myReceiver, filter);
     }
 
 
@@ -108,6 +111,7 @@ public class ServiceAudioReceiver extends IntentService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        unregisterReceiver(myReceiver);
         System.out.println("Mi spengo, ciaone.");
     }
 
@@ -118,10 +122,6 @@ public class ServiceAudioReceiver extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        myReceiver = new AudioIntentReceiver();
-        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-        registerReceiver(myReceiver, filter);
-
         userId = intent.getIntExtra("id", 0);
 
         init();

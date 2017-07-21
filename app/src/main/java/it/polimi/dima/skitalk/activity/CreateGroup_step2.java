@@ -406,6 +406,7 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
         Bundle extras = new Bundle();
         extras.putInt("userId",id);
         extras.putInt("groupId",idGroup);
+        extras.putBoolean("newGroup", true);
         myIntent.putExtras(extras);
         progressDialog3.dismiss();
         CreateGroup_step2.this.startActivity(myIntent);

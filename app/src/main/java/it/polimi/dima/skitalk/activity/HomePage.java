@@ -57,6 +57,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     private Timer timer;
     private String /*km,*/ altitude, speed;
     public static final Object cacheLock = new Object();
+    private boolean newGroup = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,8 +165,8 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                     Bundle extras = new Bundle();
                     extras.putInt("id", user.getId());
                     //extras.putString("km", user.getKm()+" km");
-                    extras.putString("altitude", user.getAltitude()+" m.a.s.l.");
-                    extras.putString("speed", user.getSpeed()+" km/h");
+                    extras.putString("altitude", altitude+" m.a.s.l.");
+                    extras.putString("speed", speed+" km/h");
                     myIntent.putExtras(extras);
                     startActivity(myIntent);
                 } else if (itemId == R.id.logout) {
@@ -232,6 +233,12 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             if (result) {
                 loadDrawerHeader();
                 showGroups();
+                if(getIntent().getBooleanExtra("updateNow", false)) {
+                    newGroup = Utils.updateUsersAndGroups(c, user, ca, cacheLock);
+                    /*if(newGroup)
+                        DISPLAY TOAST OR VIBRATE*/
+
+                }
                 progressDialog.dismiss();
             }
             else
@@ -341,7 +348,9 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                Utils.updateUsersAndGroups(c, user, ca, cacheLock);
+                newGroup = Utils.updateUsersAndGroups(c, user, ca, cacheLock);
+                /*if(newGroup)
+                    DISPLAY TOAST OR VIBRATE*/
             }
         };
         timer = new Timer();

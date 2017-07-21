@@ -74,10 +74,11 @@ public class Utils {
         return encodedImage;
     }
 
-    public static UpdateUsersAndGroupsTask updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca, Object cacheLock) {
-        UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(c, user, ca, cacheLock);
+    public static Boolean updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca, Object cacheLock) {
+        Boolean newGroup = false;
+        UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(c, user, ca, cacheLock, newGroup);
         t.execute(user.getId());
-        return t;
+        return newGroup;
     }
 
     public static boolean deleteDir(File dir) {

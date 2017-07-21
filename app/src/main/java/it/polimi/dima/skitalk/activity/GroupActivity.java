@@ -74,6 +74,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
     RecordAndPlay recordAndPlay;
     MediaButtonIntentReceiver mb = new MediaButtonIntentReceiver();
     boolean firstClick = true;
+    private boolean newGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
         Intent intent = getIntent();
         userId = intent.getIntExtra("userId", 0);
         groupId = intent.getIntExtra("groupId", 0);
+        newGroup = intent.getBooleanExtra("newGroup", false);
 
         bundle.putInt("groupId", groupId);
         bundle.putInt("userId",userId);
@@ -263,6 +265,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
         Intent myIntent = new Intent(GroupActivity.this, HomePage.class);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.putExtra("id", userId);
+        myIntent.putExtra("updateNow", newGroup);
         GroupActivity.this.startActivity(myIntent);
         finish();
     }

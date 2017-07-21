@@ -27,13 +27,16 @@ public class UpdateUsersAndGroupsTask extends AsyncTask<Integer, Void, Boolean> 
     private RecyclerGroupAdapter ca;
     private final Object cacheLock;
     private boolean needUpdate;
+    private Boolean newGroup;
 
-    public UpdateUsersAndGroupsTask(Context c, User user, RecyclerGroupAdapter ca, Object cacheLock) {
+    public UpdateUsersAndGroupsTask(Context c, User user, RecyclerGroupAdapter ca, Object cacheLock,
+                                    Boolean newGroup) {
         this.c = c;
         this.ca = ca;
         this.user = user;
         this.cacheLock = cacheLock;
         needUpdate = false;
+        this.newGroup = newGroup;
     }
 
     @Override
@@ -95,7 +98,9 @@ public class UpdateUsersAndGroupsTask extends AsyncTask<Integer, Void, Boolean> 
         if(needUpdate) {
             user.updateGroups();
             ca.notifyDataSetChanged();
-        }
+            newGroup = true;
+        } else
+            newGroup = false;
     }
 
     private HttpRequest runRequestGroupList(int id) {
