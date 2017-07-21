@@ -167,9 +167,6 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
                 setMute(item);
                 return true;
 
-            case R.id.settings:
-
-                return true;
 
             case R.id.leave_group:
 
@@ -345,6 +342,9 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
         rec.setBackgroundResource(R.drawable.ic_talk_on);
         Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v0.vibrate(50);
+        HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
+        Thread t = new Thread(groupsRequest);
+        t.start();
         record.startRecording();
         isPlaying=true;
     }
@@ -355,6 +355,9 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
         Vibrator v1 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v1.vibrate(50);
         record.stop();
+        HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
+        Thread t = new Thread(groupsRequest);
+        t.start();
         isPlaying=false;
     }
 
@@ -462,6 +465,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
                             isPlaying = false;
                             socketAlreadyOpen = false;
                             System.out.println("Channel busy, retry later..");
+                            onUp();
                             break;
                         }
 

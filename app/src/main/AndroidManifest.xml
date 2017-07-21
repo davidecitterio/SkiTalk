@@ -63,8 +63,7 @@
             android:enabled="true"/>
         <service
             android:name=".util.ServiceAudioReceiver"
-            android:enabled="true"
-            android:stopWithTask="false"/>
+            android:enabled="true" />
 
         <receiver android:name=".MediaButtonIntentReceiver" >
                 <intent-filter android:priority="10000" >
