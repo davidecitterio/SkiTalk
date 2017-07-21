@@ -66,13 +66,15 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
         c = getApplicationContext();
 
+        Intent intent = getIntent();
+
         //start receive audio service
         Intent serviceIntentAudio = new Intent(getApplicationContext(),ServiceAudioReceiver.class);
-        serviceIntentAudio.putExtra("id", serviceIntentAudio.getIntExtra("id", 0));
+        serviceIntentAudio.putExtra("id", intent.getIntExtra("id", 0));
         startService(serviceIntentAudio);
 
         //start the update coords service
-        Intent intent = getIntent();
+
         Intent intService =  new Intent(HomePage.this, ServiceUpdateCoords.class);
         intService.putExtra("id", intent.getIntExtra("id", 0));
         startService(intService);
