@@ -91,11 +91,19 @@ public class MembersFragment extends Fragment {
                             extras.putInt("mainUserId", userId);
                             extras.putBoolean("status", membersList.get(position).getIsOnline());
                             extras.putString("lastUpdate", membersList.get(position).getLastUpdate());
+                            //extras.putString("km", membersList.get(position).getKm()+" km");
+                            extras.putString("altitude", membersList.get(position).getAltitude()+" m.a.s.l.");
+                            extras.putString("speed", membersList.get(position).getSpeed()+" km/h");
                             myIntent.putExtras(extras);
                             getActivity().startActivity(myIntent);
                         } else {
                             Intent myIntent = new Intent(getActivity(), MyProfile.class);
-                            myIntent.putExtra("id", userId); //Optional parameters
+                            Bundle extras = new Bundle();
+                            extras.putInt("id", userId);
+                            //extras.putString("km", membersList.get(position).getKm()+" km");
+                            extras.putString("altitude", membersList.get(position).getAltitude()+" masl");
+                            extras.putString("speed", membersList.get(position).getSpeed()+" km/h");
+                            myIntent.putExtras(extras);
                             getActivity().startActivity(myIntent);
                         }
                     }
@@ -140,7 +148,7 @@ public class MembersFragment extends Fragment {
                         user.setOnline(member.getInt("isOnline"));
                     user.setTalking(member.getInt("idBusy") != -1);
                     user.setLastUpdate(member.getString("update_time"));
-                    user.setKm(member.getInt("km"));
+                    //user.setKm(member.getInt("km"));
                     user.setCoords(member.getDouble("latitude"),member.getDouble("longitude"));
                     user.setAltitude(member.getInt("altitude"));
                     user.setSpeed(member.getInt("speed"));

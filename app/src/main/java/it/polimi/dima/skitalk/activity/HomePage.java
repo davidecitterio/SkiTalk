@@ -28,6 +28,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,8 +54,8 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     private RecyclerGroupAdapter ca;
     private Context c;
     private Timer timer;
+    private String /*km,*/ altitude, speed;
     public static final Object cacheLock = new Object();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +141,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
     private void setNavigationDrawer() {
         dLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        dLayout.closeDrawer(GravityCompat.START);
         NavigationView navView = (NavigationView) findViewById(R.id.navigation);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -149,7 +153,12 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
                 if (itemId == R.id.my_profile) {
                     myIntent = new Intent(thisActivity, MyProfile.class);
-                    myIntent.putExtra("id", user.getId()); //Optional parameters
+                    Bundle extras = new Bundle();
+                    extras.putInt("id", user.getId());
+                    //extras.putString("km", user.getKm()+" km");
+                    extras.putString("altitude", user.getAltitude()+" m.a.s.l.");
+                    extras.putString("speed", user.getSpeed()+" km/h");
+                    myIntent.putExtras(extras);
                     startActivity(myIntent);
                 } else if (itemId == R.id.logout) {
                     myIntent = new Intent(thisActivity, Logout.class);
@@ -193,8 +202,19 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
         @Override
         protected Boolean doInBackground(Integer... params) {
+            HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/getUser.php", "id=" + params[0]);
+            Thread t = new Thread(request);
+            t.start();
             synchronized (cacheLock) {
                 user = new User(params[0], c, false);
+            }
+            JSONObject jsonUser = request.getResponse();
+            try {
+                //km = jsonUser.getString("km");
+                altitude = jsonUser.getString("altitude");
+                speed = jsonUser.getString("speed");
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
             return true;
         }
@@ -360,4 +380,10 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             ca.notifyDataSetChanged();
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if(dLayout != null)
+            dLayout.closeDrawer(GravityCompat.START);
+    }
 }

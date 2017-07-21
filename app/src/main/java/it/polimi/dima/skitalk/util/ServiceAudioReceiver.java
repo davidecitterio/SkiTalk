@@ -28,7 +28,7 @@ public class ServiceAudioReceiver extends IntentService {
     int num = 0;
     private AudioManager m_amAudioManager;
     Socket sock = null;
-    String url = "87.4.149.65";
+    String url = "87.4.149.39";
     int port = 4444;
     int userId;
 

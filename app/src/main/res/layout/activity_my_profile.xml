@@ -108,7 +108,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
 
                         <TextView
                             android:layout_width="0dp"
@@ -124,6 +125,50 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="0"
                             android:textSize="@dimen/myprofile_text_size"
+                            android:textColor="@color/primary_text"/>
+
+                    </LinearLayout>
+
+                    <View android:id="@+id/drawer_separator"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/secondary_text"/>
+
+                    <!-- Info layout -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@mipmap/ic_altitude"/>
+
+                        <TextView
+                            android:id="@+id/others_profile_altitude"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="8"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="@dimen/myprofile_stats_text_size"
+                            android:textColor="@color/primary_text"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@mipmap/ic_speed"/>
+
+                        <TextView
+                            android:id="@+id/others_profile_speed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="8"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="@dimen/myprofile_stats_text_size"
                             android:textColor="@color/primary_text"/>
 
                     </LinearLayout>

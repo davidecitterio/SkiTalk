@@ -11,6 +11,7 @@
     <dimen name="group_toolbar_active">24dp</dimen>
     <dimen name="row_group_name_size">16sp</dimen>
     <dimen name="myprofile_text_size">20sp</dimen>
+    <dimen name="myprofile_stats_text_size">16sp</dimen>
     <dimen name="group_creation_text_size">30sp</dimen>
 
 </resources>

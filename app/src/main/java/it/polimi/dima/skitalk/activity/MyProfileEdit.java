@@ -206,7 +206,13 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
     private void goBackHome() {
         Intent myIntent = new Intent(thisActivity, MyProfile.class);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        myIntent.putExtra("id", user.getId());
+        Bundle extras = new Bundle();
+        extras.putInt("id", user.getId());
+        //extras.putString("km", getIntent().getStringExtra("km"));
+        extras.putString("altitude", getIntent().getStringExtra("altitude"));
+        extras.putString("speed", getIntent().getStringExtra("speed"));
+        myIntent.putExtras(extras);
+
         startActivity(myIntent);
         finish();
     }

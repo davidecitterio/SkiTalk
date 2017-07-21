@@ -28,10 +28,13 @@ public class OthersProfile extends AppCompatActivity {
     private TextView userNameSurname;
     private TextView userNickname;
     private TextView userEmail;
+    //private TextView userKm;
+    private TextView userAltitude;
+    private TextView userSpeed;
     private TextView userStatus;
     private CircleImageView userPicture;
     private boolean status;
-    private String lastUpdate;
+    private String lastUpdate, /*km,*/ altitude, speed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +46,15 @@ public class OthersProfile extends AppCompatActivity {
         userStatus = (TextView) findViewById(R.id.others_profile_status);
         userNickname = (TextView) findViewById(R.id.others_profile_nickname);
         userEmail = (TextView) findViewById(R.id.others_profile_email);
+        //userKm = (TextView) findViewById(R.id.others_profile_km);
+        userAltitude = (TextView) findViewById(R.id.others_profile_altitude);
+        userSpeed = (TextView) findViewById(R.id.others_profile_speed);
         userPicture = (CircleImageView) findViewById(R.id.others_profile_picture);
         status = getIntent().getBooleanExtra("status", false);
         lastUpdate = getIntent().getStringExtra("lastUpdate");
+        //km = getIntent().getStringExtra("km");
+        altitude = getIntent().getStringExtra("altitude");
+        speed = getIntent().getStringExtra("speed");
 
         initializeUser();
     }
@@ -101,6 +110,9 @@ public class OthersProfile extends AppCompatActivity {
                 userNameSurname.setText(user.getName()+" "+user.getSurname());
                 userNickname.setText(user.getNickname());
                 userEmail.setText(user.getEmail());
+                //userKm.setText(km);
+                userAltitude.setText(altitude);
+                userSpeed.setText(speed);
                 userPicture.setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
                 if(status) {
                     userStatus.setTextSize(20);

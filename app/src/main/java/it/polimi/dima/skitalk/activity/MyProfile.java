@@ -37,7 +37,9 @@ public class MyProfile extends AppCompatActivity {
     private TextView userNameSurname;
     private TextView userNickname;
     private TextView userEmail;
-    private TextView userPassword;
+    //private TextView userKm;
+    private TextView userAltitude;
+    private TextView userSpeed;
     private CircleImageView userPicture;
 
     @Override
@@ -50,6 +52,9 @@ public class MyProfile extends AppCompatActivity {
         userNickname = (TextView) findViewById(R.id.myprofile_nickname);
         userEmail = (TextView) findViewById(R.id.myprofile_email);
         userPicture = (CircleImageView) findViewById(R.id.myprofile_picture);
+        //userKm = (TextView) findViewById(R.id.others_profile_km);
+        userAltitude = (TextView) findViewById(R.id.others_profile_altitude);
+        userSpeed = (TextView) findViewById(R.id.others_profile_speed);
 
         initializeUser();
     }
@@ -119,6 +124,13 @@ public class MyProfile extends AppCompatActivity {
                 userNameSurname.setText(user.getName()+" "+user.getSurname());
                 userNickname.setText(user.getNickname());
                 userEmail.setText(user.getEmail());
+                String altitude, speed;
+                //km = getIntent().getStringExtra("km");
+                altitude = getIntent().getStringExtra("altitude");
+                speed = getIntent().getStringExtra("speed");
+                //userKm.setText(km);
+                userAltitude.setText(altitude);
+                userSpeed.setText(speed);
                 userPicture.setImageBitmap(Utils.getResizedBitmap(user.getPicture(), 256));
                 progressDialog.dismiss();
             }

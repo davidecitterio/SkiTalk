@@ -526,6 +526,10 @@ public class User {
         return speed;
     }
 
+    public Integer getKm() {
+        return km;
+    }
+
     public Integer getNumOfGroups() {
         return groups.size();
     }
