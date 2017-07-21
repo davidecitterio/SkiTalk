@@ -40,6 +40,13 @@ public class ServiceAudioReceiver extends IntentService {
     }
 
     public void init(){
+        //set user online on server
+        Thread t = Utils.setUserOnline(userId, 1);
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println("Start audio receive service.");
         int maxJitter = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
@@ -116,13 +123,7 @@ public class ServiceAudioReceiver extends IntentService {
         registerReceiver(myReceiver, filter);
 
         userId = intent.getIntExtra("id", 0);
-        //set user online on server
-        Thread t = Utils.setUserOnline(userId, 1);
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         init();
         play();
     }
