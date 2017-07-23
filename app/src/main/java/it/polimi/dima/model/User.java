@@ -330,8 +330,9 @@ public class User {
         else
             groups = loadGroupList(c);
 
-        for(int i = 0; i < groups.length(); i++)
-            this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
+        if(groups != null)
+            for(int i = 0; i < groups.length(); i++)
+                this.groups.add(new Group(groups.getJSONObject(i).getInt("id"), c));
     }
 
     private JSONArray downloadGroupList() {
@@ -339,8 +340,16 @@ public class User {
         Thread t1 = new Thread(groupsRequest);
         t1.start();
         JSONArray groups = groupsRequest.getArrayResponse();
-        saveGroupsList(groups, c);
-        return groups;
+        try {
+            if(groups.getJSONObject(0).getInt("id") != -1) {
+                saveGroupsList(groups, c);
+                return groups;
+            } else
+                return null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static JSONArray loadGroupList(Context c) {

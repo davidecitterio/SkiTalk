@@ -17,9 +17,9 @@ public class HttpRequest implements Runnable{
 
     private String targetURL;
     private String urlParameters;
-    JSONObject res = null;
+    private JSONObject res = null;
     private boolean ready = false;
-    JSONArray jsonArr;
+    private JSONArray jsonArr;
 
 
     public HttpRequest(String url, String par){
