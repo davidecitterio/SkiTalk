@@ -394,6 +394,8 @@ public class CreateGroup_step2 extends Activity implements ActivityWithRecyclerV
         Utils.putBitmapInDiskCache(this, pictureURL, picture);
         //update group list
         JSONArray groupList = User.loadGroupList(this);
+        if(groupList == null)
+            groupList = new JSONArray();
         try {
             groupList.put(new JSONObject("{\"id\":\""+idGroup+"\"}"));
             User.saveGroupsList(groupList, this);

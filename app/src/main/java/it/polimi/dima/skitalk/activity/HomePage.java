@@ -3,6 +3,7 @@ package it.polimi.dima.skitalk.activity;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -170,10 +172,9 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
                     myIntent.putExtras(extras);
                     startActivity(myIntent);
                 } else if (itemId == R.id.logout) {
-                    myIntent = new Intent(thisActivity, Logout.class);
-                    myIntent.putExtra("id", user.getId()); //Optional parameters
-                    startActivity(myIntent);
-                    finish();
+
+                    doLogout();
+
                 } else {
                     dLayout.closeDrawer(GravityCompat.START);
                 }
@@ -192,6 +193,25 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             }
         });
     }
+
+    private void doLogout(){
+        new AlertDialog.Builder(this)
+                .setTitle("SkiTalk")
+                .setMessage("Do you really want to log out?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Intent myIntent;
+                        myIntent = new Intent(thisActivity, Logout.class);
+                        myIntent.putExtra("id", user.getId()); //Optional parameters
+                        startActivity(myIntent);
+                        finish();
+
+                    }})
+                .setNegativeButton(android.R.string.no, null).show();
+    }
+
 
     private void initializeUser() {
         Intent intent = getIntent();

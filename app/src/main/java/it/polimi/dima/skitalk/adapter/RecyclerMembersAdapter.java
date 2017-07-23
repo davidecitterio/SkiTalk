@@ -58,7 +58,10 @@ public class RecyclerMembersAdapter extends
     public void onBindViewHolder(MyViewHolder holder, int position) {
         User u = membersList.get(position);
         int activeGroup = activeGroupMap.get(u.getId());
-        holder.memberName.setText(u.getName());
+        if (u.getName().equals(""))
+            holder.memberName.setText(u.getNickname());
+        else
+            holder.memberName.setText(u.getName());
         if(u.getIsOnline())
             if(u.isTalking()) {
                 holder.memberInfo.setText("is talking...");
