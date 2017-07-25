@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.skitalk.R;
@@ -56,8 +55,6 @@ public class Login extends Activity {
     EditText username,password;
 
     CallbackManager callbackManager;
-
-    TextView tx1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +79,6 @@ public class Login extends Activity {
         signin = (TextView) findViewById(R.id.signin_link);
         username = (EditText)findViewById(R.id.username);
         password = (EditText)findViewById(R.id.password);
-
-        fb_login.setReadPermissions(Arrays.asList("public_profile", "email"));
-
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -252,9 +246,10 @@ public class Login extends Activity {
                         System.out.println("Non ancora registrato");
 
                         //registro nel sistema
-                        HttpRequest requestSignIn = new HttpRequest("http://skitalk.altervista.org/php/addUser.php",
-                                "email=" + params[0].getString("email") + "&nickname=" + params[0].getString("first_name")
-                                         + params[0].getString("last_name") + "&password=" + "password" + "&time=" + System.currentTimeMillis());
+                        HttpRequest requestSignIn = new HttpRequest("http://skitalk.altervista.org/php/addUserFb.php",
+                                "email=" + email + "&nickname=" + params[0].getString("first_name")
+                                         + params[0].getString("last_name") + "&password=" + "password" + "&time=" + System.currentTimeMillis()
+                                + "&name="+ params[0].getString("first_name") + "&surname=" + params[0].getString("last_name"));
 
                         Thread tSignIn = new Thread(requestSignIn);
                         tSignIn.start();
@@ -267,7 +262,6 @@ public class Login extends Activity {
                         }
                         result = true;
                         id = responseSignIn.getInt("id");
-                        return true;
                     }
                     // if correct credentials
                     else {
