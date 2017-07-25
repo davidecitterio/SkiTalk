@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.facebook.login.LoginManager;
+
 import java.io.File;
 
-import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.skitalk.R;
 import it.polimi.dima.skitalk.util.Utils;
 
@@ -33,6 +34,12 @@ public class Logout extends Activity {
         Utils.deleteDir(cacheDirectory);
 
         Utils.setUserOnline(id, 0);
+
+        try{
+        LoginManager.getInstance().logOut();}
+        catch (Exception e){
+            System.out.println("Eccezione logout facebook!");
+        }
 
         //start login activity
         Intent myIntent = new Intent(Logout.this, Login.class);

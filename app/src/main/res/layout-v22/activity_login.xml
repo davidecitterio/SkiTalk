@@ -57,10 +57,22 @@
             android:padding="12dp"
             android:text="Login"/>
 
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button_fb"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:background="@color/primary_dark"
+            android:backgroundTintMode="multiply"
+            android:textColor="@color/icons"
+            android:padding="12dp"
+            android:text="Facebook Login" />
+
         <TextView android:id="@+id/signin_link"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="18dp"
             android:text="@string/no_account"
             android:gravity="center"
             android:textSize="16dip"/>

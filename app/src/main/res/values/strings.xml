@@ -55,4 +55,9 @@
     <string name="offline">offline</string>
 
     <string name="saved_active_group_id">saved_active_group_id</string>
+
+    <string name="facebook_app_id">219483198576816</string>
+    <string name="fb_login_protocol_scheme">fb219483198576816</string>
+
+
 </resources>
