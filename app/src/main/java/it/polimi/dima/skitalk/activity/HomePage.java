@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +60,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
     private Timer timer;
     private String /*km,*/ altitude, speed;
     public static final Object cacheLock = new Object();
-    private boolean newGroup = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,12 +253,6 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
             if (result) {
                 loadDrawerHeader();
                 showGroups();
-                if(getIntent().getBooleanExtra("updateNow", false)) {
-                    newGroup = Utils.updateUsersAndGroups(c, user, ca, cacheLock);
-                    /*if(newGroup)
-                        DISPLAY TOAST OR VIBRATE*/
-
-                }
                 progressDialog.dismiss();
             }
             else
@@ -368,9 +362,7 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                newGroup = Utils.updateUsersAndGroups(c, user, ca, cacheLock);
-                /*if(newGroup)
-                    DISPLAY TOAST OR VIBRATE*/
+                Utils.updateUsersAndGroups(thisActivity, user, ca, cacheLock);
             }
         };
         timer = new Timer();
@@ -422,5 +414,19 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
         super.onPostResume();
         if(dLayout != null)
             dLayout.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        System.out.println("NEW GROUP???? "+intent.getBooleanExtra("updateNow", false));
+        if(intent.getBooleanExtra("updateNow", false)) {
+            Utils.updateUsersAndGroups(thisActivity, user, ca, cacheLock);
+        }
+    }
+
+    public void notifyNewGroup() {
+        Toast.makeText(getBaseContext(),"You added/have been added to a new group!",
+                Toast.LENGTH_LONG).show();
     }
 }

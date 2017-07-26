@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.model.User;
+import it.polimi.dima.skitalk.activity.HomePage;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 
 /**
@@ -74,11 +75,10 @@ public class Utils {
         return encodedImage;
     }
 
-    public static Boolean updateUsersAndGroups(Context c, User user, RecyclerGroupAdapter ca, Object cacheLock) {
-        Boolean newGroup = false;
-        UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(c, user, ca, cacheLock, newGroup);
+    public static UpdateUsersAndGroupsTask updateUsersAndGroups(HomePage home, User user, RecyclerGroupAdapter ca, Object cacheLock) {
+        UpdateUsersAndGroupsTask t = new UpdateUsersAndGroupsTask(home, user, ca, cacheLock);
         t.execute(user.getId());
-        return newGroup;
+        return t;
     }
 
     public static boolean deleteDir(File dir) {

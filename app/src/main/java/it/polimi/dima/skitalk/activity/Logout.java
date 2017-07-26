@@ -35,9 +35,9 @@ public class Logout extends Activity {
 
         Utils.setUserOnline(id, 0);
 
-        try{
-        LoginManager.getInstance().logOut();}
-        catch (Exception e){
+        try {
+            LoginManager.getInstance().logOut();}
+        catch (Exception e) {
             System.out.println("Eccezione logout facebook!");
         }
 

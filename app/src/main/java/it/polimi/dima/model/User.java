@@ -177,7 +177,7 @@ public class User {
             u.put("ip", user.ip);
             u.put("speed", user.speed);
             u.put("altitude", user.altitude);
-            u.put("time", user.update_time);
+            u.put("update_time", user.update_time);
             u.put("latitude", user.coords.getLatitude());
             u.put("longitude", user.coords.getLongitude());
             saveUserInfo(u, c, mainUser);
@@ -257,6 +257,7 @@ public class User {
     }
 
     private void setPicture() {
+        System.out.println("Setting picture");
         File cacheFile = new File(c.getCacheDir(), ""+pictureURL.hashCode());
         // Open input stream to the cache file
         FileInputStream fis = null;
@@ -378,7 +379,7 @@ public class User {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
     }

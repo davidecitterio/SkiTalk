@@ -44,7 +44,7 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
     private MyProfileEdit thisActivity = this;
     private User user;
     private EditText userNameView, userSurnameView, userNicknameView, userEmailView, userPasswordView;
-    private String userName, userSurname, userNickname, userEmail;
+    private String userName, userSurname, userNickname, userEmail, newPictureUrl;
     private boolean userPictureEdit, updateStrings;
     private CircleImageView userPictureView;
     private Bitmap userPicture;
@@ -153,7 +153,7 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
             System.out.println("URL: "+response.toString());
             System.out.println("Picture uploaded successfully.");
 
-            user.setPictureURL(response.getString("address"));
+            newPictureUrl = response.getString("address");
 
             processCacheAndFinish();
         } catch (JSONException e) {
@@ -171,11 +171,10 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
             //wait request1 response
             JSONObject user = dataRequest.getResponse();
             //save new image
-            String pictureUrl = this.user.getPictureURL();
-            Utils.putBitmapInDiskCache(thisActivity, pictureUrl, userPicture);
+            Utils.putBitmapInDiskCache(thisActivity, newPictureUrl, userPicture);
             //save user file
             try {
-                user.put("picture", pictureUrl);
+                user.put("picture", newPictureUrl);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -192,10 +191,9 @@ public class MyProfileEdit extends AppCompatActivity implements Response.Listene
             File cacheFile = new File(thisActivity.getCacheDir(), ""+user.getPictureURL().hashCode());
             cacheFile.delete();
             //save new image
-            String pictureUrl = this.user.getPictureURL();
-            Utils.putBitmapInDiskCache(thisActivity, pictureUrl, userPicture);
+            Utils.putBitmapInDiskCache(thisActivity, newPictureUrl, userPicture);
             //save new pictureURL info in cache
-            user.setPictureURL(pictureUrl);
+            user.setPictureURL(newPictureUrl);
             User.saveUserInfo(user, thisActivity, true);
         }
 

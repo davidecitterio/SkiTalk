@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -61,6 +62,7 @@ public class Login extends Activity {
         super.onCreate(savedInstanceState);
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         //REQUEST PERMISSION FOR LOCATION IN MAPS
         ActivityCompat.requestPermissions(this,

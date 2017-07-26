@@ -284,6 +284,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
                         t.start();
 
                         group.clearGroupCache();
+                        newGroup = true;
                         goBackToHome();
 
                     }})

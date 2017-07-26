@@ -11,10 +11,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Map;
 
 import it.polimi.dima.skitalk.util.Utils;
@@ -29,7 +25,7 @@ public class ImageUploader implements Runnable {
     private Context c;
     private String address;
     private Map<String, String> parameters;
-    Response.Listener<String> listener;
+    private Response.Listener<String> listener;
 
     public ImageUploader(Context c, Bitmap userPicture, String address, Map<String, String> parameters, Response.Listener<String> listener) {
         this.userPicture = userPicture;

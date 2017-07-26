@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +16,7 @@ import it.polimi.dima.model.Group;
 import it.polimi.dima.model.HttpRequest;
 import it.polimi.dima.model.User;
 import it.polimi.dima.skitalk.R;
+import it.polimi.dima.skitalk.activity.HomePage;
 import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 
 /**
@@ -23,20 +25,19 @@ import it.polimi.dima.skitalk.adapter.RecyclerGroupAdapter;
 
 public class UpdateUsersAndGroupsTask extends AsyncTask<Integer, Void, Boolean> {
     private Context c;
+    private HomePage home;
     private User user;
     private RecyclerGroupAdapter ca;
     private final Object cacheLock;
-    private boolean needUpdate;
-    private Boolean newGroup;
+    private boolean needUpdate, newGroup = false;
 
-    public UpdateUsersAndGroupsTask(Context c, User user, RecyclerGroupAdapter ca, Object cacheLock,
-                                    Boolean newGroup) {
-        this.c = c;
+    public UpdateUsersAndGroupsTask(HomePage home, User user, RecyclerGroupAdapter ca, Object cacheLock) {
+        this.c = home.getApplicationContext();
+        this.home = home;
         this.ca = ca;
         this.user = user;
         this.cacheLock = cacheLock;
         needUpdate = false;
-        this.newGroup = newGroup;
     }
 
     @Override
@@ -57,10 +58,28 @@ public class UpdateUsersAndGroupsTask extends AsyncTask<Integer, Void, Boolean> 
             //update and save groups list
             JSONArray oldGroupsList = User.loadGroupList(c);
             JSONArray newGroupsList = groupListRequest.getArrayResponse();
-            boolean needListUpdate = !areEquals(oldGroupsList, newGroupsList);
-            needUpdate = needListUpdate;
-            if(needListUpdate)
-                User.saveGroupsList(newGroupsList, c);
+            try {
+                if(newGroupsList.getJSONObject(0).getInt("id") != -1) {
+                    if (oldGroupsList != null)
+                        needUpdate = !areEquals(oldGroupsList, newGroupsList);
+                    else
+                        needUpdate = true;
+                    if(needUpdate) {
+                        newGroup = true;
+                        User.saveGroupsList(newGroupsList, c);
+                    }
+                } else if (oldGroupsList != null) {
+                    needUpdate = true;
+                    //delete all groups in the old list (the new is empty) and group list
+                    for(int i = 0; i < oldGroupsList.length(); i++) {
+                        (new Group(oldGroupsList.getJSONObject(0).getInt("id"), c)).clearGroupCache();
+                    }
+                    File file = new File(c.getCacheDir(), "SkiTalkGroupListInfo");
+                    file.delete();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             //update and save groups
             JSONArray groupsNews = groupNewsRequest.getArrayResponse();
@@ -98,9 +117,10 @@ public class UpdateUsersAndGroupsTask extends AsyncTask<Integer, Void, Boolean> 
         if(needUpdate) {
             user.updateGroups();
             ca.notifyDataSetChanged();
-            newGroup = true;
-        } else
-            newGroup = false;
+        }
+
+        if(newGroup)
+            home.notifyNewGroup();
     }
 
     private HttpRequest runRequestGroupList(int id) {
