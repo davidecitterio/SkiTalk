@@ -68,7 +68,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
     private AudioRecord record =null;
     private boolean isPlaying=false;
     private Socket sendAudio;
-    private final String url = "87.4.149.39";
+    private final String url = "87.2.99.227";
     private final int port = 4544;
     private CoordinatorLayout snackbarCoordinatorLayout;
     RecordAndPlay recordAndPlay;
@@ -352,6 +352,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
         v0.vibrate(50);
         record.startRecording();
         isPlaying=true;
+        System.out.println("tono inizio");
     }
 
     public void onUp(){
@@ -365,6 +366,7 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
         v1.vibrate(50);
         record.stop();
         isPlaying=false;
+        System.out.println("tono fine");
     }
 
     @Override

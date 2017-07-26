@@ -129,7 +129,7 @@ public class Login extends Activity {
                                 });
 
                         Bundle parameters = new Bundle();
-                        parameters.putString("fields", "id,first_name,last_name,middle_name,email");
+                        parameters.putString("fields", "id,email,first_name,last_name,middle_name");
                         request.setParameters(parameters);
                         request.executeAsync();
 
@@ -234,6 +234,9 @@ public class Login extends Activity {
                 //http request to the server
                 String email = params[0].getString("email");
 
+                if (email == null){
+                    email = params[0].getString("first_name")+"."+params[0].getString("last_name")+"@st.it";
+                }
                 System.out.println("Email è: " + email);
 
                 HttpRequest request = new HttpRequest("http://skitalk.altervista.org/php/checkFacebook.php",
