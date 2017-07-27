@@ -375,17 +375,24 @@ public class GroupActivity extends AppCompatActivity implements MediaButtonInten
             @Override
             public void run() {
                 if (firstClick){
-                    HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
-                    Thread t = new Thread(groupsRequest);
-                    t.start();
+                    try {
+                        rec.setBackgroundResource(R.drawable.ic_talk_on);
+                        Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-                    tone(1000, 100, 1.0);
-                    rec.setBackgroundResource(R.drawable.ic_talk_on);
-                    Vibrator v0 = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    v0.vibrate(50);
-                    record.startRecording();
-                    isPlaying=true;
-                    firstClick = false;
+                        record.startRecording();
+
+                        HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/setGroupBusy.php", "idUser="+userId+"&idGroup="+groupId);
+                        Thread t = new Thread(groupsRequest);
+                        t.start();
+                        tone(1000, 100, 1.0);
+                        v0.vibrate(50);
+
+                        isPlaying = true;
+                        firstClick = false;
+                    }
+                    catch(Exception e){
+                        System.out.println("Errore in record start.");
+                    }
                 }
                 else{
                     HttpRequest groupsRequest = new HttpRequest("http://skitalk.altervista.org/php/unsetUserTalking.php", "idUser="+userId+"&idGroup="+groupId);
