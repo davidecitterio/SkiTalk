@@ -418,15 +418,13 @@ public class HomePage extends AppCompatActivity implements SearchView.OnQueryTex
 
     @Override
     protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        System.out.println("NEW GROUP???? "+intent.getBooleanExtra("updateNow", false));
         if(intent.getBooleanExtra("updateNow", false)) {
             Utils.updateUsersAndGroups(thisActivity, user, ca, cacheLock);
         }
     }
 
     public void notifyNewGroup() {
-        Toast.makeText(getBaseContext(),"You added/have been added to a new group!",
+        Toast.makeText(getBaseContext(),"The group list has changed!",
                 Toast.LENGTH_LONG).show();
     }
 }
